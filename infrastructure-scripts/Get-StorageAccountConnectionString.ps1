@@ -1,10 +1,10 @@
 <#
 
 .SYNOPSIS
-Return either the Primary or Seconday connection String to the Consig Storage account and Write to a VSTS variable.
+Return either the Primary or Secondary connection String to the Consig Storage account and Write to a VSTS variable.
 
 .DESCRIPTION
-Return either the Primary or Seconday connection String to the Consig Storage account and Write to a VSTS variable.
+Return either the Primary or Secondary connection String to the Consig Storage account and Write to a VSTS variable.
 
 .PARAMETER Name
 The name of the Storage Account
@@ -13,13 +13,13 @@ The name of the Storage Account
 Boolean Switch to Return Secondary String
 
 .EXAMPLE
-.\Get-GetStorageAccountKey.ps1  -Name stracc
+.\Get-StorageAccountConnectionString.ps1  -Name stracc
 
 .EXAMPLE
-.\Get-GetStorageAccountKey.ps1 -Name stracc -useSecondary
+.\Get-StorageAccountConnectionString.ps1 -Name stracc -useSecondary
 
 .EXAMPLE
-.\Get-GetStorageAccountKey.ps1  -Name stracc -OutputVariable "CustomOutputVariable"
+.\Get-StorageAccountConnectionString.ps1  -Name stracc -OutputVariable "CustomOutputVariable"
 
 #>
 
