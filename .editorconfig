@@ -1,6 +1,7 @@
 # Default .editorconfig
 # https://gds-way.cloudapps.digital/manuals/programming-languages/editorconfig
 # https://github.com/PowerShell/PowerShellEditorServices/blob/master/.editorconfig
+
 root = true
 
 [*.{json,yml}]
