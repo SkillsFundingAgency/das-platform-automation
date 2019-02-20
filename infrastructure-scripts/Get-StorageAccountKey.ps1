@@ -28,10 +28,11 @@ Param(
     [ValidateNotNullOrEmpty()]
     [String]$Name,
     [Parameter(Mandatory = $false)]
-    [switch]$UseSecondary),
+    [switch]$UseSecondary,
     [Parameter(Mandatory = $true)]
     [ValidateNotNullOrEmpty()]
-    [String]$OutputVariable = "StorageConnectionString"
+	[String]$OutputVariable = "StorageConnectionString"
+)
 
 try {
 
