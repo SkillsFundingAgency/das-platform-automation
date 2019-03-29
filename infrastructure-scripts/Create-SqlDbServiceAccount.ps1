@@ -119,16 +119,11 @@ else {
   $aecure = $AccountPassword  |ConvertTo-SecureString -AsPlainText -Force 
   Set-AzureKeyVaultSecret -VaultName $KeyVaultName -Name $secretName -SecretValue $aecure 
   $query = "CREATE USER `"$SqlServiceAccountName`"  WITH PASSWORD = `'$AccountPassword`' "
-  Write-Host "Would Create new user with password of $AccountPassword "
-  $userCreate = Invoke-SqlQuery -query $query 
-  Write-Host "$UserCreate"
-  $query2 = "ALTER ROLE db_datareader ADD MEMBER `"$SqlServiceAccountName`" " 
-  Write-Host "$query2"
+ Invoke-SqlQuery -query $query 
+  $query2 = "ALTER ROLE db_datareader ADD MEMBER `"$SqlServiceAccountName`" "
   Invoke-SqlQuery -query $query2
   $query3 = "ALTER ROLE db_datawriter ADD MEMBER `"$SqlServiceAccountName`" "
-  Write-Host "$query3"
   Invoke-SqlQuery -query $query3
-  Write-Host "$query4"
   $query4 = "GRANT EXECUTE TO `"$SqlServiceAccountName`" "
   Invoke-SqlQuery -query $query4
 }
