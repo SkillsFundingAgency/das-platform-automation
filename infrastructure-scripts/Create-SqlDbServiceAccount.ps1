@@ -50,7 +50,7 @@ param
   [String] $AzureFirewallName = "AzureWebAppFirewall",
   [String] [Parameter(Mandatory = $true)] $DataBaseName,
   [String] [Parameter(Mandatory = $true)] $SqlUserName,
-  [String] [Parameter(Mandatory = $true)] $SqlPassword,
+  [SecureString] [Parameter(Mandatory = $true)] $SqlPassword,
   [String] [Parameter(Mandatory = $true)] $SqlServiceAccountName,
   [String] [Parameter(Mandatory = $true)] $SQLResourceGroup,
   [String] [Parameter(Mandatory = $true)] $Enviroment,
@@ -85,6 +85,7 @@ function Remove-AzureSQLServerFirewallRule {
     }
 }
 
+try {
 $AccountExistQuery = "SELECT * 
 FROM sys.database_principals
 WHERE name = '$SqlServiceAccountName'"
@@ -128,5 +129,11 @@ else {
   Invoke-SqlQuery -query $query4
 }
 
+Write-Host "##vso[task.setvariable variable=SQLServerServiceAccountUsername]$SqlServiceAccountNames"
+Write-Host "##vso[task.setvariable variable=secretSauce;issecret=true]$AccountPassword"
 Remove-AzureSQLServerFirewallRule
- 
+}
+catch {
+  throw "$_"
+}
+
