@@ -28,8 +28,8 @@ jobs:
     workspace:
       clean: all
     steps:
-      - task: richardfennellBM.BM-VSTS-PesterRunner-Task.Pester-Task.Pester@8
-        displayName: 'Pester Test Runner'
+      - task: petergroenewegen.PeterGroenewegen-Xpirit-Vsts-Build-Pester.Xpirit-Vsts-Build-Pester.Pester Powershell unittest@2
+        displayName: Pester Test Runner
         inputs:
           scriptFolder: '$(Build.SourcesDirectory)\Tests\*'
       - task: PublishTestResults@2
