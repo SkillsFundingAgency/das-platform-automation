@@ -29,6 +29,7 @@ jobs:
           npm install eclint
           node ./node_modules/eclint/bin/eclint.js check
         displayName: "Validate editorconfig"
+        workingDirectory: $(System.DefaultWorkingDirectory)
 
   - job: "Linux_PSCore_Build_DAS_Continuous_Integration"
     pool:
@@ -53,3 +54,4 @@ jobs:
           npm install eclint
           node ./node_modules/eclint/bin/eclint.js check
         displayName: "Validate editorconfig"
+        workingDirectory: $(System.DefaultWorkingDirectory)
