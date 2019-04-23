@@ -1,0 +1,57 @@
+name: $(GitVersion.FullSemVer)
+
+trigger:
+  batch: true
+  branches:
+    include:
+      - "*"
+
+pr: none
+
+workspace:
+  clean: all
+
+jobs:
+  - job: "Windows_PS51_Build_Continuous_Integration_02"
+    pool: "Continuous Integration 02 - SSD - 160ACU"
+    steps:
+      - task: GitVersion@4
+        displayName: "Run GitVersion"
+      - task: richardfennellBM.BM-VSTS-PesterRunner-Task.Pester-Task.Pester@8
+        displayName: 'Pester Test Runner'
+        inputs:
+          scriptFolder: '$(Build.SourcesDirectory)\Tests\*'
+      - task: PublishTestResults@2
+        displayName: 'Publish Test Results **\TEST-*.xml'
+        inputs:
+          testResultsFormat: NUnit
+          testResultsFiles: '**\TEST-*.xml'
+        condition: succeededOrFailed()
+
+  - job: "Linux_PSCore_Build_DAS_Continuous_Integration"
+    pool: "DAS - Continuous Integration"
+    steps:
+      - task: richardfennellBM.BM-VSTS-PesterRunner-Task.Pester-Task.Pester@8
+        displayName: 'Pester Test Runner'
+        inputs:
+          scriptFolder: '$(Build.SourcesDirectory)\Tests\*'
+      - task: PublishTestResults@2
+        displayName: "Publish Pester test results"
+        inputs:
+          testRunner: "NUnit"
+          testResultsFiles: '**/Test-Pester.XML'
+        condition: succeededOrFailed()
+
+  - job: "Windows_PS51_Deploy_DAS_Continuous_Deployment"
+    pool: "DAS - Continuous Deployment"
+    steps:
+      - task: richardfennellBM.BM-VSTS-PesterRunner-Task.Pester-Task.Pester@8
+        displayName: 'Pester Test Runner'
+        inputs:
+          scriptFolder: '$(Build.SourcesDirectory)\Tests\*'
+      - task: PublishTestResults@2
+        displayName: "Publish Pester test results"
+        inputs:
+          testRunner: "NUnit"
+          testResultsFiles: '**/Test-Pester.XML'
+        condition: succeededOrFailed()
