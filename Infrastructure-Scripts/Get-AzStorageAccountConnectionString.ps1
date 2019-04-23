@@ -32,52 +32,49 @@
 
 	Returns the Primary Storage Account connection string and specifies a custom output variable to be used in VSTS.
 #>
-Function Get-AzStorageAccountConnectionString {
 
-	[CmdletBinding()]
-	Param(
-		[Parameter(Mandatory = $true)]
-		[ValidateNotNullOrEmpty()]
-		[String]$ResourceGroup,
-		[Parameter(Mandatory = $true)]
-		[ValidateNotNullOrEmpty()]
-		[String]$StorageAccount,
-		[Parameter(Mandatory = $false)]
-		[switch]$UseSecondaryKey,
-		[Parameter(Mandatory = $true)]
-		[ValidateNotNullOrEmpty()]
-		[String]$OutputVariable = "StorageConnectionString"
-	)
+[CmdletBinding()]
+Param(
+	[Parameter(Mandatory = $true)]
+	[ValidateNotNullOrEmpty()]
+	[String]$ResourceGroup,
+	[Parameter(Mandatory = $true)]
+	[ValidateNotNullOrEmpty()]
+	[String]$StorageAccount,
+	[Parameter(Mandatory = $false)]
+	[switch]$UseSecondaryKey,
+	[Parameter(Mandatory = $true)]
+	[ValidateNotNullOrEmpty()]
+	[String]$OutputVariable = "StorageConnectionString"
+)
 
-	try{
-		# --- Check if the Resource Group exists in the subscription.
-		$resourceGroupExists = Get-AzResourceGroup $ResourceGroup
-		if (!$resourceGroupExists) {
-			throw "Resource Group $ResourceGroup does not exist."
-		}
-
-		# --- Check if Storage Account exists in the subscription.
-		$storageAccountExists = Get-AzStorageAccount -ResourceGroupName $ResourceGroup -Name $StorageAccount -ErrorAction SilentlyContinue
-		if (!$storageAccountExists) {
-			throw "Storage Account $StorageAccount does not exist."
-		}
-
-		# --- Return the respective Storage Account connection string.
-		if ($UseSecondaryKey.IsPresent) {
-			$key = (Get-AzStorageAccountKey -ResourceGroupName $ResourceGroup -Name $StorageAccount)[1].Value
-			$connectionString = "DefaultEndpointsProtocol=https;AccountName=$($StorageAccount);AccountKey=$($key);EndpointSuffix=core.windows.net"
-		}
-		else {
-			$key = (Get-AzStorageAccountKey -ResourceGroupName $ResourceGroup -Name $StorageAccount)[0].Value
-			$connectionString = "DefaultEndpointsProtocol=https;AccountName=$($StorageAccount);AccountKey=$($key);EndpointSuffix=core.windows.net"
-		}
-
-		# --- Set the VSTS output variable using the returned connection string.
-		Write-Output ("##vso[task.setvariable variable=$($OutputVariable);issecret=true]$($connectionString)")
+try{
+	# --- Check if the Resource Group exists in the subscription.
+	$resourceGroupExists = Get-AzResourceGroup $ResourceGroup
+	if (!$resourceGroupExists) {
+		throw "Resource Group $ResourceGroup does not exist."
 	}
 
-	catch {
-		throw "$_"
+	# --- Check if Storage Account exists in the subscription.
+	$storageAccountExists = Get-AzStorageAccount -ResourceGroupName $ResourceGroup -Name $StorageAccount -ErrorAction SilentlyContinue
+	if (!$storageAccountExists) {
+		throw "Storage Account $StorageAccount does not exist."
 	}
 
+	# --- Return the respective Storage Account connection string.
+	if ($UseSecondaryKey.IsPresent) {
+		$key = (Get-AzStorageAccountKey -ResourceGroupName $ResourceGroup -Name $StorageAccount)[1].Value
+		$connectionString = "DefaultEndpointsProtocol=https;AccountName=$($StorageAccount);AccountKey=$($key);EndpointSuffix=core.windows.net"
+	}
+	else {
+		$key = (Get-AzStorageAccountKey -ResourceGroupName $ResourceGroup -Name $StorageAccount)[0].Value
+		$connectionString = "DefaultEndpointsProtocol=https;AccountName=$($StorageAccount);AccountKey=$($key);EndpointSuffix=core.windows.net"
+	}
+
+	# --- Set the VSTS output variable using the returned connection string.
+	Write-Output ("##vso[task.setvariable variable=$($OutputVariable);issecret=true]$($connectionString)")
+}
+
+catch {
+	throw "$_"
 }
