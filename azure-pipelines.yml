@@ -3,7 +3,7 @@ trigger:
   branches:
     include:
       - "*"
-  
+
 pr: none
 
 jobs:
@@ -12,15 +12,14 @@ jobs:
     workspace:
       clean: all
     steps:
-      - task: richardfennellBM.BM-VSTS-PesterRunner-Task.Pester-Task.Pester@8
-        displayName: 'Pester Test Runner'
+      - task: PowerShell@2
         inputs:
-          scriptFolder: '$(Build.SourcesDirectory)\Tests\*'
+          filePath: 'Tests/Invoke-Tests.ps1'
       - task: PublishTestResults@2
-        displayName: 'Publish Test Results **\TEST-*.xml'
+        displayName: 'Publish Test Results **/TEST-*.xml'
         inputs:
           testResultsFormat: NUnit
-          testResultsFiles: '**\TEST-*.xml'
+          testResultsFiles: '**/TEST-*.xml'
         condition: succeededOrFailed()
 
   - job: "Linux_PSCore_Build_DAS_Continuous_Integration"
@@ -28,29 +27,13 @@ jobs:
     workspace:
       clean: all
     steps:
-      - task: petergroenewegen.PeterGroenewegen-Xpirit-Vsts-Build-Pester.Xpirit-Vsts-Build-Pester.Pester Powershell unittest@2
-        displayName: Pester Test Runner
+      - task: PowerShell@2
         inputs:
-          scriptFolder: '$(Build.SourcesDirectory)\Tests\*'
+          filePath: 'Tests/Invoke-Tests.ps1'
+          pwsh: true
       - task: PublishTestResults@2
-        displayName: "Publish Pester test results"
+        displayName: 'Publish Test Results **/TEST-*.xml'
         inputs:
-          testRunner: "NUnit"
-          testResultsFiles: '**/Test-Pester.XML'
-        condition: succeededOrFailed()
-
-  - job: "Windows_PS51_Deploy_DAS_Continuous_Deployment"
-    pool: "DAS - Continuous Deployment"
-    workspace:
-      clean: all
-    steps:
-      - task: richardfennellBM.BM-VSTS-PesterRunner-Task.Pester-Task.Pester@8
-        displayName: 'Pester Test Runner'
-        inputs:
-          scriptFolder: '$(Build.SourcesDirectory)\Tests\*'
-      - task: PublishTestResults@2
-        displayName: "Publish Pester test results"
-        inputs:
-          testRunner: "NUnit"
-          testResultsFiles: '**/Test-Pester.XML'
+          testResultsFormat: NUnit
+          testResultsFiles: '**/TEST-*.xml'
         condition: succeededOrFailed()
