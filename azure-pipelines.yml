@@ -1,22 +1,17 @@
-name: $(GitVersion.FullSemVer)
-
 trigger:
   batch: true
   branches:
     include:
       - "*"
-
+  
 pr: none
-
-workspace:
-  clean: all
 
 jobs:
   - job: "Windows_PS51_Build_Continuous_Integration_02"
     pool: "Continuous Integration 02 - SSD - 160ACU"
+    workspace:
+      clean: all
     steps:
-      - task: GitVersion@4
-        displayName: "Run GitVersion"
       - task: richardfennellBM.BM-VSTS-PesterRunner-Task.Pester-Task.Pester@8
         displayName: 'Pester Test Runner'
         inputs:
@@ -30,6 +25,8 @@ jobs:
 
   - job: "Linux_PSCore_Build_DAS_Continuous_Integration"
     pool: "DAS - Continuous Integration"
+    workspace:
+      clean: all
     steps:
       - task: richardfennellBM.BM-VSTS-PesterRunner-Task.Pester-Task.Pester@8
         displayName: 'Pester Test Runner'
@@ -44,6 +41,8 @@ jobs:
 
   - job: "Windows_PS51_Deploy_DAS_Continuous_Deployment"
     pool: "DAS - Continuous Deployment"
+    workspace:
+      clean: all
     steps:
       - task: richardfennellBM.BM-VSTS-PesterRunner-Task.Pester-Task.Pester@8
         displayName: 'Pester Test Runner'
