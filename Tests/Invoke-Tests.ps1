@@ -34,7 +34,7 @@ if ($TestType -ne 'All') {
 }
 
 # Install required modules
-$RequiredModules = @("Pester", "PSScriptAnalyzer", "Az")
+$RequiredModules = @("Pester", "PSScriptAnalyzer")
 foreach ($Module in $RequiredModules) {
     if (!(Get-Module -Name $Module -ListAvailable)) {
         Write-Output "Installing $Module"
