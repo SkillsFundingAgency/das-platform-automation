@@ -1,15 +1,13 @@
 # --- Import configuration
 $config = Get-Content $PSScriptRoot\..\Tests\Unit.Tests.Config.json -Raw | ConvertFrom-Json
-
-# --- Import the Get-AzStorageAccountConnectionString function
-Import-Module $PSScriptRoot\..\Infrastructure-Scripts\Get-AzStorageAccountConnectionString.ps1 -Force
+Set-Location $PSScriptRoot\..\Infrastructure-Scripts\
 
 Describe "Get-AzStorageAccountConnectionString Unit Tests" -Tags @("Unit") {
 
     Context "Resource Group does not exist" {
         It "The specified Resource Group was not found in the subscription, throw an error"{
             Mock Get-AzResourceGroup -MockWith { Return $null }
-            { Get-AzStorageAccountConnectionString -ResourceGroup $config.resourceGroupName -StorageAccount $config.storageAccountName -OutputVariable $config.outputVariable  } | Should throw "Resource Group $($config.resourceGroupName) does not exist."
+            { ./Get-AzStorageAccountConnectionString -ResourceGroup $config.resourceGroupName -StorageAccount $config.storageAccountName -OutputVariable $config.outputVariable  } | Should throw "Resource Group $($config.resourceGroupName) does not exist."
             Assert-MockCalled -CommandName 'Get-AzResourceGroup' -Times 1 -Scope It
         }
     }
@@ -21,7 +19,7 @@ Describe "Get-AzStorageAccountConnectionString Unit Tests" -Tags @("Unit") {
                 return $resourceGroupExist
             }
             Mock Get-AzStorageAccount -MockWith { Return $null }
-            { Get-AzStorageAccountConnectionString -ResourceGroup $config.resourceGroupName -StorageAccount $config.storageAccountName -OutputVariable $config.outputVariable  } | Should throw "Storage Account $($config.storageAccountName) does not exist."
+            { ./Get-AzStorageAccountConnectionString -ResourceGroup $config.resourceGroupName -StorageAccount $config.storageAccountName -OutputVariable $config.outputVariable  } | Should throw "Storage Account $($config.storageAccountName) does not exist."
             Assert-MockCalled -CommandName 'Get-AzResourceGroup' -Times 1 -Scope It
             Assert-MockCalled -CommandName 'Get-AzStorageAccount' -Times 1 -Scope It
         }
@@ -48,7 +46,7 @@ Describe "Get-AzStorageAccountConnectionString Unit Tests" -Tags @("Unit") {
 		}
 
         It "Primary Storage Account Key is returned and environment output provided"{
-			$ConnectionString = Get-AzStorageAccountConnectionString -ResourceGroup $config.resourceGroupName -StorageAccount $config.storageAccountName -OutputVariable $config.outputVariable
+			$ConnectionString = ./Get-AzStorageAccountConnectionString -ResourceGroup $config.resourceGroupName -StorageAccount $config.storageAccountName -OutputVariable $config.outputVariable
 			$ConnectionString | Should Be "##vso[task.setvariable variable=$($config.outputVariable);issecret=true]DefaultEndpointsProtocol=https;AccountName=$($config.storageAccountName);AccountKey=key1;EndpointSuffix=core.windows.net"
 			Assert-MockCalled -CommandName 'Get-AzResourceGroup' -Times 1 -Scope It
 			Assert-MockCalled -CommandName 'Get-AzStorageAccount' -Times 1 -Scope It
@@ -56,7 +54,7 @@ Describe "Get-AzStorageAccountConnectionString Unit Tests" -Tags @("Unit") {
 		}
 
         It "Secondary Storage Account Key is returned and environment output provided"{
-			$ConnectionString = Get-AzStorageAccountConnectionString -ResourceGroup $config.resourceGroupName -StorageAccount $config.storageAccountName -OutputVariable $config.outputVariable -UseSecondaryKey
+			$ConnectionString = ./Get-AzStorageAccountConnectionString -ResourceGroup $config.resourceGroupName -StorageAccount $config.storageAccountName -OutputVariable $config.outputVariable -UseSecondaryKey
 			$ConnectionString | Should Be "##vso[task.setvariable variable=$($config.outputVariable);issecret=true]DefaultEndpointsProtocol=https;AccountName=$($config.storageAccountName);AccountKey=key2;EndpointSuffix=core.windows.net"
 			Assert-MockCalled -CommandName 'Get-AzResourceGroup' -Times 1 -Scope It
 			Assert-MockCalled -CommandName 'Get-AzStorageAccount' -Times 1 -Scope It
