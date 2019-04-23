@@ -58,7 +58,8 @@ Describe "Should have a unit test file" -Tags @("Quality")  {
         $TestName = "$($Script.BaseName).Tests.ps1"
         Context "$($Script.BaseName)" {
             It "Should have an associated unit test called UTxxx.$TestName" {
-                $TestFile = Get-Item -Path "./*$TestName" -ErrorAction SilentlyContinue
+                $TestFile = Get-Item -Path "$PSScriptRoot/UT*$TestName" -ErrorAction SilentlyContinue
+				$TestFile
                 $TestFile | Should Not Be $null
             }
         }
