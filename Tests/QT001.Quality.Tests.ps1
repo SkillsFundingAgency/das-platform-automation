@@ -57,8 +57,8 @@ Describe "Should have a unit test file" -Tags @("Quality")  {
     foreach ($Script in $Scripts) {
         $TestName = "$($Script.BaseName).Tests.ps1"
         Context "$($Script.BaseName)" {
-            It "Should have an associated unit test called $TestName" {
-                $TestFile = Get-Item -Path "$PSScriptRoot\..\tests\*$TestName" -ErrorAction SilentlyContinue
+            It "Should have an associated unit test called UTxxx.$TestName" {
+                $TestFile = Get-Item -Path "./*$TestName" -ErrorAction SilentlyContinue
                 $TestFile | Should Not Be $null
             }
         }

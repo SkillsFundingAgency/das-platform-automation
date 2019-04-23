@@ -8,7 +8,7 @@ pr: none
 
 jobs:
   - job: "Windows_PS51_Build_Continuous_Integration_02"
-    pool: "Continuous Integration 02 - SSD - 160ACU"
+    pool: "DAS - Continuous Deployment"
     workspace:
       clean: all
     steps:
