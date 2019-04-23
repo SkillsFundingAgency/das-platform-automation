@@ -1,6 +1,6 @@
 {
-    "location": "West Europe",
-    "resourceGroupName": "das-test-pester-rg",
-    "storageAccountName": "dastestpestersa",
-    "outputVariable": "StorageConnectionString"
+  "location": "West Europe",
+  "resourceGroupName": "das-test-pester-rg",
+  "storageAccountName": "dastestpestersa",
+  "outputVariable": "StorageConnectionString"
 }
