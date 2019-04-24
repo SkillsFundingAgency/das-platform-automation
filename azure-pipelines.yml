@@ -16,6 +16,11 @@ jobs:
     workspace:
       clean: all
     steps:
+      - script: |
+          npm install eclint
+          node ./node_modules/eclint/bin/eclint.js check
+        displayName: "Validate editorconfig"
+        workingDirectory: $(System.DefaultWorkingDirectory)
       - task: PowerShell@2
         inputs:
           filePath: "Tests/Invoke-Tests.ps1"
@@ -25,11 +30,6 @@ jobs:
           testResultsFormat: NUnit
           testResultsFiles: "**/TEST-*.xml"
         condition: succeededOrFailed()
-      - script: |
-          npm install eclint
-          node ./node_modules/eclint/bin/eclint.js check
-        displayName: "Validate editorconfig"
-        workingDirectory: $(System.DefaultWorkingDirectory)
 
   - job: "Linux_PSCore_Build_DAS_Continuous_Integration"
     pool:
@@ -40,6 +40,11 @@ jobs:
     workspace:
       clean: all
     steps:
+      - script: |
+          npm install eclint
+          node $(npm root)/eclint/bin/eclint.js check $(System.DefaultWorkingDirectory)
+        displayName: "Validate editorconfig"
+        workingDirectory: $(System.DefaultWorkingDirectory)
       - task: PowerShell@2
         inputs:
           filePath: "Tests/Invoke-Tests.ps1"
@@ -50,8 +55,3 @@ jobs:
           testResultsFormat: NUnit
           testResultsFiles: "**/TEST-*.xml"
         condition: succeededOrFailed()
-      - script: |
-          npm install eclint
-          node $(npm root)/eclint/bin/eclint.js check $(System.DefaultWorkingDirectory)
-        displayName: "Validate editorconfig"
-        workingDirectory: $(System.DefaultWorkingDirectory)
