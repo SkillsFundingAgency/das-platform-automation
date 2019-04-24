@@ -101,9 +101,3 @@ Mock class constructors where applicable. This will test changes to classes.
 | -- | -- |
 | The PowerShell Best Practices and Style Guide | https://poshcode.gitbooks.io/powershell-practice-and-style/ |
 |  | |
-
-
-
-
-
-
