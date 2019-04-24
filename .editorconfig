@@ -9,10 +9,10 @@ indent_style = space
 trim_trailing_whitespace = true
 charset = utf-8
 insert_final_newline = true
+end_of_line = lf
 
 [*.{json,yml}]
 indent_size = 2
-end_of_line = lf
 
 [*.{ps1,psm1,psd1}]
 indent_size = 4
