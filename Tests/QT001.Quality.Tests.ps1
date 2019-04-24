@@ -1,6 +1,6 @@
 $Scripts = Get-ChildItem -Path $PSScriptRoot\..\Infrastructure-Scripts\*.ps1 -File
 
-Describe "Script documentation tests" -Tags @("Quality")  {
+Describe "Script documentation tests" -Tags @("Quality") {
 
     foreach ($Script in $Scripts) {
 
@@ -52,7 +52,7 @@ Describe "Script code quality tests" -Tags @("Quality") {
     }
 }
 
-Describe "Should have a unit test file" -Tags @("Quality")  {
+Describe "Should have a unit test file" -Tags @("Quality") {
 
     foreach ($Script in $Scripts) {
         $TestName = "$($Script.BaseName).Tests.ps1"
