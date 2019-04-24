@@ -9,5 +9,6 @@
   "powershell.codeFormatting.ignoreOneLineBlock": false,
   "powershell.codeFormatting.useCorrectCasing": true,
   "powershell.codeFormatting.preset": "Custom",
-  "powershell.codeFormatting.alignPropertyValuePairs": true
+  "powershell.codeFormatting.alignPropertyValuePairs": true,
+  "powershell.codeFormatting.whitespaceAroundPipe": true
 }
