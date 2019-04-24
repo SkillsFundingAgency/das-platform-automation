@@ -7,7 +7,7 @@ trigger:
 pr: none
 
 jobs:
-  - job: "Windows_PS51_Build_Continuous_Integration_02"
+  - job: "Windows_PS51_Build_DAS_Continuous_Deployment"
     pool:
       name: "DAS - Continuous Deployment"
       demands:
