@@ -8,32 +8,50 @@ pr: none
 
 jobs:
   - job: "Windows_PS51_Build_Continuous_Integration_02"
-    pool: "DAS - Continuous Deployment"
+    pool:
+      name: "DAS - Continuous Deployment"
+      demands:
+        - npm
+        - node.js
     workspace:
       clean: all
     steps:
       - task: PowerShell@2
         inputs:
-          filePath: 'Tests/Invoke-Tests.ps1'
+          filePath: "Tests/Invoke-Tests.ps1"
       - task: PublishTestResults@2
-        displayName: 'Publish Test Results **/TEST-*.xml'
+        displayName: "Publish Test Results **/TEST-*.xml"
         inputs:
           testResultsFormat: NUnit
-          testResultsFiles: '**/TEST-*.xml'
+          testResultsFiles: "**/TEST-*.xml"
         condition: succeededOrFailed()
+      - script: |
+          npm install eclint
+          node ./node_modules/eclint/bin/eclint.js check
+        displayName: "Validate editorconfig"
+        workingDirectory: $(System.DefaultWorkingDirectory)
 
   - job: "Linux_PSCore_Build_DAS_Continuous_Integration"
-    pool: "DAS - Continuous Integration"
+    pool:
+      name: "DAS - Continuous Integration"
+      demands:
+        - npm
+        - node.js
     workspace:
       clean: all
     steps:
       - task: PowerShell@2
         inputs:
-          filePath: 'Tests/Invoke-Tests.ps1'
+          filePath: "Tests/Invoke-Tests.ps1"
           pwsh: true
       - task: PublishTestResults@2
-        displayName: 'Publish Test Results **/TEST-*.xml'
+        displayName: "Publish Test Results **/TEST-*.xml"
         inputs:
           testResultsFormat: NUnit
-          testResultsFiles: '**/TEST-*.xml'
+          testResultsFiles: "**/TEST-*.xml"
         condition: succeededOrFailed()
+      - script: |
+          npm install eclint
+          node $(npm root)/eclint/bin/eclint.js check $(System.DefaultWorkingDirectory)
+        displayName: "Validate editorconfig"
+        workingDirectory: $(System.DefaultWorkingDirectory)
