@@ -6,7 +6,7 @@ This repository contains PowerShell helper scripts to be used locally and in Azu
 # New Script Checklist
 Use the following as a checklist for creating new helper scripts.
 
-| Requirement                     | Notes      
+| Requirement                     | Notes
 | ------------------------------ | --------- |
 | Work locally and on build agents.| |
 | Contain descriptive inline comments. | |
@@ -15,7 +15,7 @@ Use the following as a checklist for creating new helper scripts.
 | Pester unit test.|      |
 | Use only Az module cmdlets.|     |
 | Follows the agreed naming covention. | See Naming Conventions section.    |
-| Adheres to .editorconfig | Stored in .editorconfig | 
+| Adheres to .editorconfig | Stored in .editorconfig |
 | Adheres to .vscode settings | Stored in .vscode/settings.json|
 
 # Code Layout and Formatting
@@ -24,16 +24,16 @@ This section attempts to provide a guide that will ensure a consistant code layo
 | Section | Description |
 | - | - |
 | EditorConfig | EditorConfig is used to enforce a consistant readable format. |
-| VS Code Settings | | 
+| VS Code Settings | |
 | Documentation | Provides details of how to create comment based help and generate external help markdown using PlatyPS. |
 | Naming Conventions | Provides a table containing the case type to use for identifiers as well as examples of each. |
 
 ## EditorConfig
-In order to maintain a consistent coding style an EditorConfig file is used to define the coding style to be used. The file **.editorconfig** contains the required styles. The EditorConfig file defines styles such as indentation size, indentation style, newline rules and more. 
+In order to maintain a consistent coding style an EditorConfig file is used to define the coding style to be used. The file **.editorconfig** contains the required styles. The EditorConfig file defines styles such as indentation size, indentation style, newline rules and more.
 
 ### EditorConfig Installation
 
-EditorConfig can be installed as a VS Code extension. Search for and install **EditorConfig for VS Code**. The VS Code Marketplace has more information [here](https://marketplace.visualstudio.com/items?itemName=EditorConfig.EditorConfig). 
+EditorConfig can be installed as a VS Code extension. Search for and install **EditorConfig for VS Code**. The VS Code Marketplace has more information [here](https://marketplace.visualstudio.com/items?itemName=EditorConfig.EditorConfig).
 
 For further information on EditorConfig [EditorConfig](https://editorconfig.org/)
 
@@ -56,7 +56,7 @@ For further information see [about_Comment_Based_Help](https://github.com/PowerS
 
 ### PlatyPS External Help Markdown
 
-All PowerShell scripts in Infrastructure-Scripts must have external help documentation generated in markdown using the [PlatyPS](https://github.com/PowerShell/platyPS) module. 
+All PowerShell scripts in Infrastructure-Scripts must have external help documentation generated in markdown using the [PlatyPS](https://github.com/PowerShell/platyPS) module.
 
 ADD A TEST TO CHECK FOR MARKDOWN OUTPUT IS PRESENT, IF NOT HERES HOW TO DO IT:
 
@@ -101,9 +101,3 @@ Mock class constructors where applicable. This will test changes to classes.
 | -- | -- |
 | The PowerShell Best Practices and Style Guide | https://poshcode.gitbooks.io/powershell-practice-and-style/ |
 |  | |
-
-
-
-
-
-

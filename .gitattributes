@@ -4,5 +4,4 @@
 * text=auto
 
 # Declare files that will always have LF line endings on checkout. (as per editorconfig)
-*.json text eol=lf
-*.yml text eol=lf
+* text eol=lf
