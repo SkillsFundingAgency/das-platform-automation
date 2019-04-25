@@ -16,8 +16,7 @@
 
 #>
 
-#Requires -Modules Pester
-#Requires -Modules PSScriptAnalyzer
+#Requires -Modules Pester, PSScriptAnalyzer
 
 [CmdletBinding()]
 Param(
