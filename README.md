@@ -14,6 +14,7 @@
     - [EditorConfig](#editorconfig)
         - [EditorConfig Installation](#editorconfig-installation)
     - [VS Code Settings](#vs-code-settings)
+- [Documentation](#documentation)
     - [Comment Based Help](#comment-based-help)
     - [PlatyPS](#platyps)
     - [Naming Conventions](#naming-conventions)
@@ -26,9 +27,11 @@
 <!-- /TOC -->
 
 ## About
+
 This repository contains PowerShell helper scripts to be used locally and in Azure Pipelines for the Digital Apprenticeship Service (DAS). It also includes a checklist for creating new helper scripts, a code layout and formatting guide, script documentation and testing details.
 
 # Helper Script Checklist
+
 Use the following as a checklist for creating new helper scripts.
 
 |Requirement| Description                     | Additional Notes
@@ -44,24 +47,23 @@ Use the following as a checklist for creating new helper scripts.
 |Should| Adhere to .editorconfig | Stored in .editorconfig |
 |Should| Adhere to .vscode settings | Stored in .vscode/settings.json|
 |Should| Use a forward slash in paths. | This is to ensure comptability on both Windows and Linux. |
-|Should Not| Use aliases. |This can cause less readable code. |
-|Should Not | Hard coded credentials (especially plain text) | Expose sensitive information. |
-|Should Not | Use Write-Host. | As explained by [Jeffrey Snover](http://www.jsnover.com/blog/2013/12/07/write-host-considered-harmful/) and [Don Jones](https://www.itprotoday.com/powershell/what-do-not-do-powershell-part-1) |
 | Should | Use -ErrorAction per cmdlet. |  |
-|Should Not | Set global error actions. | Using a global error action, particularly to suppress errors will hinder troubleshooting.  |
+|Should NOT| Use aliases. |This can cause less readable code. |
+|Should NOT | Hard code credentials (especially plain text) | Expose sensitive information. |
+|Should NOT | Use Write-Host. | As explained by [Jeffrey Snover](http://www.jsnover.com/blog/2013/12/07/write-host-considered-harmful/) and [Don Jones](https://www.itprotoday.com/powershell/what-do-not-do-powershell-part-1) |
+|Should NOT | Set global error actions. | Using a global error action, particularly to suppress errors will hinder troubleshooting.  |
 
 # Code Layout and Formatting
+
 This section provides an overview of the following:
 
 | Section Header | Description |
 | - | - |
 | EditorConfig | EditorConfig is used to enforce a consistant readable format. |
 | VS Code Settings | |
-| Comment Based Help | |
-| PlatyPS | Provides details of how to create comment based help and generate external help markdown using PlatyPS. |
-| Naming Conventions | Provides a table containing the case type to use for identifiers as well as examples of each. |
 
 ## EditorConfig
+
 In order to maintain a consistent coding style an EditorConfig file is used to define the coding style to be used. The file **.editorconfig** contains the required styles. The EditorConfig file defines styles such as indentation size, indentation style, newline rules and more.
 
 ### EditorConfig Installation
@@ -74,7 +76,18 @@ For further information on EditorConfig [EditorConfig](https://editorconfig.org/
 
 TO DO
 
+# Documentation
+
+This section provides an overview of the following:
+
+| Section Header | Description |
+| - | - |
+| Comment Based Help | |
+| PlatyPS | Provides details of how to create comment based help and generate external help markdown using PlatyPS. |
+| Naming Conventions | Provides a table containing the case type to use for identifiers as well as examples of each. |
+
 ## Comment Based Help
+
 Scripts and functions should contain comment based help that is compatible with **Get-Help**.
 
 The help should consist of the following elements:
@@ -97,6 +110,7 @@ TO DO
 ADD A PESTER TEST FOR THIS TO CHECK DOC EXISTS
 
 ## Naming Conventions
+
 To ensure a consistant readable format, use the following naming conventions:
 
 | Identifier                     | Case      | Example      |
@@ -144,4 +158,4 @@ TO DO
 | Reference | URL |
 | -- | -- |
 | The PowerShell Best Practices and Style Guide | https://poshcode.gitbooks.io/powershell-practice-and-style/ |
-|  | |
+| Overview of PowerShell Code Quality | https://mathieubuisson.github.io/powershell-code-quality-pscodehealth/  |
