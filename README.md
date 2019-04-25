@@ -109,8 +109,8 @@ To ensure a consistant readable format, use the following naming conventions:
 | Keywords in comment-based help | UPPERCASE | .SYPNOSIS, .EXAMPLE |
 | Two letter acronyms            | UPPERCASE acronym    | VMName |
 | Three letter (or more) acronyms | Pascal    | AbcName |
-| Constants / Built-in Variables | Pascal    | Microsoft maintains Pascal in their built-in variables, i.e. $PSVersionTable. Tab autocomplete in PowerShell for reference. |
-| Constants / Built-in Variables - Exceptions | camel | Keep camel case for built-in variables, i.e. $true and $false. Tab autocomplete in PowerShell for reference. |
+| Constants / Built-in Variables | Pascal and uppercase acronym    | Microsoft maintains Pascal in their built-in variables, i.e. $PSVersionTable, $PSScriptRoot. Tab autocomplete in PowerShell for reference. |
+| Constants / Built-in Variables - Exceptions | camel | Keep camel case for built-in variables, i.e. $true, $false, $null. Tab autocomplete in PowerShell for reference. |
 | Module Names                   | Pascal    ||
 | Function or cmdlet names       | Pascal    ||
 | Class Names                    | Pascal    ||

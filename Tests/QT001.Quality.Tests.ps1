@@ -1,29 +1,29 @@
-$Scripts = Get-ChildItem -Path $PSScriptRoot\..\Infrastructure-Scripts\*.ps1 -File
+$scripts = Get-ChildItem -Path $PSScriptRoot/../Infrastructure-Scripts/*.ps1 -File
 
 Describe "Script documentation tests" -Tags @("Quality") {
 
-    foreach ($Script in $Scripts) {
+    foreach ($script in $scripts) {
 
-        $Help = Get-Help $Script.FullName
+        $help = Get-Help $script.FullName
 
-        Context $Script.BaseName {
+        Context $script.BaseName {
 
             It "Has a synopsis" {
-                $Help.Synopsis | Should Not BeNullOrEmpty
+                $help.Synopsis | Should Not BeNullOrEmpty
             }
 
             It "Has a description" {
-                $Help.Description | Should Not BeNullOrEmpty
+                $help.Description | Should Not BeNullOrEmpty
             }
 
             It "Has an example" {
-                $Help.Examples | Should Not BeNullOrEmpty
+                $help.Examples | Should Not BeNullOrEmpty
             }
 
-            foreach ($Parameter in $Help.Parameters.Parameter) {
-                if ($Parameter -notmatch 'whatif|confirm') {
-                    It "Has a Parameter description for $($Parameter.Name)" {
-                        $Parameter.Description.Text | Should Not BeNullOrEmpty
+            foreach ($parameter in $help.Parameters.Parameter) {
+                if ($parameter -notmatch 'whatif|confirm') {
+                    It "Has a Parameter description for $($parameter.Name)" {
+                        $parameter.Description.Text | Should Not BeNullOrEmpty
                     }
                 }
             }
@@ -33,19 +33,19 @@ Describe "Script documentation tests" -Tags @("Quality") {
 
 Describe "Script code quality tests" -Tags @("Quality") {
 
-    $Rules = Get-ScriptAnalyzerRule
-    $ExcludeRules = @(
+    $rules = Get-ScriptAnalyzerRule
+    $excludeRules = @(
         "PSAvoidUsingWriteHost",
         "PSAvoidUsingEmptyCatchBlock",
         "PSAvoidUsingPlainTextForPassword"
     )
 
-    foreach ($Script in $Scripts) {
-        Context $Script.BaseName {
-            forEach ($Rule in $Rules) {
-                It "Should pass Script Analyzer rule $Rule" {
-                    $Result = Invoke-ScriptAnalyzer -Path $Script.FullName -IncludeRule $Rule -ExcludeRule $ExcludeRules
-                    $Result.Count | Should Be 0
+    foreach ($script in $scripts) {
+        Context $script.BaseName {
+            forEach ($rule in $rules) {
+                It "Should pass Script Analyzer rule $rule" {
+                    $result = Invoke-ScriptAnalyzer -Path $script.FullName -IncludeRule $rule -ExcludeRule $excludeRules
+                    $result.Count | Should Be 0
                 }
             }
         }
@@ -54,12 +54,12 @@ Describe "Script code quality tests" -Tags @("Quality") {
 
 Describe "Should have a unit test file" -Tags @("Quality") {
 
-    foreach ($Script in $Scripts) {
-        $TestName = "$($Script.BaseName).Tests.ps1"
-        Context "$($Script.BaseName)" {
-            It "Should have an associated unit test called UTxxx.$TestName" {
-                $TestFile = Get-Item -Path "$PSScriptRoot/UT*$TestName" -ErrorAction SilentlyContinue
-                $TestFile | Should Not Be $null
+    foreach ($script in $scripts) {
+        $testName = "$($script.BaseName).Tests.ps1"
+        Context "$($script.BaseName)" {
+            It "Should have an associated unit test called UTxxx.$testName" {
+                $testFile = Get-Item -Path "$PSScriptRoot/UT*$testName" -ErrorAction SilentlyContinue
+                $testFile | Should Not Be $null
             }
         }
     }
