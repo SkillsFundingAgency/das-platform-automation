@@ -16,6 +16,9 @@
 
 #>
 
+#Requires -Modules Pester
+#Requires -Modules PSScriptAnalyzer
+
 [CmdletBinding()]
 Param(
     [Parameter(Mandatory = $false)]
@@ -31,14 +34,6 @@ $testParameters = @{
 }
 if ($TestType -ne 'All') {
     $testParameters['Tag'] = $TestType
-}
-
-$requiredModules = @("Pester", "PSScriptAnalyzer")
-foreach ($module in $requiredModules) {
-    if (!(Get-Module -Name $module -ListAvailable)) {
-        Write-Output "Installing $module"
-        Install-Module -Name $module -Scope CurrentUser -Force
-    }
 }
 
 Remove-Item "$PSScriptRoot\TEST-*.xml"
