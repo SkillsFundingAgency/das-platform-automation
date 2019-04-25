@@ -31,10 +31,10 @@ This repository contains PowerShell helper scripts to be used locally and in Azu
 # Helper Script Checklist
 Use the following as a checklist for creating new helper scripts.
 
-|Requirement| Item                     | Section Links and Notes
+|Requirement| Description                     | Additional Notes
 |-| - | - |
 |Should| Work locally and on build agents.| |
-|Should| Contain descriptive inline comments. | |
+|Should| Contain minimal yet descriptive inline comments. | Consider using Write-Verbose or Write-Debug, useful for progress or status information. |
 |Should| Contain comment based help.|     |
 |Should| Have external help markdown documentation.| Generated using PlatyPS. |
 |Should| Have a Pester unit test which passes all tests.| Save in Tests folder.     |
@@ -43,8 +43,12 @@ Use the following as a checklist for creating new helper scripts.
 |Should| Follow the naming covention. | See [Naming Conventions](#naming-conventions)    |
 |Should| Adhere to .editorconfig | Stored in .editorconfig |
 |Should| Adhere to .vscode settings | Stored in .vscode/settings.json|
-|Should| Use a forward slash in paths. | This is to ensure comptability on both Windows and Linux.
-|Should Not| Use aliases. |
+|Should| Use a forward slash in paths. | This is to ensure comptability on both Windows and Linux. |
+|Should Not| Use aliases. |This can cause less readable code. |
+|Should Not | Hard coded credentials (especially plain text) | Expose sensitive information. |
+|Should Not | Use Write-Host. | As explained by [Jeffrey Snover](http://www.jsnover.com/blog/2013/12/07/write-host-considered-harmful/) and [Don Jones](https://www.itprotoday.com/powershell/what-do-not-do-powershell-part-1) |
+| Should | Use -ErrorAction per cmdlet. |  |
+|Should Not | Set global error actions. | Using a global error action, particularly to suppress errors will hinder troubleshooting.  |
 
 # Code Layout and Formatting
 This section provides an overview of the following:
@@ -97,20 +101,21 @@ To ensure a consistant readable format, use the following naming conventions:
 
 | Identifier                     | Case      | Example      |
 | ------------------------------ | --------- | ------------ |
+| Global variables               | Pascal    | $Global:$Variable |
+| Parameter variables             | Pascal    | $ParameterVariable             |
+| Local Variables                      | camel    | $localVariable, $this, $args              |
+| Language keywords              | lowercase     | foreach, -eq, try, catch, switch |
+| Process block keywords | lowercase | begin, process, end |
+| Keywords in comment-based help | UPPERCASE | .SYPNOSIS, .EXAMPLE    |
+| Two letter acronyms            | UPPERCASE acronym          | VMName             |
+| Three letter (or more) acronyms | Pascal | AbcName |
+| Constants / Built-in Variables | Pascal    | Microsoft maintains Pascal in their built-in variables, i.e. $PSVersionTable     |
+| Constants / Built-in Variables - Exceptions | camel | Keep camel case for built-in variables, i.e. $true and $false.
 | Module Names                   | Pascal    |              |
 | Function or cmdlet names       | Pascal    |              |
-| Class                          | Pascal    |              |
+| Class Names                         | Pascal    |              |
 | Attribute Names                | Pascal    |              |
 | Public fields or properties    | Pascal    |              |
-| Global variables               | Pascal    |              |
-| Constants                      | Pascal    |              |
-| Parameter variable             | Pascal    |              |
-| Variables                      | camel    |              |
-| Language keywords              | lowercase     | foreach, -eq, try, catch, switch |
-| Process block keywords | lowercase | begin, process |
-| Keywords in comment-based help | UPPERCASE | .SYPNOSIS, .EXAMPLE    |
-| Two letter acroynms            | UPPERCASE          | VMName             |
-| Three letter (or more) acronyms | Pascal |  |
 
 # Testing
 
