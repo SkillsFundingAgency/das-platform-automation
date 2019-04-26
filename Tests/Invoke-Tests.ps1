@@ -29,7 +29,7 @@ $testParameters = @{
     OutputFormat = 'NUnitXml'
     OutputFile   = "$PSScriptRoot\TEST-$TestType.xml"
     Script       = "$PSScriptRoot"
-    PassThru     = $True
+    PassThru     = $true
 }
 if ($TestType -ne 'All') {
     $testParameters['Tag'] = $TestType
