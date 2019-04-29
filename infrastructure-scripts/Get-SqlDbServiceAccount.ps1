@@ -32,7 +32,7 @@ The name of the Keyvault for the Enviroment
 
 .EXAMPLE
 
-.\Create-SqlDbServiceAccount.ps1  -ServerName ServerName `
+.\Get-SqlDbServiceAccount.ps1  -ServerName ServerName `
                                    -DataBaseName DataBaseName `
                                    -SqlUserName SqlUserName `
                                    -SqlPassword SqlPassword `
