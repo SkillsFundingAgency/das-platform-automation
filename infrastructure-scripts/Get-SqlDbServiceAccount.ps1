@@ -6,13 +6,13 @@ Create A Sql Database Service Account Automation
 Create A Sql Database Service Account Automation
 
 .PARAMETER ServerNamr
-Name of the SQL Server 
+Name of the SQL Server
 
 .PARAMETER AzureFirewallName
-Name of the tempoary Sql Server Firewall rule created 
+Name of the tempoary Sql Server Firewall rule created
 
 .PARAMETER SqlUserName
-Sql Server Master User Name 
+Sql Server Master User Name
 
 .PARAMETER SqlPassword
 Sql Server Master Password.
@@ -46,7 +46,7 @@ The name of the Keyvault for the Enviroment
 [CmdletBinding(DefaultParameterSetName = 'None')]
 param
 (
-    [Parameter(Mandatory = $true)] 
+    [Parameter(Mandatory = $true)]
     [String] $ServerName,
     [String] $AzureFirewallName = "AzureWebAppFirewall",
     [Parameter(Mandatory = $true)]
@@ -110,28 +110,28 @@ try {
 
     Write-Host "$ServerName.database.windows.net"
     $ServerFQDN = "$ServerName.database.windows.net"
-    $accountExist = Invoke-SqlQuery $AccountExistQuery 
+    $accountExist = Invoke-SqlQuery $AccountExistQuery
     Write-Output $accountExist
 
 
     if ($accountExist) {
-        $AccountPassword = Get-AzureKeyVaultSecret -VaultName $KeyVaultName -name $secretName 
+        $AccountPassword = Get-AzureKeyVaultSecret -VaultName $KeyVaultName -name $secretName
         $query = @"
-        ALTER USER "$SqlServiceAccountName" WITH PASSWORD = '$AccountPassword' 
+        ALTER USER "$SqlServiceAccountName" WITH PASSWORD = '$AccountPassword'
 "@
         Invoke-SqlQuery -query $query
     }
     else {
-        $AccountPassword = Get-RandomPassword 
-        $aecure = $AccountPassword | ConvertTo-SecureString -AsPlainText -Force 
-        Set-AzureKeyVaultSecret -VaultName $KeyVaultName -Name $secretName -SecretValue $aecure 
+        $AccountPassword = Get-RandomPassword
+        $aecure = $AccountPassword | ConvertTo-SecureString -AsPlainText -Force
+        Set-AzureKeyVaultSecret -VaultName $KeyVaultName -Name $secretName -SecretValue $aecure
         $query = @"
                     CREATE USER "$SqlServiceAccountName"  WITH PASSWORD = '$AccountPassword'
-                    ALTER ROLE db_datareader ADD MEMBER "$SqlServiceAccountName"   
-                    ALTER ROLE db_datawriter ADD MEMBER "$SqlServiceAccountName"  
-                    GRANT EXECUTE TO "$SqlServiceAccountName" 
+                    ALTER ROLE db_datareader ADD MEMBER "$SqlServiceAccountName"
+                    ALTER ROLE db_datawriter ADD MEMBER "$SqlServiceAccountName"
+                    GRANT EXECUTE TO "$SqlServiceAccountName"
 "@
-        Invoke-SqlQuery -query $query 
+        Invoke-SqlQuery -query $query
     }
 
     Write-Host "##vso[task.setvariable variable=SQLServerServiceAccountUsername]$SqlServiceAccountNames"
