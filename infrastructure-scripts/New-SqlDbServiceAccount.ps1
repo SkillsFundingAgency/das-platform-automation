@@ -5,11 +5,11 @@ Create A Sql Database Service Account Automation
 .DESCRIPTION
 Create A Sql Database Service Account Automation
 
-.PARAMETER ServerNamr
+.PARAMETER ServerName
 Name of the SQL Server
 
-.PARAMETER AzureFirewallName
-Name of the tempoary Sql Server Firewall rule created
+.PARAMETER AzureFireWallName
+Name of the tempoary Sql Server FireWall rule created (Optional)
 
 .PARAMETER SqlUserName
 Sql Server Master User Name
@@ -23,23 +23,26 @@ The name of the service account to be created.
 .Parameter SQLResourceGroup
 The Resource group of the SQL Server
 
-.PARAMETER Enviroment
-The Enviroment of the New Service account,
+.PARAMETER Environment
+The Environment of the New Service account,
 
 .PARAMETER KeyVaultName
-The name of the Keyvault for the Enviroment
+The name of the Keyvault for the Environment
 
 
 .EXAMPLE
+$New-SqlDBAccountParameters = @{
+	 ServerName = ServerName
+     DataBaseName = DataBaseName
+     SqlUserName = SqlUserName
+	 SqlPassword = SqlPassword
+     SqlServiceAccountName = SqlServiceAccountName
+     SQLResourceGroup = SQLResourceGroup
+     Enviroment = Enviroment
+     KeyVaultName = KeyVaultName
+}
 
-.\New-SqlDbServiceAccount.ps1  -ServerName ServerName `
-                                   -DataBaseName DataBaseName `
-                                   -SqlUserName SqlUserName `
-                                   -SqlPassword SqlPassword `
-                                   -SqlServiceAccountName SqlServiceAccountName `
-                                   -SQLResourceGroup SQLResourceGroup
-                                   -Enviroment Enviroment
-                                   -KeyVaultName KeyVaultName
+.\New-SqlDbServiceAccount.ps1 @New-SqlDBAccountParameters
 
 #>
 
@@ -54,7 +57,7 @@ param
     [Parameter(Mandatory = $true)]
     [String]$SqlUserName,
     [Parameter(Mandatory = $true)]
-    [SecureString]  $SqlPassword,
+    [String]  $SqlPassword,
     [Parameter(Mandatory = $true)]
     [String]  $SqlServiceAccountName,
     [Parameter(Mandatory = $true)]
@@ -81,27 +84,19 @@ function Get-RandomPassword {
     $Password = ([char[]]([char]33..[char]95) + ([char[]]([char]97..[char]126)) + 0..9 | Sort-Object { Get-Random })[0..33] -join ''
     return $Password
 }
-function Invoke-SqlQuery([String] $Query) {
-    $Output = Invoke-Sqlcmd -ServerInstance $ServerFQDN -Database $DataBaseName -Username $SqlUserName -Password $SqlPassword -OutputSqlErrors $true -Query $Query
-    return $Output
-}
 
 function Remove-AzureSQLServerFirewallRule {
-    If ((Get-AzureRmSqlServerFirewallRule -ServerName $ServerName -ResourceGroupName $SQLResourceGroup -FirewallRuleName $AzureFirewallName -ErrorAction SilentlyContinue)) {
+    if ((Get-AzureRmSqlServerFirewallRule -ServerName $ServerName -ResourceGroupName $SQLResourceGroup -FirewallRuleName $AzureFirewallName -ErrorAction SilentlyContinue)) {
         Remove-AzureRmSqlServerFirewallRule -FirewallRuleName $AzureFirewallName -ServerName $ServerName -ResourceGroupName $SQLResourceGroup
     }
 }
 
 try {
-    $AccountExistQuery = @"
-                        SELECT * FROM sys.database_principals WHERE name = '$SqlServiceAccountName'
-"@
-
     $SecretName = "${Enviroment}-${SqlServiceAccountName}"
 
     Write-Host "$SecretName"
 
-    If ((Get-AzureRmSqlServerFirewallRule -ServerName $ServerName -ResourceGroupName $SQLResourceGroup -FirewallRuleName $AzureFirewallName -ErrorAction SilentlyContinue) -eq $null) {
+    if ((Get-AzureRmSqlServerFirewallRule -ServerName $ServerName -ResourceGroupName $SQLResourceGroup -FirewallRuleName $AzureFirewallName -ErrorAction SilentlyContinue) -eq $null) {
         New-AzureSQLServerFirewallRule
     }
     else {
@@ -110,12 +105,24 @@ try {
 
     Write-Host "$ServerName.database.windows.net"
     $ServerFQDN = "$ServerName.database.windows.net"
-    $AccountExist = Invoke-SqlQuery $accountExistQuery
-    Write-Output $accountExist
 
+    $AccountExistQuery = @"
+	SELECT * FROM sys.database_principals WHERE name = '$SqlServiceAccountName'
+"@
+
+    $SQLCmdParameters = @{
+        ServerInstance  = $ServerFQDN
+        Database        = $DataBaseName
+        Username        = $SqlUserName
+        Password        = $SqlPassword
+        OutputSqlErrors = $true
+        Query           = $AccountExistQuery
+    }
+
+    $AccountExist = Invoke-Sqlcmd @SQLCmdParameters
 
     if ($AccountExist) {
-		Write-Host "Account Exists"
+        Write-Host "Account Exists"
     }
     else {
         $AccountPassword = Get-RandomPassword
@@ -127,11 +134,21 @@ try {
                     ALTER ROLE db_datawriter ADD MEMBER "$SqlServiceAccountName"
                     GRANT EXECUTE TO "$SqlServiceAccountName"
 "@
-        Invoke-SqlQuery -query $Query
+
+        $SQLCmdParameters = @{
+            ServerInstance  = $ServerFQDN
+            Database        = $DataBaseName
+            Username        = $SqlUserName
+            Password        = $SqlPassword
+            OutputSqlErrors = $true
+            Query           = $Query
+        }
+        Invoke-Sqlcmd @SQLCmdParameters
     }
 
+
     Write-Host "##vso[task.setvariable variable=SQLServerServiceAccountUsername]$SqlServiceAccountName"
-    Write-Host "##vso[task.setvariable variable=secretSauce;issecret=true]$AccountPassword"
+    Write-Host "##vso[task.setvariable variable=SQLServerServiceAccountPassword;issecret=true]$AccountPassword"
     Remove-AzureSQLServerFirewallRule
 }
 catch {
