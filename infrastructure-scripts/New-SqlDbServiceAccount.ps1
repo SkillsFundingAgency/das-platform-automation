@@ -32,7 +32,7 @@ The name of the Keyvault for the Enviroment
 
 .EXAMPLE
 
-.\Get-SqlDbServiceAccount.ps1  -ServerName ServerName `
+.\New-SqlDbServiceAccount.ps1  -ServerName ServerName `
                                    -DataBaseName DataBaseName `
                                    -SqlUserName SqlUserName `
                                    -SqlPassword SqlPassword `
@@ -69,21 +69,21 @@ $ErrorActionPreference = 'Stop'
 
 
 function New-AzureSQLServerFirewallRule {
-    $agentIP = (New-Object net.webclient).downloadstring("http://checkip.dyndns.com") -replace "[^\d\.]"
-    New-AzureRmSqlServerFirewallRule -StartIPAddress $agentIp -EndIPAddress $agentIp -FirewallRuleName $AzureFirewallName -ServerName $ServerName -ResourceGroupName $SQLResourceGroup
+    $AgentIP = (New-Object net.webclient).downloadstring("http://checkip.dyndns.com") -replace "[^\d\.]"
+    New-AzureRmSqlServerFirewallRule -StartIPAddress $AgentIp -EndIPAddress $AgentIp -FirewallRuleName $AzureFirewallName -ServerName $ServerName -ResourceGroupName $SQLResourceGroup
 }
 function Update-AzureSQLServerFirewallRule {
-    $agentIP = (New-Object net.webclient).downloadstring("http://checkip.dyndns.com") -replace "[^\d\.]"
-    Set-AzureRmSqlServerFirewallRule -StartIPAddress $agentIp -EndIPAddress $agentIp -FirewallRuleName $AzureFirewallName -ServerName $ServerName -ResourceGroupName $SQLResourceGroup
+    $AgentIP = (New-Object net.webclient).downloadstring("http://checkip.dyndns.com") -replace "[^\d\.]"
+    Set-AzureRmSqlServerFirewallRule -StartIPAddress $AgentIp -EndIPAddress $AgentIp -FirewallRuleName $AzureFirewallName -ServerName $ServerName -ResourceGroupName $SQLResourceGroup
 }
 
 function Get-RandomPassword {
     $Password = ([char[]]([char]33..[char]95) + ([char[]]([char]97..[char]126)) + 0..9 | Sort-Object { Get-Random })[0..33] -join ''
     return $Password
 }
-function Invoke-SqlQuery([String] $query) {
-    $output = Invoke-Sqlcmd -ServerInstance $ServerFQDN -Database $DataBaseName -Username $SqlUserName -Password $SqlPassword -OutputSqlErrors $true -Query $query
-    return $output
+function Invoke-SqlQuery([String] $Query) {
+    $Output = Invoke-Sqlcmd -ServerInstance $ServerFQDN -Database $DataBaseName -Username $SqlUserName -Password $SqlPassword -OutputSqlErrors $true -Query $Query
+    return $Output
 }
 
 function Remove-AzureSQLServerFirewallRule {
@@ -97,9 +97,9 @@ try {
                         SELECT * FROM sys.database_principals WHERE name = '$SqlServiceAccountName'
 "@
 
-    $secretName = "${Enviroment}-${SqlServiceAccountName}"
+    $SecretName = "${Enviroment}-${SqlServiceAccountName}"
 
-    Write-Host "$secretName"
+    Write-Host "$SecretName"
 
     If ((Get-AzureRmSqlServerFirewallRule -ServerName $ServerName -ResourceGroupName $SQLResourceGroup -FirewallRuleName $AzureFirewallName -ErrorAction SilentlyContinue) -eq $null) {
         New-AzureSQLServerFirewallRule
@@ -110,31 +110,27 @@ try {
 
     Write-Host "$ServerName.database.windows.net"
     $ServerFQDN = "$ServerName.database.windows.net"
-    $accountExist = Invoke-SqlQuery $AccountExistQuery
+    $AccountExist = Invoke-SqlQuery $accountExistQuery
     Write-Output $accountExist
 
 
-    if ($accountExist) {
-        $AccountPassword = Get-AzureKeyVaultSecret -VaultName $KeyVaultName -name $secretName
-        $query = @"
-        ALTER USER "$SqlServiceAccountName" WITH PASSWORD = '$AccountPassword'
-"@
-        Invoke-SqlQuery -query $query
+    if ($AccountExist) {
+		Write-Host "Account Exists"
     }
     else {
         $AccountPassword = Get-RandomPassword
-        $aecure = $AccountPassword | ConvertTo-SecureString -AsPlainText -Force
-        Set-AzureKeyVaultSecret -VaultName $KeyVaultName -Name $secretName -SecretValue $aecure
-        $query = @"
+        $SecureAccountPassword = $AccountPassword | ConvertTo-SecureString -AsPlainText -Force
+        Set-AzureKeyVaultSecret -VaultName $KeyVaultName -Name $SecretName -SecretValue $SecureAccountPassword
+        $Query = @"
                     CREATE USER "$SqlServiceAccountName"  WITH PASSWORD = '$AccountPassword'
                     ALTER ROLE db_datareader ADD MEMBER "$SqlServiceAccountName"
                     ALTER ROLE db_datawriter ADD MEMBER "$SqlServiceAccountName"
                     GRANT EXECUTE TO "$SqlServiceAccountName"
 "@
-        Invoke-SqlQuery -query $query
+        Invoke-SqlQuery -query $Query
     }
 
-    Write-Host "##vso[task.setvariable variable=SQLServerServiceAccountUsername]$SqlServiceAccountNames"
+    Write-Host "##vso[task.setvariable variable=SQLServerServiceAccountUsername]$SqlServiceAccountName"
     Write-Host "##vso[task.setvariable variable=secretSauce;issecret=true]$AccountPassword"
     Remove-AzureSQLServerFirewallRule
 }
