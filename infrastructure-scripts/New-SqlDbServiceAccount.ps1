@@ -52,26 +52,13 @@ param (
 
 $ErrorActionPreference = 'Stop'
 
-function New-AzureSQLServerFirewallRule {
-    $AgentIP = (New-Object net.webclient).downloadstring("http://checkip.dyndns.com") -replace "[^\d\.]"
-    New-AzureRmSqlServerFirewallRule -StartIPAddress $AgentIp -EndIPAddress $AgentIp -FirewallRuleName $AzureFirewallName -ServerName $ServerName -ResourceGroupName $SQLResourceGroup
-}
-function Update-AzureSQLServerFirewallRule {
-    $AgentIP = (New-Object net.webclient).downloadstring("http://checkip.dyndns.com") -replace "[^\d\.]"
-    Set-AzureRmSqlServerFirewallRule -StartIPAddress $AgentIp -EndIPAddress $AgentIp -FirewallRuleName $AzureFirewallName -ServerName $ServerName -ResourceGroupName $SQLResourceGroup
-}
 function Get-RandomPassword {
     $Password = ([char[]]([char]33..[char]95) + ([char[]]([char]97..[char]126)) + 0..9 | Sort-Object { Get-Random })[0..33] -join ''
     return $Password
 }
-function Remove-AzureSQLServerFirewallRule {
-    if ((Get-AzureRmSqlServerFirewallRule -ServerName $ServerName -ResourceGroupName $SQLResourceGroup -FirewallRuleName $AzureFirewallName -ErrorAction SilentlyContinue)) {
-        Remove-AzureRmSqlServerFirewallRule -FirewallRuleName $AzureFirewallName -ServerName $ServerName -ResourceGroupName $SQLResourceGroup
-    }
-}
 
 try {
-
+	$AgentIP = (New-Object net.webclient).downloadstring("http://checkip.dyndns.com") -replace "[^\d\.]"
     $ServiceAccountSecretName = "$Enviroment-$SqlServiceAccountName".ToLower()
     $ServerFQDN = "$ServerName.database.windows.net"
 
@@ -91,26 +78,36 @@ try {
         throw "Could not retrieve secure password for $ServerName"
     }
 
-    # --- Add agent IP exception to the firewall
+	# --- Add agent IP exception to the firewall
+	Write-Host "Updating firewall rule with agent ip: $AgentIP"
+	$FirewallUpdateParameters = @{
+		StartIPAddress = $AgentIp
+		EndIPAddress = $AgentIp
+		FirewallRuleName = $AzureFirewallName
+		ServerName = $ServerName
+		ResourceGroupName = $ServerResource.ResourceGroupName
+	}
+
     if (!(Get-AzureRmSqlServerFirewallRule -ServerName $ServerName -ResourceGroupName $ServerResource.ResourceGroupName -FirewallRuleName $AzureFirewallName -ErrorAction SilentlyContinue)) {
-        New-AzureSQLServerFirewallRule
+        $null = New-AzureRmSqlServerFirewallRule @FirewallUpdateParameters
     }
     else {
-        Update-AzureSQLServerFirewallRule
+        $null = Set-AzureRmSqlServerFirewallRule @FirewallUpdateParameters
     }
 
-    # --- Retrieve or set service account password
+	# --- Retrieve or set service account password
+	Write-Host "Creating service account: $SqlServiceAccountName"
     $ServiceAccountPassword = (Get-AzureKeyVaultSecret -VaultName $KeyVaultName -Name $ServiceAccountSecretName).SecretValueText
     if (!$ServiceAccountPassword) {
-        $AccountPassword = Get-RandomPassword
-        $SecureAccountPassword = $AccountPassword | ConvertTo-SecureString -AsPlainText -Force
-        Set-AzureKeyVaultSecret -VaultName $KeyVaultName -Name $SecretName -SecretValue $SecureAccountPassword
+        $ServiceAccountPassword = Get-RandomPassword
+        $SecureAccountPassword = $ServiceAccountPassword | ConvertTo-SecureString -AsPlainText -Force
+        $null = Set-AzureKeyVaultSecret -VaultName $KeyVaultName -Name $ServiceAccountSecretName -SecretValue $SecureAccountPassword
     }
 
     # --- Execute query
     $Query = @"
     IF NOT EXISTS (SELECT name FROM sys.database_principals WHERE NAME = '$($SqlServiceAccountName)') BEGIN
-        CREATE USER "$($SqlServiceAccountName)" WITH PASSWORD = '$($AccountPassword)';
+        CREATE USER "$($SqlServiceAccountName)" WITH PASSWORD = '$($ServiceAccountPassword)';
     END
 
     ALTER ROLE db_datareader
@@ -134,11 +131,14 @@ try {
     Invoke-Sqlcmd @SQLCmdParameters
 
     Write-Host "##vso[task.setvariable variable=SQLServerServiceAccountUsername]$SqlServiceAccountName"
-    Write-Host "##vso[task.setvariable variable=SQLServerServiceAccountPassword;issecret=true]$AccountPassword"
+    Write-Host "##vso[task.setvariable variable=SQLServerServiceAccountPassword;issecret=true]$ServiceAccountPassword"
 }
 catch {
     throw "$_"
 }
 finally {
-    Remove-AzureSQLServerFirewallRule
+	$ServerResource = Get-AzureRmResource -Name $ServerName -ResourceType "Microsoft.Sql/servers"
+    if ((Get-AzureRmSqlServerFirewallRule -ServerName $ServerName -ResourceGroupName $ServerResource.ResourceGroupName -FirewallRuleName $AzureFirewallName -ErrorAction SilentlyContinue)) {
+        $null = Remove-AzureRmSqlServerFirewallRule -FirewallRuleName $AzureFirewallName -ServerName $ServerName -ResourceGroupName $ServerResource.ResourceGroupName
+	}
 }
