@@ -9,7 +9,7 @@ Create A Sql Database Service Account Automation
 Name of the SQL Server
 
 .PARAMETER AzureFireWallName
-Name of the tempoary Sql Server FireWall rule created (Optional)
+Name of the temporary Sql Server FireWall rule created (Optional)
 
 .PARAMETER SqlServiceAccountName
 The name of the service account to be created.
@@ -23,11 +23,11 @@ The name of the Keyvault for the Environment
 
 .EXAMPLE
 $New-SqlDBAccountParameters = @{
-	 ServerName = ServerName
-     DataBaseName = DataBaseName
-     SqlServiceAccountName = SqlServiceAccountName
-     Enviroment = Enviroment
-     KeyVaultName = KeyVaultName
+	 ServerName = $ServerName
+     DataBaseName = $DataBaseName
+     SqlServiceAccountName = $SqlServiceAccountName
+     Environment = $Environment
+     KeyVaultName = $KeyVaultName
 }
 
 .\New-SqlDbServiceAccount.ps1 @New-SqlDBAccountParameters
@@ -45,7 +45,7 @@ param (
     [Parameter(Mandatory = $true)]
     [String]$SqlServiceAccountName,
     [Parameter(Mandatory = $true)]
-    [String]$Enviroment,
+    [String]$Environment,
     [Parameter(Mandatory = $true)]
     [String]$KeyVaultName
 )
@@ -58,8 +58,8 @@ function Get-RandomPassword {
 }
 
 try {
-	$AgentIP = (New-Object net.webclient).downloadstring("http://checkip.dyndns.com") -replace "[^\d\.]"
-    $ServiceAccountSecretName = "$Enviroment-$SqlServiceAccountName".ToLower()
+	$AgentIP = (Invoke-WebRequest -Uri http://checkip.dyndns.com -UseBasicParsing).Content -Replace "[^\d\.]"
+    $ServiceAccountSecretName = "$Environment-$SqlServiceAccountName".ToLower()
     $ServerFQDN = "$ServerName.database.windows.net"
 
     # --- Retrieve SQL Server details
