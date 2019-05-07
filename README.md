@@ -41,15 +41,15 @@ Use the following as a checklist for creating new helper scripts.
 |Should| Contain comment based help.|     |
 |Should| Have external help markdown documentation.| Generated using PlatyPS. |
 |Should| Have a Pester unit test which passes all tests.| Save in Tests folder.     |
-|Should| Pester unit test filename to start UTxxx | Increment by one. |
+|Should| Pester unit test filename to start UTxxx. | Increment by one. |
 |Should| Use Az module cmdlets only.|     |
 |Should| Follow the naming covention. | See [Naming Conventions](#naming-conventions)    |
-|Should| Adhere to .editorconfig | Stored in .editorconfig |
-|Should| Adhere to .vscode settings | Stored in .vscode/settings.json|
-|Should| Use a forward slash in paths. | This is to ensure comptability on both Windows and Linux. |
+|Should| Adhere to .editorconfig. | Stored in .editorconfig |
+|Should| Adhere to .vscode settings. | Stored in .vscode/settings.json|
+|Should| Use a forward slash ('/') in paths. | This is to ensure compatibility on both Windows and Linux platforms. |
 | Should | Use -ErrorAction per cmdlet. |  |
 |Should NOT| Use aliases. |This can cause less readable code. |
-|Should NOT | Hard code credentials (especially plain text) | Expose sensitive information. |
+|Should NOT | Hard code credentials (especially plain text). | Expose sensitive information. |
 |Should NOT | Use Write-Host. | As explained by [Jeffrey Snover](http://www.jsnover.com/blog/2013/12/07/write-host-considered-harmful/) and [Don Jones](https://www.itprotoday.com/powershell/what-do-not-do-powershell-part-1) |
 |Should NOT | Set global error actions. | Using a global error action, particularly to suppress errors will hinder troubleshooting.  |
 
@@ -117,7 +117,7 @@ To ensure a consistant readable format, use the following naming conventions:
 | ------------------------------ | --------- | ------------ |
 | Global variables               | Pascal    | $Global:$Variable |
 | Parameter variables            | Pascal    | $ParameterVariable |
-| Local Variables                | camel    | $localVariable, $this, $args |
+| Local Variables                | Pascal    | $LocalVariable |
 | Language keywords              | lowercase    | foreach, -eq, try, catch, switch |
 | Process block keywords | lowercase | begin, process, end |
 | Keywords in comment-based help | UPPERCASE | .SYPNOSIS, .EXAMPLE |

@@ -50,29 +50,29 @@ Param(
 
 try {
     # --- Check if the Resource Group exists in the subscription.
-    $resourceGroupExists = Get-AzResourceGroup $ResourceGroup
-    if (!$resourceGroupExists) {
+    $ResourceGroupExists = Get-AzResourceGroup $ResourceGroup
+    if (!$ResourceGroupExists) {
         throw "Resource Group $ResourceGroup does not exist."
     }
 
     # --- Check if Storage Account exists in the subscription.
-    $storageAccountExists = Get-AzStorageAccount -ResourceGroupName $ResourceGroup -Name $StorageAccount -ErrorAction SilentlyContinue
-    if (!$storageAccountExists) {
+    $StorageAccountExists = Get-AzStorageAccount -ResourceGroupName $ResourceGroup -Name $StorageAccount -ErrorAction SilentlyContinue
+    if (!$StorageAccountExists) {
         throw "Storage Account $StorageAccount does not exist."
     }
 
     # --- Return the respective Storage Account connection string.
     if ($UseSecondaryKey.IsPresent) {
-        $key = (Get-AzStorageAccountKey -ResourceGroupName $ResourceGroup -Name $StorageAccount)[1].Value
-        $connectionString = "DefaultEndpointsProtocol=https;AccountName=$($StorageAccount);AccountKey=$($key);EndpointSuffix=core.windows.net"
+        $Key = (Get-AzStorageAccountKey -ResourceGroupName $ResourceGroup -Name $StorageAccount)[1].Value
+        $ConnectionString = "DefaultEndpointsProtocol=https;AccountName=$($StorageAccount);AccountKey=$($Key);EndpointSuffix=core.windows.net"
     }
     else {
-        $key = (Get-AzStorageAccountKey -ResourceGroupName $ResourceGroup -Name $StorageAccount)[0].Value
-        $connectionString = "DefaultEndpointsProtocol=https;AccountName=$($StorageAccount);AccountKey=$($key);EndpointSuffix=core.windows.net"
+        $Key = (Get-AzStorageAccountKey -ResourceGroupName $ResourceGroup -Name $StorageAccount)[0].Value
+        $ConnectionString = "DefaultEndpointsProtocol=https;AccountName=$($StorageAccount);AccountKey=$($Key);EndpointSuffix=core.windows.net"
     }
 
     # --- Set the VSTS output variable using the returned connection string.
-    Write-Output ("##vso[task.setvariable variable=$($OutputVariable);issecret=true]$($connectionString)")
+    Write-Output ("##vso[task.setvariable variable=$($OutputVariable);issecret=true]$($ConnectionString)")
 }
 
 catch {

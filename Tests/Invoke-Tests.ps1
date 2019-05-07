@@ -25,20 +25,20 @@ Param(
     [String] $TestType = "All"
 )
 
-$testParameters = @{
+$TestParameters = @{
     OutputFormat = 'NUnitXml'
     OutputFile   = "$PSScriptRoot\TEST-$TestType.xml"
     Script       = "$PSScriptRoot"
     PassThru     = $true
 }
 if ($TestType -ne 'All') {
-    $testParameters['Tag'] = $TestType
+    $TestParameters['Tag'] = $TestType
 }
 
 Remove-Item "$PSScriptRoot\TEST-*.xml"
 
-$result = Invoke-Pester @testParameters
+$Result = Invoke-Pester @TestParameters
 
-if ($result.FailedCount -ne 0) {
-    Write-Error "Pester returned $($result.FailedCount) errors"
+if ($Result.FailedCount -ne 0) {
+    Write-Error "Pester returned $($Result.FailedCount) errors"
 }
