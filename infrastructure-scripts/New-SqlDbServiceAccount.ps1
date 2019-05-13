@@ -58,7 +58,7 @@ function Get-RandomPassword {
 }
 
 try {
-	$AgentIP = Invoke-WebRequest ifconfig.me/ip -UseBasicParsing).Content.Trim()
+	$AgentIP = (Invoke-WebRequest ifconfig.me/ip -UseBasicParsing).Content.Trim()
     $ServiceAccountSecretName = "$Environment-$SqlServiceAccountName".ToLower()
     $ServerFQDN = "$ServerName.database.windows.net"
 
