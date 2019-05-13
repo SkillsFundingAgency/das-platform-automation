@@ -106,8 +106,21 @@ try {
     Write-Host "$ServerName.database.windows.net"
     $ServerFQDN = "$ServerName.database.windows.net"
 
-    $AccountExistQuery = @"
-	SELECT * FROM sys.database_principals WHERE name = '$SqlServiceAccountName'
+    $AccountPassword = Get-RandomPassword
+    $SecureAccountPassword = $AccountPassword | ConvertTo-SecureString -AsPlainText -Force
+
+    $Query = @"
+    IF NOT EXISTS (SELECT name FROM sys.database_principals WHERE NAME = '$($SqlServiceAccountName)') BEGIN
+        CREATE USER "$($SqlServiceAccountName)" WITH PASSWORD = '$($AccountPassword)';
+    END
+
+    ALTER ROLE db_datareader
+        ADD MEMBER "$($SqlServiceAccountName)"
+
+    ALTER ROLE db_datawriter
+        ADD MEMBER "$($SqlServiceAccountName)"
+
+    GRANT EXECUTE TO "$($SqlServiceAccountName)"
 "@
 
     $SQLCmdParameters = @{
@@ -116,38 +129,14 @@ try {
         Username        = $SqlUserName
         Password        = $SqlPassword
         OutputSqlErrors = $true
-        Query           = $AccountExistQuery
+        Query           = $Query
     }
-
-    $AccountExist = Invoke-Sqlcmd @SQLCmdParameters
-
-    if ($AccountExist) {
-        Write-Host "Account Exists"
-    }
-    else {
-        $AccountPassword = Get-RandomPassword
-        $SecureAccountPassword = $AccountPassword | ConvertTo-SecureString -AsPlainText -Force
-        Set-AzureKeyVaultSecret -VaultName $KeyVaultName -Name $SecretName -SecretValue $SecureAccountPassword
-        $Query = @"
-                    CREATE USER "$SqlServiceAccountName"  WITH PASSWORD = '$AccountPassword'
-                    ALTER ROLE db_datareader ADD MEMBER "$SqlServiceAccountName"
-                    ALTER ROLE db_datawriter ADD MEMBER "$SqlServiceAccountName"
-                    GRANT EXECUTE TO "$SqlServiceAccountName"
-"@
-
-        $SQLCmdParameters = @{
-            ServerInstance  = $ServerFQDN
-            Database        = $DataBaseName
-            Username        = $SqlUserName
-            Password        = $SqlPassword
-            OutputSqlErrors = $true
-            Query           = $Query
-        }
-        Invoke-Sqlcmd @SQLCmdParameters
-    }
+	Invoke-Sqlcmd @SQLCmdParameters -verbose
 
 
-    Write-Host "##vso[task.setvariable variable=SQLServerServiceAccountUsername]$SqlServiceAccountName"
+	#Set-AzureKeyVaultSecret -VaultName $KeyVaultName -Name $SecretName -SecretValue $SecureAccountPassword
+
+	Write-Host "##vso[task.setvariable variable=SQLServerServiceAccountUsername]$SqlServiceAccountName"
     Write-Host "##vso[task.setvariable variable=SQLServerServiceAccountPassword;issecret=true]$AccountPassword"
     Remove-AzureSQLServerFirewallRule
 }
