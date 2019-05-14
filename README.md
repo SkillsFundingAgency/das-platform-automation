@@ -16,12 +16,15 @@
     - [VS Code Settings](#vs-code-settings)
 - [Documentation](#documentation)
     - [Comment Based Help](#comment-based-help)
-    - [PlatyPS](#platyps)
     - [Naming Conventions](#naming-conventions)
 - [Testing](#testing)
     - [Pester](#pester)
+        - [Introduction](#introduction)
+        - [How it's Used](#how-its-used)
+        - [How to Write a Pester Unit Test](#how-to-write-a-pester-unit-test)
     - [PSScriptAnalyzer](#psscriptanalyzer)
-    - [PSCodeHealth](#pscodehealth)
+        - [Introduction](#introduction-1)
+        - [How it's Used](#how-its-used-1)
 - [References and Further Reading](#references-and-further-reading)
 
 <!-- /TOC -->
@@ -36,19 +39,18 @@ Use the following as a checklist for creating new helper scripts.
 
 |Requirement| Description                     | Additional Notes
 |-| - | - |
-|Should| Work locally and on build agents.| |
+|Should| Work locally and on build agents.| Scripts should work on any environment not just build agents. |
 |Should| Contain minimal yet descriptive inline comments. | Consider using Write-Verbose or Write-Debug, useful for progress or status information. |
-|Should| Contain comment based help.|     |
-|Should| Have external help markdown documentation.| Generated using PlatyPS. |
-|Should| Have a Pester unit test which passes all tests.| Save in Tests folder.     |
+|Should| Contain comment based help.| For example a Synopsis, Description and Example(s). |
+|Should| Have a Pester unit test which passes all tests.| Save in Tests folder. |
 |Should| Pester unit test filename to start UTxxx. | Increment by one. |
-|Should| Use Az module cmdlets only.|     |
+|Should| Use Az module cmdlets only.| This is the Microsoft intended PowerShell module for interacting with Azure. Replaces AzureRM module. |
 |Should| Follow the naming covention. | See [Naming Conventions](#naming-conventions)    |
 |Should| Adhere to .editorconfig. | Stored in .editorconfig |
 |Should| Adhere to .vscode settings. | Stored in .vscode/settings.json|
 |Should| Use a forward slash ('/') in paths. | This is to ensure compatibility on both Windows and Linux platforms. |
-| Should | Use -ErrorAction per cmdlet. |  |
-|Should NOT| Use aliases. |This can cause less readable code. |
+|Should| Use -ErrorAction per cmdlet. |   |
+|Should NOT| Use aliases. | This can cause less readable code. |
 |Should NOT | Hard code credentials (especially plain text). | Expose sensitive information. |
 |Should NOT | Use Write-Host. | As explained by [Jeffrey Snover](http://www.jsnover.com/blog/2013/12/07/write-host-considered-harmful/) and [Don Jones](https://www.itprotoday.com/powershell/what-do-not-do-powershell-part-1) |
 |Should NOT | Set global error actions. | Using a global error action, particularly to suppress errors will hinder troubleshooting.  |
@@ -59,8 +61,8 @@ This section provides an overview of the following:
 
 | Section Header | Description |
 | - | - |
-| EditorConfig | EditorConfig is used to enforce a consistant readable format. |
-| VS Code Settings | |
+| EditorConfig | Provides an overview of how EditorConfig is used to enforce a consistant readable format. |
+| VS Code Settings | Provides an overview of how settings.json can be used to enforce consistency for VS Code settings. |
 
 ## EditorConfig
 
@@ -82,8 +84,7 @@ This section provides an overview of the following:
 
 | Section Header | Description |
 | - | - |
-| Comment Based Help | |
-| PlatyPS | Provides details of how to create comment based help and generate external help markdown using PlatyPS. |
+| Comment Based Help | Provides an overview of what help should be used in the infrastructure scripts. |
 | Naming Conventions | Provides a table containing the case type to use for identifiers as well as examples of each. |
 
 ## Comment Based Help
@@ -98,16 +99,6 @@ The help should consist of the following elements:
 - At least one example demonstrating how the script can be executed
 
 For further information see [about_Comment_Based_Help](https://github.com/PowerShell/PowerShell-Docs/blob/staging/reference/5.1/Microsoft.PowerShell.Core/About/about_Comment_Based_Help.md)
-
-INSERT EXAMPLE
-
-## PlatyPS
-
-All PowerShell scripts in the Infrastructure-Scripts folder must have external help documentation generated in markdown using the [PlatyPS](https://github.com/PowerShell/platyPS) module.
-
-TO DO
-
-ADD A PESTER TEST FOR THIS TO CHECK DOC EXISTS
 
 ## Naming Conventions
 
@@ -137,21 +128,22 @@ This section provides an overview of the following:
 
 | Section Header | Description |
 | - | - |
-| Pester |  |
-| PSScriptAnalyzer | |
-| PSCodeHealth | |
+| Pester | Provides an introduction to Pester and how it is used to test the infrastructure scripts.  |
+| PSScriptAnalyzer | Provides an introduction to PSScriptAnalyzer and how it is used to check code quality.  |
 
 ## Pester
 
-TO DO
+### Introduction
+
+### How it's Used
+
+### How to Write a Pester Unit Test
 
 ## PSScriptAnalyzer
 
-TO DO
+### Introduction
 
-## PSCodeHealth
-
-TO DO
+### How it's Used
 
 # References and Further Reading
 
