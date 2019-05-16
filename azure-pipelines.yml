@@ -58,7 +58,7 @@ jobs:
 
   - deployment: "GitHubRelease"
     displayName: "Create Release in GitHub"
-    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/github-assets'))
     dependsOn:
       - "Windows_PS51_Build_DAS_Continuous_Deployment"
       - "Linux_PSCore_Build_DAS_Continuous_Integration"
@@ -80,3 +80,4 @@ jobs:
                 tagSource: "manual"
                 tag: "$(Build.BuildNumber)"
                 addChangeLog: true
+                assets: "$(System.DefaultWorkingDirectory)/Infrastructure-Scripts/**/*.ps1"
