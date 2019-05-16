@@ -80,3 +80,4 @@ jobs:
                 tagSource: "manual"
                 tag: "$(Build.BuildNumber)"
                 addChangeLog: true
+                assets: "$(System.DefaultWorkingDirectory)/Infrastructure-Scripts/**/*.ps1"
