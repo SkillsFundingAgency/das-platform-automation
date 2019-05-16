@@ -66,7 +66,7 @@ jobs:
       runOnce:
         deploy:
           steps:
-            - task: gittools.gitversion.gitversion-task.GitVersion@4
+            - task: GitVersion@4
               displayName: GitVersion
             - task: GitHubRelease@0
               inputs:
