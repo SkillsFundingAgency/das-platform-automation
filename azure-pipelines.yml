@@ -6,78 +6,80 @@ trigger:
 
 pr: none
 
-jobs:
-  - job: "Windows_PS51_Build_DAS_Continuous_Deployment"
-    pool:
-      name: "DAS - Continuous Deployment"
-      demands:
-        - npm
-        - node.js
-    workspace:
-      clean: all
-    steps:
-      - script: |
-          npm install eclint
-          node ./node_modules/eclint/bin/eclint.js check
-        displayName: "Validate editorconfig"
-        workingDirectory: $(System.DefaultWorkingDirectory)
-      - task: PowerShell@2
-        inputs:
-          filePath: "Tests/Invoke-Tests.ps1"
-      - task: PublishTestResults@2
-        displayName: "Publish Test Results **/TEST-*.xml"
-        inputs:
-          testResultsFormat: NUnit
-          testResultsFiles: "**/TEST-*.xml"
-        condition: succeededOrFailed()
 
-  - job: "Linux_PSCore_Build_DAS_Continuous_Integration"
-    pool:
-      name: "DAS - Continuous Integration"
-      demands:
-        - npm
-        - node.js
-    workspace:
-      clean: all
-    steps:
-      - script: |
-          npm install eclint
-          node $(npm root)/eclint/bin/eclint.js check $(System.DefaultWorkingDirectory)
-        displayName: "Validate editorconfig"
-        workingDirectory: $(System.DefaultWorkingDirectory)
-      - task: PowerShell@2
-        inputs:
-          filePath: "Tests/Invoke-Tests.ps1"
-          pwsh: true
-      - task: PublishTestResults@2
-        displayName: "Publish Test Results **/TEST-*.xml"
-        inputs:
-          testResultsFormat: NUnit
-          testResultsFiles: "**/TEST-*.xml"
-        condition: succeededOrFailed()
+stages:
+  - stage: Test
+    jobs:
+      - job: "Windows_PS51_Build_DAS_Continuous_Deployment"
+        pool:
+          name: "DAS - Continuous Deployment"
+          demands:
+            - npm
+            - node.js
+        workspace:
+          clean: all
+        steps:
+          - script: |
+              npm install eclint
+              node ./node_modules/eclint/bin/eclint.js check
+            displayName: "Validate editorconfig"
+            workingDirectory: $(System.DefaultWorkingDirectory)
+          - task: PowerShell@2
+            inputs:
+              filePath: "Tests/Invoke-Tests.ps1"
+          - task: PublishTestResults@2
+            displayName: "Publish Test Results **/TEST-*.xml"
+            inputs:
+              testResultsFormat: NUnit
+              testResultsFiles: "**/TEST-*.xml"
+            condition: succeededOrFailed()
 
-  - deployment: "GitHubRelease"
-    displayName: "Create Release in GitHub"
+      - job: "Linux_PSCore_Build_DAS_Continuous_Integration"
+        pool:
+          name: "DAS - Continuous Integration"
+          demands:
+            - npm
+            - node.js
+        workspace:
+          clean: all
+        steps:
+          - script: |
+              npm install eclint
+              node $(npm root)/eclint/bin/eclint.js check $(System.DefaultWorkingDirectory)
+            displayName: "Validate editorconfig"
+            workingDirectory: $(System.DefaultWorkingDirectory)
+          - task: PowerShell@2
+            inputs:
+              filePath: "Tests/Invoke-Tests.ps1"
+              pwsh: true
+          - task: PublishTestResults@2
+            displayName: "Publish Test Results **/TEST-*.xml"
+            inputs:
+              testResultsFormat: NUnit
+              testResultsFiles: "**/TEST-*.xml"
+            condition: succeededOrFailed()
+
+  - stage: Release
     condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
-    dependsOn:
-      - "Windows_PS51_Build_DAS_Continuous_Deployment"
-      - "Linux_PSCore_Build_DAS_Continuous_Integration"
-    pool:
-      name: "DAS - Continuous Deployment"
-    environment: GitHub
-    strategy:
-      runOnce:
-        deploy:
-          steps:
-            - task: GitVersion@4
-              displayName: GitVersion
-            - task: GitHubRelease@0
-              inputs:
-                gitHubConnection: "SFA"
-                repositoryName: "$(Build.Repository.Name)"
-                action: "create"
-                target: "$(Build.SourceVersion)"
-                tagSource: "manual"
-                tag: "$(Build.BuildNumber)"
-                addChangeLog: true
-                assets: "$(System.DefaultWorkingDirectory)/Infrastructure-Scripts/**/*.ps1"
+    jobs:
+    - deployment: "GitHubRelease"
+      displayName: "Create Release in GitHub"
+      pool:
+        name: "DAS - Continuous Deployment"
+      environment: GitHub
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+              - task: GitVersion@4
+                displayName: GitVersion
+              - task: GitHubRelease@0
+                inputs:
+                  gitHubConnection: "SFA"
+                  repositoryName: "$(Build.Repository.Name)"
+                  action: "create"
+                  target: "$(Build.SourceVersion)"
+                  tagSource: "manual"
+                  tag: "$(Build.BuildNumber)"
+                  addChangeLog: true
+                  assets: "$(System.DefaultWorkingDirectory)/Infrastructure-Scripts/**/*.ps1"
