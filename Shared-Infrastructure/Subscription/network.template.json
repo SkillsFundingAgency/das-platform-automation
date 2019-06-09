@@ -29,12 +29,26 @@
         "description": "The CIDR notation of the subnet address space"
       }
     },
+    "managementSubnetNamePrefix": {
+      "type": "string",
+      "defaultValue": "mgmt-sn",
+      "metadata": {
+        "description": "The prefix used for naming new management subnets."
+      }
+    },
     "managementSubnetCount": {
       "type": "int",
       "defaultValue": 1,
       "maxValue": 1,
       "metadata": {
         "description": "The number of management subnets to provision"
+      }
+    },
+    "externalSubnetNamePrefix": {
+      "type": "string",
+      "defaultValue": "ext-app-sn",
+      "metadata": {
+        "description": "The prefix used for naming new external app subnets."
       }
     },
     "externalAppSubnetCount": {
@@ -45,34 +59,31 @@
         "description": "The number of external subnets to provision"
       }
     },
+    "ineternalSubnetNamePrefix": {
+      "type": "string",
+      "defaultValue": "int-app-sn",
+      "metadata": {
+        "description": "The prefix used for naming new internal app subnets."
+      }
+    },
     "internalAppSubnetCount": {
       "type": "int",
       "defaultValue": 1,
       "maxValue": 10,
       "metadata": {
-        "description": "The number of internal subnets to provision"
+        "description": "The number of internal subnets to provision."
+      }
+    },
+    "serviceEndpointList":{
+      "type": "array",
+      "defaultValue": [],
+      "metadata": {
+        "description": "A list of service endpoints to configure on the subnets provisioned in the vnet."
       }
     }
   },
   "variables": {
     "deploymentUrlBase": "https://raw.githubusercontent.com/SkillsFundingAgency/das-platform-building-blocks/as-vnet-integration/templates/",
-    "managementSubnetNamePrefix": "das-mgmt-sn",
-    "ineternalSubnetNamePrefix": "das-int-app-sn",
-    "externalSubnetNamePrefix": "das-ext-app-sn",
-    "subnetServiceEndpoints": [
-      {
-        "service": "Microsoft.Web"
-      },
-      {
-        "service": "Microsoft.Sql"
-      },
-      {
-        "service": "Microsoft.Storage"
-      },
-      {
-        "service": "Microsoft.AzureCosmosDB"
-      }
-    ],
     "subnetDelegations": [
       {
         "name": "webapp",
@@ -84,16 +95,22 @@
         }
       }
     ],
+    "serviceEndpointsEmpty": [],
     "copy": [
+      {
+        "name": "serviceEndpoints",
+        "count": "[if(greater(length(parameters('serviceEndpointList')), 0), length(parameters('serviceEndpointList')), 1)]",
+        "input": {
+          "service": "[if(greater(length(parameters('serviceEndpointList')), 0), parameters('serviceEndpointList')[copyIndex('serviceEndPoints')], json('null'))]"
+        }
+      },
       {
         "name": "managementSubnetCopy",
         "count": "[parameters('managementSubnetCount')]",
         "input": {
-          "name": "[concat(variables('managementSubnetNamePrefix'), '-', copyIndex('managementSubnetCopy'))]",
+          "name": "[concat(parameters('managementSubnetNamePrefix'), '-', copyIndex('managementSubnetCopy'))]",
           "properties": {
-            "addressPrefix": "[blocks.getNextAddressRange(parameters('virtualNetworkAddressSpacePrefix'), 0, copyIndex('managementSubnetCopy'), parameters('subnetAddressSpaceCIDR'))]",
-            "serviceEndpoints": "[variables('subnetServiceEndpoints')]",
-            "delegations": "[variables('subnetDelegations')]"
+            "addressPrefix": "[blocks.getNextAddressRange(parameters('virtualNetworkAddressSpacePrefix'), 0, copyIndex('managementSubnetCopy'), parameters('subnetAddressSpaceCIDR'))]"
           }
         }
       },
@@ -101,10 +118,10 @@
         "name": "externalSubnetCopy",
         "count": "[parameters('externalAppSubnetCount')]",
         "input": {
-          "name": "[concat(variables('externalSubnetNamePrefix'), '-', copyIndex('externalSubnetCopy'))]",
+          "name": "[concat(parameters('externalSubnetNamePrefix'), '-', copyIndex('externalSubnetCopy'))]",
           "properties": {
             "addressPrefix": "[blocks.getNextAddressRange(parameters('virtualNetworkAddressSpacePrefix'), 100, copyIndex('externalSubnetCopy'), parameters('subnetAddressSpaceCIDR'))]",
-            "serviceEndpoints": "[variables('subnetServiceEndpoints')]",
+            "serviceEndpoints": "[if(greater(length(parameters('serviceEndpointList')), 0), variables('serviceEndPoints'), variables('serviceEndpointsEmpty'))]",
             "delegations": "[variables('subnetDelegations')]"
           }
         }
@@ -113,10 +130,10 @@
         "name": "internalSubnetCopy",
         "count": "[parameters('internalAppSubnetCount')]",
         "input": {
-          "name": "[concat(variables('ineternalSubnetNamePrefix'), '-', copyIndex('internalSubnetCopy'))]",
+          "name": "[concat(parameters('ineternalSubnetNamePrefix'), '-', copyIndex('internalSubnetCopy'))]",
           "properties": {
             "addressPrefix": "[blocks.getNextAddressRange(parameters('virtualNetworkAddressSpacePrefix'), 200, copyIndex('internalSubnetCopy'), parameters('subnetAddressSpaceCIDR'))]",
-            "serviceEndpoints": "[variables('subnetServiceEndpoints')]",
+            "serviceEndpoints": "[if(greater(length(parameters('serviceEndpointList')), 0), variables('serviceEndPoints'), variables('serviceEndpointsEmpty'))]",
             "delegations": "[variables('subnetDelegations')]"
           }
         }
@@ -151,6 +168,9 @@
             "type": "string",
             "value": "[concat(parameters('networkPrefix'), '.' , add(parameters('networkStartingAddress'), parameters('index')) ,'.0', parameters('mask'))]"
           }
+        },
+        "getValueIfNotEmpty":{
+
         }
       }
     }

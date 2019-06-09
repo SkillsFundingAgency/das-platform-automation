@@ -1,0 +1,307 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "resourceEnvironmentName": {
+      "type": "string",
+      "metadata": {
+        "description": "Base environment name. E.g. DEV. PP, PRD, MO. "
+      }
+    },
+    "serviceName": {
+      "type": "string",
+      "defaultValue": "shared",
+      "metadata": {
+        "description":"Service name of the service. E.g shared infrastructure = shared."
+      }
+    },
+    "keyVaultAccessObjectIds": {
+      "type": "array",
+      "metadata": {
+        "description": "Object Ids of the Azure AD Objects you want to grant Key Vault access to"
+      }
+    },
+    "microsoftAzureWebsitesRPObjectId": {
+      "type": "string"
+    },
+    "backupManagementServiceObjectId": {
+      "type": "string"
+    },
+    "diskEncryptionAppRegistrationObjectId": {
+      "type": "string"
+    },
+    "environments": {
+      "type": "array",
+      "defaultValue": [],
+      "metadata": {
+        "description": "String array of all environments in this subscription"
+      }
+    },
+    "sqlServerActiveDirectoryAdminLogin": {
+      "type": "string",
+      "metadata": {
+        "description": "The active directory admin that will be assigned to the sql server"
+      }
+    },
+    "sqlServerActiveDirectoryAdminObjectId": {
+      "type": "string",
+      "metadata": {
+        "description": "The object id of the active directory admin that will be assigned to the sql server"
+      }
+    },
+    "threatDetectionEmailAddress": {
+      "type": "string",
+      "metadata": {
+        "description": "The email address that threat alerts will be sent to"
+      }
+    },
+    "aseHostingEnvironmentName": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Optional ASE to deploy ASP to"
+      }
+    },
+    "aseResourceGroup": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Resource group where the optional ASE resides"
+      }
+    },
+    "databaseConfiguration": {
+      "type": "object",
+      "metadata": {
+        "description": "Configuration object which describes the structure of failover groups"
+      }
+    }
+  },
+  "variables": {
+    "deploymentUrlBase": "https://raw.githubusercontent.com/SkillsFundingAgency/das-platform-building-blocks/as_vnet_integration/templates/",
+    "sharedDeploymentUrlBase": "https://raw.githubusercontent.com/SkillsFundingAgency/das-platform-automation/shared_infrastructure/Subscription/",
+    "resourceNamePrefix": "[toLower(concat('das-', parameters('resourceEnvironmentName'),'-', parameters('serviceName')))]",
+    "keyVaultName": "[concat(variables('resourceNamePrefix'),'-kv')]",
+    "configurationStorageName": "[toLower(concat('das',parameters('resourceEnvironmentName'),'config'))]",
+    "keyVaultAccessPolicies": [
+      {
+        "objectId": "[parameters('microsoftAzureWebsitesRPObjectId')]",
+        "tenantId": "[subscription().tenantId]",
+        "permissions": {
+          "secrets": [
+            "Get"
+          ]
+        }
+      },
+      {
+        "objectId": "[parameters('backupManagementServiceObjectId')]",
+        "tenantId": "[subscription().tenantId]",
+        "permissions": {
+          "keys": [
+            "Get",
+            "List",
+            "Backup"
+          ],
+          "secrets": [
+            "Get",
+            "List",
+            "Backup"
+          ]
+        }
+      },
+      {
+        "objectId": "[parameters('diskEncryptionAppRegistrationObjectId')]",
+        "tenantId": "[subscription().tenantId]",
+        "permissions": {
+          "keys": [
+            "WrapKey"
+          ],
+          "secrets": [
+            "Set"
+          ]
+        }
+      }
+    ],
+    "copy": [
+      {
+        "name": "parameterKeyVaultAccessPolicies",
+        "count": "[length(parameters('keyVaultAccessObjectIds'))]",
+        "input": {
+          "objectId": "[parameters('keyVaultAccessObjectIds')[copyIndex('parameterKeyVaultAccessPolicies')]]",
+          "tenantId": "[subscription().tenantId]",
+          "permissions": {
+            "secrets": [
+              "Get",
+              "List",
+              "Set"
+            ]
+          }
+        }
+      }
+    ],
+    "subnetServiceEndpointList": [
+      "Microsoft.Web",
+      "Microsoft.Sql",
+      "Microsoft.Storage",
+      "Microsoft.AzureCosmosDB"
+    ]
+  },
+  "resources": [
+    {
+      "apiVersion": "2017-05-10",
+      "name": "[concat('virtual-network-west-europe', parameters('environments')[copyIndex()])]",
+      "type": "Microsoft.Resources/deployments",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(variables('sharedDeploymentUrlBase'),'network.template.json')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "virtualNetworkName": {
+            "value": "[concat('das-',parameters('environments')[copyIndex()],'-shared-vnet-we')]"
+          },
+          "serviceEndpointList": {
+            "value": "[variables('subnetServiceEndpointList')]"
+          }
+        }
+      },
+      "copy": {
+        "name": "virtualNetworkCopy",
+        "count": "[length(parameters('environments'))]"
+      }
+    },
+    {
+      "apiVersion": "2017-05-10",
+      "name": "key-vault",
+      "type": "Microsoft.Resources/deployments",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(variables('deploymentUrlBase'),'keyvault.json')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "keyVaultName": {
+            "value": "[variables('keyVaultName')]"
+          },
+          "keyVaultAccessPolicies": {
+            "value": "[concat(variables('KeyVaultAccessPolicies'), variables('parameterKeyVaultAccessPolicies'))]"
+          },
+          "enabledForDiskEncryption": {
+            "value": true
+          },
+          "enabledForTemplateDeployment": {
+            "value": true
+          },
+          "enableSoftDelete": {
+            "value": true
+          }
+        }
+      }
+    },
+    {
+      "apiVersion": "2017-05-10",
+      "name": "[concat('sql-server-key-vault-secrets-', parameters('environments')[copyIndex()])]",
+      "type": "Microsoft.Resources/deployments",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(variables('deploymentUrlBase'),'keyvault-secret.json')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "keyVaultName": {
+            "value": "[variables('keyVaultName')]"
+          },
+          "secretName": {
+            "value": "[toLower(concat('das-', parameters('environments')[copyIndex()], '-shared-sql'))]"
+          },
+          "secretValue": {
+            "value": "[concat(toUpper(substring(parameters('environments')[copyIndex()],0,1)), uniqueString(resourceGroup().id, string(copyIndex()), parameters('environments')[copyIndex()]), toLower(substring(parameters('environments')[copyIndex()],sub(length(parameters('environments')[copyIndex()]), 1),1)), '!')]"
+          }
+        }
+      },
+      "copy": {
+        "name": "secretsCopy",
+        "count": "[length(parameters('environments'))]"
+      },
+      "dependsOn": [
+        "key-vault"
+      ]
+    },
+    {
+      "apiVersion": "2017-05-10",
+      "name": "configuration-storage-account",
+      "type": "Microsoft.Resources/deployments",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(variables('deploymentUrlBase'),'storage-account-arm.json')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "storageAccountName": {
+            "value": "[variables('configurationStorageName')]"
+          }
+        }
+      }
+    },
+    {
+      "apiVersion": "2017-05-10",
+      "name": "[toLower(concat(parameters('environments')[copyIndex()], '-shared-environment-infrastructure'))]",
+      "type": "Microsoft.Resources/deployments",
+      "resourceGroup": "[toLower(concat('das-', parameters('environments')[copyIndex()], '-shared-rg'))]",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(variables('sharedDeploymentUrlBase'), 'Environment/template.json')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "environmentName": {
+            "value": "[toUpper(parameters('environments')[copyIndex()])]"
+          },
+          "sharedKeyVaultResourceGroup": {
+            "value": "[resourceGroup().name]"
+          },
+          "sharedKeyVaultName": {
+            "value": "[variables('keyVaultName')]"
+          },
+          "sharedKeyVaultId": {
+            "value": "[reference('key-vault').outputs.KeyVaultResourceId.value]" //This is necessary because the "dependsOn" is not waiting for the key-vault to deploy
+          },
+          "sqlServerAdminPasswordSecretName": {
+            "value": "[toLower(concat('das-', parameters('environments')[copyIndex()], '-shared-sql'))]"
+          },
+          "sqlServerActiveDirectoryAdminLogin": {
+            "value": "[parameters('sqlServerActiveDirectoryAdminLogin')]"
+          },
+          "sqlServerActiveDirectoryAdminObjectId": {
+            "value": "[parameters('sqlServerActiveDirectoryAdminObjectId')]"
+          },
+          "threatDetectionEmailAddress": {
+            "value": "[parameters('threatDetectionEmailAddress')]"
+          },
+          "aseHostingEnvironmentName": {
+            "value": "[parameters('aseHostingEnvironmentName')]"
+          },
+          "aseResourceGroup": {
+            "value": "[parameters('aseResourceGroup')]"
+          },
+          "databaseConfiguration": {
+            "value": "[parameters('databaseConfiguration')]"
+          }
+        }
+      },
+      "copy": {
+        "name": "environmentCopy",
+        "count": "[length(parameters('environments'))]"
+      },
+      "dependsOn": [
+        "key-vault",
+        "secretsCopy"
+      ]
+    }
+  ],
+  "outputs": {}
+}
