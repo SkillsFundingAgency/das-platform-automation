@@ -77,12 +77,12 @@
     }
   },
   "variables": {
-    "deploymentUrlBase": "https://raw.githubusercontent.com/SkillsFundingAgency/das-platform-building-blocks/as_vnet_integration/templates/",
+    "deploymentUrlBase": "https://raw.githubusercontent.com/SkillsFundingAgency/das-platform-building-blocks/as-vnet-integration/templates/",
     "sharedDeploymentUrlBase": "https://raw.githubusercontent.com/SkillsFundingAgency/das-platform-automation/shared_infrastructure/Subscription/",
     "resourceNamePrefix": "[toLower(concat('das-', parameters('resourceEnvironmentName'),'-', parameters('serviceName')))]",
     "keyVaultName": "[concat(variables('resourceNamePrefix'),'-kv')]",
     "configurationStorageName": "[toLower(concat('das',parameters('resourceEnvironmentName'),'config'))]",
-    "keyVaultAccessPolicies": [
+    "keyVaultAccessPolicies1": [
       {
         "objectId": "[parameters('microsoftAzureWebsitesRPObjectId')]",
         "tenantId": "[subscription().tenantId]",
@@ -117,6 +117,17 @@
           ],
           "secrets": [
             "Set"
+          ]
+        }
+      }
+    ],
+    "keyVaultAccessPolicies": [
+      {
+        "objectId": "[parameters('microsoftAzureWebsitesRPObjectId')]",
+        "tenantId": "[subscription().tenantId]",
+        "permissions": {
+          "secrets": [
+            "Get"
           ]
         }
       }
@@ -157,6 +168,9 @@
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
+          "deploymentUrlBase": {
+            "value": "[variables('deploymentUrlBase')]"
+          },
           "virtualNetworkName": {
             "value": "[concat('das-',parameters('environments')[copyIndex()],'-shared-vnet-we')]"
           },

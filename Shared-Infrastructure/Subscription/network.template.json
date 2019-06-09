@@ -2,6 +2,12 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
+    "deploymentBaseUrl": {
+      "type": "string",
+      "metadata": {
+        "description": "The base Url for building block templates."
+      }
+    },
     "virtualNetworkName": {
       "type": "string",
       "metadata": {
@@ -83,7 +89,6 @@
     }
   },
   "variables": {
-    "deploymentUrlBase": "https://raw.githubusercontent.com/SkillsFundingAgency/das-platform-building-blocks/as-vnet-integration/templates/",
     "subnetDelegations": [
       {
         "name": "webapp",
