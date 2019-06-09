@@ -72,14 +72,14 @@
     }
   },
   "variables": {
-    "deploymentUrlBase": "https://raw.githubusercontent.com/SkillsFundingAgency/das-platform-building-blocks/master/templates/",
-    "sharedASMStorageName": "[toLower(concat('das',parameters('environmentName'),'shdasmstr'))]",
-    "sharedARMStorageName": "[toLower(concat('das',parameters('environmentName'),'shdarmstr'))]",
-    "sharedAppServicePlanName": "[toLower(concat('das-',parameters('environmentName'),'-shared-asp'))]",
-    "serviceBusNamespaceName": "[toLower(concat('das-',parameters('EnvironmentName'),'-shared-ns'))]",
-    "redisCacheName": "[toLower(concat('das-',parameters('EnvironmentName'),'-shared-rds'))]",
-    "cdnProfileName": "[toLower(concat('das-',parameters('EnvironmentName'),'-shared-cdn'))]",
-    "eventHubNamespaceName": "[toLower(concat('das-',parameters('EnvironmentName'),'-shared-eh'))]",
+    "deploymentUrlBase": "https://raw.githubusercontent.com/SkillsFundingAgency/das-platform-building-blocks/as-vnet-integration/templates/",
+    "sharedARMStorageName": "[toLower(concat('das',parameters('environmentName'),'sharedstr'))]",
+    "resourceNamePrefix": "[toLower(concat('das-', parameters('environmentName'),'-shared'))]",
+    "sharedAppServicePlanName": "[concat(variables('resourceNamePrefix'),'-asp')]",
+    "serviceBusNamespaceName": "[concat(variables('resourceNamePrefix'),'-ns')]",
+    "redisCacheName": "[concat(variables('resourceNamePrefix'),'-rds')]",
+    "cdnProfileName": "[concat(variables('resourceNamePrefix'),'-cdn')]",
+    "eventHubNamespaceName": "[concat(variables('resourceNamePrefix'),'-eh')]",
     "deployToASE": "[greater(length(parameters('aseHostingEnvironmentName')), 0)]",
     "appServicePlanSKUs": {
       "standard": {
@@ -101,31 +101,12 @@
         "nameSuffix": "ne"
       }
     },
-    "managementResourceGroupName": "[toLower(concat('das-',parameters('environmentName'),'-mgmt-rg'))]",
     "baseSqlServerName": "[toLower(concat('das-',parameters('environmentName'),'-shared-sql'))]",
     "deployFailoverGroups": "[contains(createArray('pp', 'prd') , toLower(parameters('environmentName')))]",
     "primarySQLServerName": "[toLower(concat(variables('baseSQLServerName'), '-', variables('sqlServerLocationMap').primary.nameSuffix))]",
     "secondarySQLServerName": "[toLower(concat(variables('baseSQLServerName'), '-', variables('sqlServerLocationMap').secondary.nameSuffix))]"
   },
   "resources": [
-
-    {
-      "apiVersion": "2017-05-10",
-      "name": "classic-shared-storage",
-      "type": "Microsoft.Resources/deployments",
-      "properties": {
-        "mode": "Incremental",
-        "templateLink": {
-          "uri": "[concat(variables('deploymentUrlBase'),'storage-account-classic.json')]",
-          "contentVersion": "1.0.0.0"
-        },
-        "parameters": {
-          "storageAccountName": {
-            "value": "[variables('sharedASMStorageName')]"
-          }
-        }
-      }
-    },
     {
       "apiVersion": "2017-05-10",
       "name": "arm-shared-storage",
