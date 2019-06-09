@@ -200,15 +200,6 @@
           },
           "sqlStorageAccountName": {
             "value": "[variables('sharedARMStorageName')]"
-          },
-          "omsWorkspaceName": {
-            "value": "[parameters('omsWorkspaceName')]"
-          },
-          "omsWorkspaceResourceGroupName": {
-            "value": "[parameters('omsWorkspaceResourceGroupName')]"
-          },
-          "omsWorkspaceSubscriptionId": {
-            "value": "[parameters('omsWorkspaceSubscriptionId')]"
           }
         }
       },
