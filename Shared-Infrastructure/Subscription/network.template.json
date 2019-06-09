@@ -80,7 +80,7 @@
         "description": "The number of internal subnets to provision."
       }
     },
-    "serviceEndpointList":{
+    "serviceEndpointList": {
       "type": "array",
       "defaultValue": [],
       "metadata": {
@@ -126,7 +126,7 @@
           "name": "[concat(parameters('externalSubnetNamePrefix'), '-', copyIndex('externalSubnetCopy'))]",
           "properties": {
             "addressPrefix": "[blocks.getNextAddressRange(parameters('virtualNetworkAddressSpacePrefix'), 100, copyIndex('externalSubnetCopy'), parameters('subnetAddressSpaceCIDR'))]",
-            "serviceEndpoints": "[if(greater(length(parameters('serviceEndpointList')), 0), variables('serviceEndPoints'), variables('serviceEndpointsEmpty'))]",
+            "serviceEndpoints": "[blocks.getValueOrDefault(parameters('serviceEndpointList'), variables('serviceEndpoints'))]",
             "delegations": "[variables('subnetDelegations')]"
           }
         }
@@ -138,7 +138,7 @@
           "name": "[concat(parameters('ineternalSubnetNamePrefix'), '-', copyIndex('internalSubnetCopy'))]",
           "properties": {
             "addressPrefix": "[blocks.getNextAddressRange(parameters('virtualNetworkAddressSpacePrefix'), 200, copyIndex('internalSubnetCopy'), parameters('subnetAddressSpaceCIDR'))]",
-            "serviceEndpoints": "[if(greater(length(parameters('serviceEndpointList')), 0), variables('serviceEndPoints'), variables('serviceEndpointsEmpty'))]",
+            "serviceEndpoints": "[blocks.getValueOrDefault(parameters('serviceEndpointList'), variables('serviceEndpoints'))]",
             "delegations": "[variables('subnetDelegations')]"
           }
         }
@@ -174,8 +174,20 @@
             "value": "[concat(parameters('networkPrefix'), '.' , add(parameters('networkStartingAddress'), parameters('index')) ,'.0', parameters('mask'))]"
           }
         },
-        "getValueIfNotEmpty":{
-
+        "getValueOrDefault": {
+          "parameters": [
+            {
+              "name": "inputArray",
+              "type": "array"
+            },{
+              "name": "output",
+              "type": "array"
+            }
+          ],
+          "output": {
+            "type": "array",
+            "value": "[if(greater(length(parameters('input')), 0), parameters('input'), array(0))]"
+          }
         }
       }
     }

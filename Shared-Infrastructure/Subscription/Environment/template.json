@@ -1,0 +1,437 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "environmentName": {
+      "type": "string",
+      "metadata": {
+        "description": "Abbreviated name for the environment, eg: AT, TEST, PP, PRD"
+      }
+    },
+    "sharedKeyVaultResourceGroup": {
+      "type": "string",
+      "metadata": {
+        "description": "Resource group of the shared Key Vault for storing the SQL password"
+      }
+    },
+    "sharedKeyVaultName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the shared Key Vault for storing the SQL password"
+      }
+    },
+    "sharedKeyVaultId": {
+      "type": "string",
+      "metadata": {
+        "description": "This is necessary because the 'dependsOn' in the subscription template is not waiting for the keyvault to deploy"
+      }
+    },
+    "sqlServerAdminPasswordSecretName": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the Key Vault secret which contains the SQL Admin password for this environment"
+      }
+    },
+    "sqlServerActiveDirectoryAdminLogin": {
+      "type": "string",
+      "metadata": {
+        "description": "The active directory admin that will be assigned to the sql server"
+      }
+    },
+    "sqlServerActiveDirectoryAdminObjectId": {
+      "type": "string",
+      "metadata": {
+        "description": "The object id of the active directory admin that will be assigned to the sql server"
+      }
+    },
+    "threatDetectionEmailAddress": {
+      "type": "string",
+      "metadata": {
+        "description": "The email address that threat alerts will be sent to"
+      }
+    },
+    "omsWorkspaceName": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the OMS workspace that will collect audit events"
+      }
+    },
+    "omsWorkspaceResourceGroupName": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the OMS workspace resource group that will collect audit events"
+      }
+    },
+    "omsWorkspaceSubscriptionId": {
+      "type": "string",
+      "metadata": {
+        "description": "The id of the OMS workspace subscription that will collect audit events"
+      }
+    },
+    "aseHostingEnvironmentName": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Optional ASE to deploy ASP to"
+      }
+    },
+    "aseResourceGroup": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Resource group where the optional ASE resides"
+      }
+    },
+    "databaseConfiguration": {
+      "type": "object",
+      "metadata": {
+        "description": "Configuration object which describes the structure of failovergroups"
+      }
+    }
+  },
+  "variables": {
+    "deploymentUrlBase": "https://raw.githubusercontent.com/SkillsFundingAgency/das-platform-building-blocks/master/templates/",
+    "sharedASMStorageName": "[toLower(concat('das',parameters('environmentName'),'shdasmstr'))]",
+    "sharedARMStorageName": "[toLower(concat('das',parameters('environmentName'),'shdarmstr'))]",
+    "sharedAppServicePlanName": "[toLower(concat('das-',parameters('environmentName'),'-shared-asp'))]",
+    "serviceBusNamespaceName": "[toLower(concat('das-',parameters('EnvironmentName'),'-shared-ns'))]",
+    "redisCacheName": "[toLower(concat('das-',parameters('EnvironmentName'),'-shared-rds'))]",
+    "cdnProfileName": "[toLower(concat('das-',parameters('EnvironmentName'),'-shared-cdn'))]",
+    "eventHubNamespaceName": "[toLower(concat('das-',parameters('EnvironmentName'),'-shared-eh'))]",
+    "deployToASE": "[greater(length(parameters('aseHostingEnvironmentName')), 0)]",
+    "appServicePlanSKUs": {
+      "standard": {
+        "size": "2",
+        "instanceCount": 2
+      },
+      "isolated": {
+        "size": "1",
+        "instanceCount": 2
+      }
+    },
+    "sqlServerLocationMap": {
+      "primary": {
+        "location": "westeurope",
+        "nameSuffix": "we"
+      },
+      "secondary": {
+        "location": "northeurope",
+        "nameSuffix": "ne"
+      }
+    },
+    "managementResourceGroupName": "[toLower(concat('das-',parameters('environmentName'),'-mgmt-rg'))]",
+    "baseSqlServerName": "[toLower(concat('das-',parameters('environmentName'),'-shared-sql'))]",
+    "deployFailoverGroups": "[contains(createArray('pp', 'prd') , toLower(parameters('environmentName')))]",
+    "primarySQLServerName": "[toLower(concat(variables('baseSQLServerName'), '-', variables('sqlServerLocationMap').primary.nameSuffix))]",
+    "secondarySQLServerName": "[toLower(concat(variables('baseSQLServerName'), '-', variables('sqlServerLocationMap').secondary.nameSuffix))]"
+  },
+  "resources": [
+
+    {
+      "apiVersion": "2017-05-10",
+      "name": "classic-shared-storage",
+      "type": "Microsoft.Resources/deployments",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(variables('deploymentUrlBase'),'storage-account-classic.json')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "storageAccountName": {
+            "value": "[variables('sharedASMStorageName')]"
+          }
+        }
+      }
+    },
+    {
+      "apiVersion": "2017-05-10",
+      "name": "arm-shared-storage",
+      "type": "Microsoft.Resources/deployments",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(variables('deploymentUrlBase'),'storage-account-arm.json')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "storageAccountName": {
+            "value": "[variables('sharedARMStorageName')]"
+          }
+        }
+      }
+    },
+    {
+      "apiVersion": "2017-05-10",
+      "name": "sql-server-deployment",
+      "type": "Microsoft.Resources/deployments",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(variables('deploymentUrlBase'),'sql-server.json')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "sqlServerName": {
+            "value": "[if(variables('deployFailoverGroups'), variables('primarySQLServerName'), variables('baseSQLServerName'))]"
+          },
+          "sqlServerLocation": {
+            "value": "[variables('sqlServerLocationMap').primary.location]"
+          },
+          "sqlServerAdminUserName": {
+            "value": "[concat('d', uniqueString(resourceGroup().id, guid(if(variables('deployFailoverGroups'), variables('primarySQLServerName'), variables('baseSQLServerName')))))]"
+          },
+          "sqlServerAdminPassword": {
+            "reference": {
+              "keyVault": {
+                "id": "[resourceId(parameters('sharedKeyVaultResourceGroup'), 'Microsoft.KeyVault/vaults', parameters('sharedKeyVaultName'))]"
+              },
+              "secretName": "[parameters('sqlServerAdminPasswordSecretName')]"
+            }
+          },
+          "sqlServerActiveDirectoryAdminLogin": {
+            "value": "[parameters('sqlServerActiveDirectoryAdminLogin')]"
+          },
+          "sqlServerActiveDirectoryAdminObjectId": {
+            "value": "[parameters('sqlServerActiveDirectoryAdminObjectId')]"
+          },
+          "threatDetectionEmailAddress": {
+            "value": "[parameters('threatDetectionEmailAddress')]"
+          },
+          "sqlStorageAccountName": {
+            "value": "[variables('sharedARMStorageName')]"
+          },
+          "omsWorkspaceName": {
+            "value": "[parameters('omsWorkspaceName')]"
+          },
+          "omsWorkspaceResourceGroupName": {
+            "value": "[parameters('omsWorkspaceResourceGroupName')]"
+          },
+          "omsWorkspaceSubscriptionId": {
+            "value": "[parameters('omsWorkspaceSubscriptionId')]"
+          }
+        }
+      },
+      "dependsOn": [
+        "arm-shared-storage"
+      ]
+    },
+    {
+      "apiVersion": "2017-05-10",
+      "name": "sql-server-deployment-replica",
+      "type": "Microsoft.Resources/deployments",
+      "condition": "[variables('deployFailoverGroups')]",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(variables('deploymentUrlBase'),'sql-server.json')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "sqlServerName": {
+            "value": "[if(variables('deployFailoverGroups'), variables('secondarySQLServerName'), variables('baseSQLServerName'))]"
+          },
+          "sqlServerLocation": {
+            "value": "[variables('sqlServerLocationMap').secondary.location]"
+          },
+          "sqlServerAdminUserName": {
+            "value": "[concat('d', uniqueString(resourceGroup().id, guid(variables('secondarySQLServerName'))))]"
+          },
+          "sqlServerAdminPassword": {
+            "reference": {
+              "keyVault": {
+                "id": "[resourceId(parameters('sharedKeyVaultResourceGroup'), 'Microsoft.KeyVault/vaults', parameters('sharedKeyVaultName'))]"
+              },
+              "secretName": "[parameters('sqlServerAdminPasswordSecretName')]"
+            }
+          },
+          "sqlServerActiveDirectoryAdminLogin": {
+            "value": "[parameters('sqlServerActiveDirectoryAdminLogin')]"
+          },
+          "sqlServerActiveDirectoryAdminObjectId": {
+            "value": "[parameters('sqlServerActiveDirectoryAdminObjectId')]"
+          },
+          "threatDetectionEmailAddress": {
+            "value": "[parameters('threatDetectionEmailAddress')]"
+          },
+          "sqlStorageAccountName": {
+            "value": "[variables('sharedARMStorageName')]"
+          },
+          "omsWorkspaceName": {
+            "value": "[parameters('omsWorkspaceName')]"
+          },
+          "omsWorkspaceResourceGroupName": {
+            "value": "[parameters('omsWorkspaceResourceGroupName')]"
+          },
+          "omsWorkspaceSubscriptionId": {
+            "value": "[parameters('omsWorkspaceSubscriptionId')]"
+          }
+        }
+      },
+      "dependsOn": [
+        "arm-shared-storage"
+      ]
+    },
+    {
+      "apiVersion": "2017-05-10",
+      "name": "sql-server-failover-group",
+      "type": "Microsoft.Resources/deployments",
+      "condition": "[variables('deployFailoverGroups')]",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(variables('deploymentUrlBase'),'sql-server-failover-group.json')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "failoverGroupName": {
+            "value": "[variables('baseSqlServerName')]"
+          },
+          "primarySqlServerName": {
+            "value": "[variables('primarySQLServerName')]"
+          },
+          "secondarySqlServerName": {
+            "value": "[variables('secondarySQLServerName')]"
+          },
+          "databases": {
+            "value": "[parameters('databaseConfiguration')[toUpper(parameters('environmentName'))].DatabaseResourceIds]"
+          }
+        }
+      },
+      "dependsOn": [
+        "sql-server-deployment",
+        "sql-server-deployment-replica"
+      ]
+    },
+    {
+      "apiVersion": "2017-05-10",
+      "name": "app-service-plan",
+      "type": "Microsoft.Resources/deployments",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(variables('deploymentUrlBase'),'app-service-plan.json')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "appServicePlanName": {
+            "value": "[variables('sharedAppServicePlanName')]"
+          },
+          "aseHostingEnvironmentName": {
+            "value": "[parameters('aseHostingEnvironmentName')]"
+          },
+          "aseResourceGroup": {
+            "value": "[parameters('aseResourceGroup')]"
+          },
+          "aspSize": {
+            "value": "[if(variables('deployToASE'), variables('appServicePlanSKUs').isolated.size, variables('appServicePlanSKUs').standard.size)]"
+          },
+          "aspInstances": {
+            "value": "[if(variables('deployToASE'), variables('appServicePlanSKUs').isolated.instanceCount, variables('appServicePlanSKUs').standard.instanceCount)]"
+          }
+        }
+      }
+    },
+    {
+      "apiVersion": "2017-05-10",
+      "name": "service-bus",
+      "type": "Microsoft.Resources/deployments",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(variables('deploymentUrlBase'),'service-bus.json')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "serviceBusNamespaceName": {
+            "value": "[variables('serviceBusNamespaceName')]"
+          },
+          "serviceBusQueues": {
+            "value": [
+              "deadletters"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "apiVersion": "2017-05-10",
+      "name": "redis-cache",
+      "type": "Microsoft.Resources/deployments",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(variables('deploymentUrlBase'),'redis.json')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "redisCacheName": {
+            "value": "[variables('redisCacheName')]"
+          },
+          "redisCacheSKU": {
+            "value": "Standard"
+          },
+          "redisCacheFamily": {
+            "value": "C"
+          },
+          "redisCacheCapacity": {
+            "value": 1
+          },
+          "enableNonSslPort": {
+            "value": false
+          }
+        }
+      }
+    },
+    {
+      "apiVersion": "2017-05-10",
+      "name": "cdn-profile",
+      "type": "Microsoft.Resources/deployments",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(variables('deploymentUrlBase'),'cdn-profile.json')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "cdnProfileName": {
+            "value": "[variables('cdnProfileName')]"
+          },
+          "cdnSKU": {
+            "value": "Standard_Verizon"
+          }
+        }
+      }
+    },
+    {
+      "apiVersion": "2017-05-10",
+      "name": "event-hub-namespace",
+      "type": "Microsoft.Resources/deployments",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(variables('deploymentUrlBase'),'event-hub-namespace.json')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "eventHubNamespaceName": {
+            "value": "[variables('eventHubNamespaceName')]"
+          },
+          "eventHubTier": {
+            "value": "Standard"
+          },
+          "eventHubCapacity": {
+            "value": 1
+          },
+          "isAutoInflateEnabled": {
+            "value": true
+          },
+          "maximumThroughputUnits": {
+            "value": 20
+          }
+        }
+      }
+    }
+  ],
+  "outputs": {}
+}
