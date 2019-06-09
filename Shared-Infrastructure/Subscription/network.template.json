@@ -179,14 +179,15 @@
             {
               "name": "inputArray",
               "type": "array"
-            },{
-              "name": "output",
+            },
+            {
+              "name": "outputArray",
               "type": "array"
             }
           ],
           "output": {
             "type": "array",
-            "value": "[if(greater(length(parameters('input')), 0), parameters('input'), array(0))]"
+            "value": "[if(greater(length(parameters('inputArray')), 0), parameters('outputArray'), array(0))]"
           }
         }
       }
