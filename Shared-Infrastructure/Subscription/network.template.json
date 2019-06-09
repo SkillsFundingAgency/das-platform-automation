@@ -1,0 +1,184 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "virtualNetworkName": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the virtual network."
+      }
+    },
+    "virtualNetworkAddressSpacePrefix": {
+      "type": "string",
+      "defaultValue": "10.0",
+      "metadata": {
+        "description": "Prefix address space of the Vnet"
+      }
+    },
+    "virtualNetworkAddressSpaceCIDR": {
+      "type": "string",
+      "defaultValue": "/16",
+      "metadata": {
+        "description": "The CIDR notation of the Vnet address space"
+      }
+    },
+    "subnetAddressSpaceCIDR": {
+      "type": "string",
+      "defaultValue": "/24",
+      "metadata": {
+        "description": "The CIDR notation of the subnet address space"
+      }
+    },
+    "managementSubnetCount": {
+      "type": "int",
+      "defaultValue": 1,
+      "maxValue": 1,
+      "metadata": {
+        "description": "The number of management subnets to provision"
+      }
+    },
+    "externalAppSubnetCount": {
+      "type": "int",
+      "defaultValue": 1,
+      "maxValue": 10,
+      "metadata": {
+        "description": "The number of external subnets to provision"
+      }
+    },
+    "internalAppSubnetCount": {
+      "type": "int",
+      "defaultValue": 1,
+      "maxValue": 10,
+      "metadata": {
+        "description": "The number of internal subnets to provision"
+      }
+    }
+  },
+  "variables": {
+    "deploymentUrlBase": "https://raw.githubusercontent.com/SkillsFundingAgency/das-platform-building-blocks/as-vnet-integration/templates/",
+    "managementSubnetNamePrefix": "das-mgmt-sn",
+    "ineternalSubnetNamePrefix": "das-int-app-sn",
+    "externalSubnetNamePrefix": "das-ext-app-sn",
+    "subnetServiceEndpoints": [
+      {
+        "service": "Microsoft.Web"
+      },
+      {
+        "service": "Microsoft.Sql"
+      },
+      {
+        "service": "Microsoft.Storage"
+      },
+      {
+        "service": "Microsoft.AzureCosmosDB"
+      }
+    ],
+    "subnetDelegations": [
+      {
+        "name": "webapp",
+        "properties": {
+          "serviceName": "Microsoft.Web/serverFarms",
+          "actions": [
+            "Microsoft.Network/virtualNetworks/subnets/action"
+          ]
+        }
+      }
+    ],
+    "copy": [
+      {
+        "name": "managementSubnetCopy",
+        "count": "[parameters('managementSubnetCount')]",
+        "input": {
+          "name": "[concat(variables('managementSubnetNamePrefix'), '-', copyIndex('managementSubnetCopy'))]",
+          "properties": {
+            "addressPrefix": "[das.getNextAddressRange(parameters('virtualNetworkAddressSpacePrefix'), 0, copyIndex('managementSubnetCopy'), parameters('subnetAddressSpaceCIDR'))]",
+            "serviceEndpoints": "[variables('subnetServiceEndpoints')]",
+            "delegations": "[variables('subnetDelegations')]"
+          }
+        }
+      },
+      {
+        "name": "externalSubnetCopy",
+        "count": "[parameters('externalAppSubnetCount')]",
+        "input": {
+          "name": "[concat(variables('externalSubnetNamePrefix'), '-', copyIndex('externalSubnetCopy'))]",
+          "properties": {
+            "addressPrefix": "[das.getNextAddressRange(parameters('virtualNetworkAddressSpacePrefix'), 100, copyIndex('externalSubnetCopy'), parameters('subnetAddressSpaceCIDR'))]",
+            "serviceEndpoints": "[variables('subnetServiceEndpoints')]",
+            "delegations": "[variables('subnetDelegations')]"
+          }
+        }
+      },
+      {
+        "name": "internalSubnetCopy",
+        "count": "[parameters('internalAppSubnetCount')]",
+        "input": {
+          "name": "[concat(variables('ineternalSubnetNamePrefix'), '-', copyIndex('internalSubnetCopy'))]",
+          "properties": {
+            "addressPrefix": "[das.getNextAddressRange(parameters('virtualNetworkAddressSpacePrefix'), 200, copyIndex('internalSubnetCopy'), parameters('subnetAddressSpaceCIDR'))]",
+            "serviceEndpoints": "[variables('subnetServiceEndpoints')]",
+            "delegations": "[variables('subnetDelegations')]"
+          }
+        }
+      }
+    ],
+    "subnetConfiguration": "[union(variables('managementSubnetCopy'), variables('externalSubnetCopy'), variables('internalSubnetCopy'))]"
+  },
+  "functions": [
+    {
+      "namespace": "das",
+      "members": {
+        "getNextAddressRange": {
+          "parameters": [
+            {
+              "name": "networkPrefix",
+              "type": "string"
+            },
+            {
+              "name": "networkStartingAddress",
+              "type": "int"
+            },
+            {
+              "name": "index",
+              "type": "int"
+            },
+            {
+              "name": "mask",
+              "type": "string"
+            }
+          ],
+          "output": {
+            "type": "string",
+            "value": "[concat(parameters('networkPrefix'), '.' , add(parameters('networkStartingAddress'), parameters('index')) ,'.0', parameters('mask'))]"
+          }
+        }
+      }
+    }
+  ],
+  "resources": [
+    {
+      "apiVersion": "2017-05-10",
+      "name": "virtual-network",
+      "type": "Microsoft.Resources/deployments",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(variables('deploymentUrlBase'),'virtual-network.json')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "armVnetName": {
+            "value": "[parameters('virtualNetworkName')]"
+          },
+          "armVnetAddressSpaceCIDR": {
+            "value": "[das.getNextAddressRange(parameters('virtualNetworkAddressSpacePrefix'), 0, 0, parameters('virtualNetworkAddressSpaceCIDR'))]"
+          },
+          "subnetConfiguration": {
+            "value": "[variables('subnetConfiguration')]"
+          }
+        }
+      }
+    }
+  ],
+  "outputs": {}
+}
