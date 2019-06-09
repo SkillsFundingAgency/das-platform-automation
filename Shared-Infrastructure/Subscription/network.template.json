@@ -91,7 +91,7 @@
         "input": {
           "name": "[concat(variables('managementSubnetNamePrefix'), '-', copyIndex('managementSubnetCopy'))]",
           "properties": {
-            "addressPrefix": "[das.getNextAddressRange(parameters('virtualNetworkAddressSpacePrefix'), 0, copyIndex('managementSubnetCopy'), parameters('subnetAddressSpaceCIDR'))]",
+            "addressPrefix": "[blocks.getNextAddressRange(parameters('virtualNetworkAddressSpacePrefix'), 0, copyIndex('managementSubnetCopy'), parameters('subnetAddressSpaceCIDR'))]",
             "serviceEndpoints": "[variables('subnetServiceEndpoints')]",
             "delegations": "[variables('subnetDelegations')]"
           }
@@ -103,7 +103,7 @@
         "input": {
           "name": "[concat(variables('externalSubnetNamePrefix'), '-', copyIndex('externalSubnetCopy'))]",
           "properties": {
-            "addressPrefix": "[das.getNextAddressRange(parameters('virtualNetworkAddressSpacePrefix'), 100, copyIndex('externalSubnetCopy'), parameters('subnetAddressSpaceCIDR'))]",
+            "addressPrefix": "[blocks.getNextAddressRange(parameters('virtualNetworkAddressSpacePrefix'), 100, copyIndex('externalSubnetCopy'), parameters('subnetAddressSpaceCIDR'))]",
             "serviceEndpoints": "[variables('subnetServiceEndpoints')]",
             "delegations": "[variables('subnetDelegations')]"
           }
@@ -115,7 +115,7 @@
         "input": {
           "name": "[concat(variables('ineternalSubnetNamePrefix'), '-', copyIndex('internalSubnetCopy'))]",
           "properties": {
-            "addressPrefix": "[das.getNextAddressRange(parameters('virtualNetworkAddressSpacePrefix'), 200, copyIndex('internalSubnetCopy'), parameters('subnetAddressSpaceCIDR'))]",
+            "addressPrefix": "[blocks.getNextAddressRange(parameters('virtualNetworkAddressSpacePrefix'), 200, copyIndex('internalSubnetCopy'), parameters('subnetAddressSpaceCIDR'))]",
             "serviceEndpoints": "[variables('subnetServiceEndpoints')]",
             "delegations": "[variables('subnetDelegations')]"
           }
@@ -126,7 +126,7 @@
   },
   "functions": [
     {
-      "namespace": "das",
+      "namespace": "blocks",
       "members": {
         "getNextAddressRange": {
           "parameters": [
@@ -171,7 +171,7 @@
             "value": "[parameters('virtualNetworkName')]"
           },
           "armVnetAddressSpaceCIDR": {
-            "value": "[das.getNextAddressRange(parameters('virtualNetworkAddressSpacePrefix'), 0, 0, parameters('virtualNetworkAddressSpaceCIDR'))]"
+            "value": "[blocks.getNextAddressRange(parameters('virtualNetworkAddressSpacePrefix'), 0, 0, parameters('virtualNetworkAddressSpaceCIDR'))]"
           },
           "subnetConfiguration": {
             "value": "[variables('subnetConfiguration')]"
