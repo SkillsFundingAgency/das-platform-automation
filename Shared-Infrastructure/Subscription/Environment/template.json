@@ -50,24 +50,6 @@
         "description": "The email address that threat alerts will be sent to"
       }
     },
-    "omsWorkspaceName": {
-      "type": "string",
-      "metadata": {
-        "description": "The name of the OMS workspace that will collect audit events"
-      }
-    },
-    "omsWorkspaceResourceGroupName": {
-      "type": "string",
-      "metadata": {
-        "description": "The name of the OMS workspace resource group that will collect audit events"
-      }
-    },
-    "omsWorkspaceSubscriptionId": {
-      "type": "string",
-      "metadata": {
-        "description": "The id of the OMS workspace subscription that will collect audit events"
-      }
-    },
     "aseHostingEnvironmentName": {
       "type": "string",
       "defaultValue": "",
@@ -247,15 +229,6 @@
           },
           "sqlStorageAccountName": {
             "value": "[variables('sharedARMStorageName')]"
-          },
-          "omsWorkspaceName": {
-            "value": "[parameters('omsWorkspaceName')]"
-          },
-          "omsWorkspaceResourceGroupName": {
-            "value": "[parameters('omsWorkspaceResourceGroupName')]"
-          },
-          "omsWorkspaceSubscriptionId": {
-            "value": "[parameters('omsWorkspaceSubscriptionId')]"
           }
         }
       },
