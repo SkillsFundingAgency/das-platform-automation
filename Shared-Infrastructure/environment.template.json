@@ -73,7 +73,7 @@
   },
   "variables": {
     "deploymentUrlBase": "https://raw.githubusercontent.com/SkillsFundingAgency/das-platform-building-blocks/as-vnet-integration/templates/",
-    "sharedDeploymentUrlBase": "https://raw.githubusercontent.com/SkillsFundingAgency/das-platform-automation/shared_infrastructure/Shared-Infrastructure/Subscription/",
+    "sharedDeploymentUrlBase": "https://raw.githubusercontent.com/SkillsFundingAgency/das-platform-automation/shared_infrastructure/Shared-Infrastructure/",
     "environmentName": "[toLower(parameters('environmentName'))]",
     "resourceNamePrefix": "[toLower(concat('das-', variables('environmentName'),'-shared'))]",
     "sharedAppServicePlanName": "[concat(variables('resourceNamePrefix'),'-asp')]",
@@ -142,6 +142,26 @@
     },
     {
       "apiVersion": "2017-05-10",
+      "name": "[concat('getSubnetResourceIdList', variables('environmentName'))]",
+      "type": "Microsoft.Resources/deployments",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(variables('sharedDeploymentUrlBase'),'utilities/getSubnetResourceIdList.json')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "virtualNetworkName": {
+            "value": "[variables('virtualNetworkName')]"
+          },
+          "subnetConfiguration": {
+            "value": "[reference(concat('virtual-network-west-europe', variables('environmentName'))).outputs.subnetConfiguration.value]"
+          }
+        }
+      }
+    },
+    {
+      "apiVersion": "2017-05-10",
       "name": "configuration-storage-account",
       "type": "Microsoft.Resources/deployments",
       "properties": {
@@ -155,13 +175,7 @@
             "value": "[variables('configurationStorageName')]"
           },
           "subnetResourceIdList": {
-            "copy": [
-              {
-                "name": "value",
-                "count": "[length(reference(variables('virtualNetworkName')).outputs.subnetConfiguration.value)]",
-                "input": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), reference(variables('virtualNetworkName')).outputs.subnetConfiguration.value[copyIndex('value').name])]"
-              }
-            ]
+            "value": "[reference(concat('getSubnetResourceIdList', variables('environmentName'))).outputs.subnetResourceIdList.value]"
           }
         }
       }
@@ -181,13 +195,7 @@
             "value": "[variables('sharedARMStorageName')]"
           },
           "subnetResourceIdList": {
-            "copy": [
-              {
-                "name": "value",
-                "count": "[length(reference(variables('virtualNetworkName')).outputs.subnetConfiguration.value)]",
-                "input": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), reference(variables('virtualNetworkName')).outputs.subnetConfiguration.value[copyIndex('value').name])]"
-              }
-            ]
+            "value": "[reference(concat('getSubnetResourceIdList', variables('environmentName'))).outputs.subnetResourceIdList.value]"
           }
         }
       }
@@ -233,13 +241,7 @@
             "value": "[variables('sharedARMStorageName')]"
           },
           "subnetResourceIdList": {
-            "copy": [
-              {
-                "name": "value",
-                "count": "[length(reference(variables('virtualNetworkName')).outputs.subnetConfiguration.value)]",
-                "input": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), reference(variables('virtualNetworkName')).outputs.subnetConfiguration.value[copyIndex('value').name])]"
-              }
-            ]
+            "value": "[reference(concat('getSubnetResourceIdList', variables('environmentName'))).outputs.subnetResourceIdList.value]"
           }
         }
       },
