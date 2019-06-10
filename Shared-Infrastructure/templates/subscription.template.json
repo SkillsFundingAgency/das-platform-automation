@@ -5,74 +5,96 @@
     "resourceEnvironmentName": {
       "type": "string",
       "metadata": {
-        "description": "Base environment name. E.g. DEV. PP, PRD, MO. "
+        "description": "Base environment name. E.g. DEV. PP, PRD, MO. ",
+        "environmentVariable": "resourceEnvironmentName"
       }
     },
     "serviceName": {
       "type": "string",
       "defaultValue": "shared",
       "metadata": {
-        "description": "Service name of the service. E.g shared infrastructure = shared."
+        "description": "Service name of the service. E.g shared infrastructure = shared.",
+        "environmentVariable": "serviceName"
       }
     },
     "keyVaultAccessObjectIds": {
       "type": "array",
       "metadata": {
-        "description": "Object Ids of the Azure AD Objects you want to grant Key Vault access to"
+        "description": "Object Ids of the Azure AD Objects you want to grant Key Vault access to",
+        "environmentVariable": "keyVaultAccessObjectIds"
       }
     },
     "microsoftAzureWebsitesRPObjectId": {
-      "type": "string"
+      "type": "string",
+      "metadata": {
+        "description": "Object Id of the Azure Websites RP",
+        "environmentVariable": "microsoftAzureWebsitesRPObjectId"
+      }
     },
     "backupManagementServiceObjectId": {
-      "type": "string"
+      "type": "string",
+      "metadata": {
+        "description": "Object Id for the backup management service",
+        "environmentVariable": "backupManagementServiceObjectId"
+      }
     },
     "diskEncryptionAppRegistrationObjectId": {
-      "type": "string"
+      "type": "string",
+      "metadata": {
+        "description": "Object Id for the disk Encryption App Registration",
+        "environmentVariable": "diskEncryptionAppRegistrationObjectId"
+      }
     },
     "environments": {
       "type": "array",
       "defaultValue": [],
       "metadata": {
-        "description": "String array of all environments in this subscription"
+        "description": "String array of all environments in this subscription",
+        "environmentVariable": "environmentNames"
       }
     },
     "sqlServerActiveDirectoryAdminLogin": {
       "type": "string",
       "metadata": {
-        "description": "The active directory admin that will be assigned to the sql server"
+        "description": "The active directory admin that will be assigned to the sql server",
+        "environmentVariable": "sqlServerActiveDirectoryAdminLogin"
       }
     },
     "sqlServerActiveDirectoryAdminObjectId": {
       "type": "string",
       "metadata": {
-        "description": "The object id of the active directory admin that will be assigned to the sql server"
+        "description": "The object id of the active directory admin that will be assigned to the sql server",
+        "environmentVariable": "sqlServerActiveDirectoryAdminObjectId"
       }
     },
     "threatDetectionEmailAddress": {
       "type": "string",
       "metadata": {
-        "description": "The email address that threat alerts will be sent to"
+        "description": "The email address that threat alerts will be sent to",
+        "environmentVariable": "threatDetectionEmailAddress"
       }
     },
     "aseHostingEnvironmentName": {
       "type": "string",
       "defaultValue": "",
       "metadata": {
-        "description": "Optional ASE to deploy ASP to"
+        "description": "Optional ASE to deploy ASP to",
+        "environmentVariable": "aseHostingEnvironmentName"
       }
     },
     "aseResourceGroup": {
       "type": "string",
       "defaultValue": "",
       "metadata": {
-        "description": "Resource group where the optional ASE resides"
+        "description": "Resource group where the optional ASE resides",
+        "environmentVariable": "aseResourceGroup"
       }
     },
     "databaseConfiguration": {
       "type": "object",
       "metadata": {
-        "description": "Configuration object which describes the structure of failover groups"
+        "description": "Configuration object which describes the structure of failover groups",
+        "environmentVariable": "databaseConfiguration"
       }
     },
     "managementSubnetCount": {
@@ -80,7 +102,8 @@
       "defaultValue": 1,
       "maxValue": 1,
       "metadata": {
-        "description": "The number of management subnets to provision"
+        "description": "The number of management subnets to provision",
+        "environmentVariable": "managementSubnetCount"
       }
     },
     "externalAppSubnetCount": {
@@ -88,7 +111,8 @@
       "defaultValue": 1,
       "maxValue": 10,
       "metadata": {
-        "description": "The number of external subnets to provision"
+        "description": "The number of external subnets to provision",
+        "environmentVariable": "externalAppSubnetCount"
       }
     },
     "internalAppSubnetCount": {
@@ -96,7 +120,8 @@
       "defaultValue": 1,
       "maxValue": 10,
       "metadata": {
-        "description": "The number of internal subnets to provision."
+        "description": "The number of internal subnets to provision.",
+        "environmentVariable": "internalAppSubnetCount"
       }
     }
   },
@@ -255,7 +280,7 @@
             "value": "[variables('keyVaultName')]"
           },
           "sharedKeyVaultId": {
-            "value": "[reference('key-vault').outputs.KeyVaultResourceId.value]" //This is necessary because the "dependsOn" is not waiting for the key-vault to deploy
+            "value": "[reference('key-vault').outputs.KeyVaultResourceId.value]"
           },
           "sqlServerAdminPasswordSecretName": {
             "value": "[toLower(concat('das-', parameters('environments')[copyIndex()], '-shared-sql'))]"
