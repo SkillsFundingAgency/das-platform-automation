@@ -124,7 +124,7 @@
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "[concat(variables('sharedDeploymentUrlBase'),'network.template.json')]",
+          "uri": "[concat(variables('sharedDeploymentUrlBase'),'templates/network.template.json')]",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
@@ -167,7 +167,7 @@
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "[concat(variables('deploymentUrlBase'),'storage-account-arm.json')]",
+          "uri": "[concat(variables('deploymentUrlBase'),'templates/storage-account-arm.json')]",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
@@ -187,7 +187,7 @@
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "[concat(variables('deploymentUrlBase'),'storage-account-arm.json')]",
+          "uri": "[concat(variables('deploymentUrlBase'),'templates/storage-account-arm.json')]",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
@@ -207,7 +207,7 @@
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "[concat(variables('deploymentUrlBase'),'sql-server.json')]",
+          "uri": "[concat(variables('deploymentUrlBase'),'templates/sql-server.json')]",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
@@ -239,6 +239,26 @@
           },
           "sqlStorageAccountName": {
             "value": "[variables('sharedARMStorageName')]"
+          }
+        }
+      },
+      "dependsOn": [
+        "arm-shared-storage"
+      ]
+    },
+    {
+      "apiVersion": "2017-05-10",
+      "name": "sql-server-firewall-rule",
+      "type": "Microsoft.Resources/deployments",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(variables('deploymentUrlBase'),'templates/sql-server-firewall-rules.json')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "sqlServerName": {
+            "value": "[if(variables('deployFailoverGroups'), variables('primarySQLServerName'), variables('baseSQLServerName'))]"
           },
           "subnetResourceIdList": {
             "value": "[reference(concat('getSubnetResourceIdList', variables('environmentName'))).outputs.subnetResourceIdList.value]"
@@ -246,7 +266,7 @@
         }
       },
       "dependsOn": [
-        "arm-shared-storage"
+        "sql-server-deployment"
       ]
     },
     {
@@ -257,7 +277,7 @@
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "[concat(variables('deploymentUrlBase'),'sql-server.json')]",
+          "uri": "[concat(variables('deploymentUrlBase'),'templates/sql-server.json')]",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
@@ -304,7 +324,7 @@
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "[concat(variables('deploymentUrlBase'),'sql-server-failover-group.json')]",
+          "uri": "[concat(variables('deploymentUrlBase'),'templates/sql-server-failover-group.json')]",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
@@ -334,7 +354,7 @@
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "[concat(variables('deploymentUrlBase'),'app-service-plan.json')]",
+          "uri": "[concat(variables('deploymentUrlBase'),'templates/app-service-plan.json')]",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
@@ -363,7 +383,7 @@
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "[concat(variables('deploymentUrlBase'),'service-bus.json')]",
+          "uri": "[concat(variables('deploymentUrlBase'),'templates/service-bus.json')]",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
@@ -385,7 +405,7 @@
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "[concat(variables('deploymentUrlBase'),'redis.json')]",
+          "uri": "[concat(variables('deploymentUrlBase'),'templates/redis.json')]",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
@@ -414,7 +434,7 @@
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "[concat(variables('deploymentUrlBase'),'cdn-profile.json')]",
+          "uri": "[concat(variables('deploymentUrlBase'),'templates/cdn-profile.json')]",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
@@ -434,7 +454,7 @@
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "[concat(variables('deploymentUrlBase'),'event-hub-namespace.json')]",
+          "uri": "[concat(variables('deploymentUrlBase'),'templates/event-hub-namespace.json')]",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
