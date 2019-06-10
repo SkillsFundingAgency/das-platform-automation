@@ -1,0 +1,135 @@
+{
+    "id": "7c21ef57-08a3-4dab-a647-1c790f76ad19",
+    "name": "GenerateConfiguration",
+    "friendlyName": "Generate Configuration",
+    "description": "Generate and validate configuration from a schema",
+    "helpMarkDown": "",
+    "category": "Utility",
+    "author": "Craig Gumbley",
+    "visibility": [
+        "Release"
+    ],
+    "version": {
+        "Major": 0,
+        "Minor": 0,
+        "Patch": 0
+    },
+    "groups": [
+        {
+            "name": "schema",
+            "displayName": "Schema Definitions",
+            "isExpanded": true
+        },
+        {
+            "name": "azurestorage",
+            "displayName": "Azure Storage",
+            "isExpanded": true
+        }
+    ],
+    "inputs": [
+        {
+            "name": "SourcePath",
+            "type": "filePath",
+            "label": "Source Path",
+            "defaultValue": "$(System.DefaultWorkingDirectory)",
+            "required": true,
+            "groupName": "schema",
+            "helpMarkDown": "Path of the directory that contains the schemas."
+        },
+        {
+            "name": "TargetFilename",
+            "type": "string",
+            "label": "Target Filename",
+            "defaultValue": "*.schema.json",
+            "required": true,
+            "groupName": "schema",
+            "helpMarkDown": "Names of the schemas to process. Wildcards are accepted."
+        },
+        {
+            "name": "ConnectedServiceNameSelector",
+            "type": "pickList",
+            "label": "Azure Connection Type",
+            "required": false,
+            "groupName": "azurestorage",            
+            "helpMarkDown": "",
+            "defaultValue": "ASM",
+            "options": {
+                "ASM": "Azure Classic",
+                "ARM": "Azure Resource Manager"
+            }
+        },
+        {
+            "name": "ASM",
+            "type": "connectedService:Azure",
+            "label": "Service Connection",
+            "defaultValue": "",
+            "required": true,
+            "groupName": "azurestorage",            
+            "helpMarkDown": "Azure Classic subscription.",
+            "visibleRule": "ConnectedServiceNameSelector = ASM"
+        },
+        {
+            "name": "ARM",
+            "type": "connectedService:AzureRM",
+            "label": "Service Connection",
+            "defaultValue": "",
+            "required": true,
+            "groupName": "azurestorage",            
+            "helpMarkDown": "Azure Resource Manager subscription.",
+            "visibleRule": "ConnectedServiceNameSelector = ARM"
+        },
+        {
+            "name": "StorageAccount",
+            "type": "pickList",
+            "label": "Storage Account",
+            "defaultValue": "",
+            "required": true,
+            "groupName": "azurestorage",            
+            "helpMarkDown": "Choose a pre-existing classic storage account.",
+            "properties": {
+                "EditableOptions": "True"
+            },
+            "visibleRule": "ConnectedServiceNameSelector = ASM"
+        },
+        {
+            "name": "StorageAccountRM",
+            "type": "pickList",
+            "label": "Storage Account",
+            "defaultValue": "",
+            "required": true,
+            "groupName": "azurestorage",            
+            "helpMarkDown": "Choose a pre-existing ARM storage account.",
+            "properties": {
+                "EditableOptions": "True"
+            },
+            "visibleRule": "ConnectedServiceNameSelector = ARM"
+        },
+        {
+            "name": "TableName",
+            "type": "string",
+            "label": "Table Name",
+            "defaultValue": "",
+            "required": true,
+            "groupName": "azurestorage",            
+            "helpMarkDown": "Specify an existing table in the storage account."
+        }        
+    ],
+    "dataSourceBindings": [
+        {
+            "target": "StorageAccount",
+            "endpointId": "$(ASM)",
+            "dataSourceName": "AzureStorageServiceNames"
+        },
+        {
+            "target": "StorageAccountRM",
+            "endpointId": "$(ARM)",
+            "dataSourceName": "AzureStorageAccountRM"
+        }
+    ],
+    "instanceNameFormat": "Process schemas in $(SourcePath)",
+    "execution": {
+        "PowerShell3": {
+            "target": "Invoke-Task.ps1"
+        }
+    }
+}

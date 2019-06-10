@@ -1,0 +1,22 @@
+{
+  "include": [
+    {
+      "type": "PSGallery",
+      "name": "VstsTaskSdk",
+      "version": "",
+      "path": "Task/ps_modules"
+
+    },
+    {
+      "type": "Local",
+      "name": "VstsAzureHelpers_",
+      "version": ""
+    },
+    {
+      "type": "Nuget",
+      "name": "Newtonsoft.Json",
+      "version": "",
+      "path": "Task/Lib"
+    }
+  ]
+}

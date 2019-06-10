@@ -1,0 +1,32 @@
+{
+  "DatabaseConnectionString": " ",
+  "PsrsDatabaseConnectionString": " ",
+  "FailureTolerance": 10,
+  "EventsApi": {
+    "BaseUrl": " ",
+    "ClientToken": " "
+  },
+  "AccountsApi": {
+    "ApiBaseUrl": " ",
+    "ClientId": " ",
+    "ClientSecret": " ",
+    "IdentifierUri": " ",
+    "Tenant": " "
+  },
+  "PaymentsEvents": {
+    "ApiBaseUrl": " ",
+    "ClientToken": " "
+  },
+  "PaymentsEnabled": true,
+  "TransfersEnabled": true,
+  "DataLocksEnabled": true,
+  "PerformancePlatform": {
+    "Url": "",
+    "Token": ""
+  },
+  "AgreementsApiUrl": " ",
+  "CommitmentsApi": {
+    "ClientToken": "xxxxxxxxxxxxxxxxxxxxxx",
+    "BaseUrl": "https://url.com"
+  }
+}

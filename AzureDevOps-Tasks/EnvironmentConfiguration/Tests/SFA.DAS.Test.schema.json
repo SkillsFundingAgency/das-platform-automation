@@ -1,0 +1,45 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "definitions": {},
+  "properties": {
+    "EventsApi": {
+      "properties": {
+        "BaseUrl": {
+          "minLength": 1,
+          "type": "string",
+          "environmentVariable": "EventsApiBaseUrl"
+        },
+        "ClientToken": {
+          "minLength": 1,
+          "type": "string",
+          "environmentVariable": "EventsApiClientToken"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "BaseUrl",
+        "ClientToken"
+      ],
+      "type": "object"
+    },
+    "PaymentsEnabled": {
+      "type": "boolean",
+      "environmentVariable": "PaymentsEnabled"
+    },
+    "PaymentsInt": {
+      "type": "integer",
+      "environmentVariable": "PaymentsInt"
+    },
+    "PaymentsNumber": {
+      "type": "number",
+      "environmentVariable": "PaymentsNumber"
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "EventsApi",
+    "PaymentsEnabled",
+    "PaymentsInt"
+  ],
+  "type": "object"
+}
