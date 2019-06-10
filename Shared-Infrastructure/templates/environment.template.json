@@ -69,6 +69,30 @@
       "metadata": {
         "description": "Configuration object which describes the structure of failovergroups"
       }
+    },
+    "managementSubnetCount": {
+      "type": "int",
+      "defaultValue": 1,
+      "maxValue": 1,
+      "metadata": {
+        "description": "The number of management subnets to provision"
+      }
+    },
+    "externalAppSubnetCount": {
+      "type": "int",
+      "defaultValue": 1,
+      "maxValue": 10,
+      "metadata": {
+        "description": "The number of external subnets to provision"
+      }
+    },
+    "internalAppSubnetCount": {
+      "type": "int",
+      "defaultValue": 1,
+      "maxValue": 10,
+      "metadata": {
+        "description": "The number of internal subnets to provision."
+      }
     }
   },
   "variables": {
@@ -136,6 +160,15 @@
           },
           "serviceEndpointList": {
             "value": "[variables('subnetServiceEndpointList')]"
+          },
+          "managementSubnetCount": {
+            "value": "[parameters('managementSubnetCount')]"
+          },
+          "externalAppSubnetCount": {
+            "value": "[parameters('externalAppSubnetCount')]"
+          },
+          "internalAppSubnetCount": {
+            "value": "[parameters('internalAppSubnetCount')]"
           }
         }
       }
