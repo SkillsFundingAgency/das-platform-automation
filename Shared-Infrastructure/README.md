@@ -7,6 +7,8 @@ The deployment consists of two layers.
 ### Subscription layer
 The subscription layer owns resources that are shared horizontally across a subscription and are used for management purposes. For example, Log Analytics, Azure Automation, KeyVault, Storage, Alerting, Dashboards etc.
 
+**Note**: A subscription can contain one or more environments.
+
 ### Environment layer
 The environment layer owns resources that are shared vertically across an environment and are typically used to provide a platform for other indipendant applications. For example; App Service Plans, Virtual Networks, SQL Servers, ServiceBus etc.
 
