@@ -2,3 +2,6 @@
 node_modules/
 package-lock.json
 TEST*.xml
+AzureDevOps-Tasks/**/*/ps_modules/VstsTaskSdk
+Shared-Infrastructure/**/subscription.parameters.json
+Shared-Infrastructure/**/envs.ps1
