@@ -1,4 +1,4 @@
-# Apprenticeships Shared Infrastructure Platform
+# Apprenticeship Service Shared Infrastructure
 
 The templates hosted in this repository facilitate the deployment of the shared infrastructure for the Apprenticeships Service.
 
