@@ -124,7 +124,7 @@
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "[concat(variables('sharedDeploymentUrlBase'),'network.template.json')]",
+          "uri": "[concat(variables('sharedDeploymentUrlBase'),'templates/network.template.json')]",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
