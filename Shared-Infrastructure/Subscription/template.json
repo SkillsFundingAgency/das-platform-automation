@@ -81,7 +81,6 @@
     "sharedDeploymentUrlBase": "https://raw.githubusercontent.com/SkillsFundingAgency/das-platform-automation/shared_infrastructure/Shared-Infrastructure/Subscription/",
     "resourceNamePrefix": "[toLower(concat('das-', parameters('resourceEnvironmentName'),'-', parameters('serviceName')))]",
     "keyVaultName": "[concat(variables('resourceNamePrefix'),'-kv')]",
-    "configurationStorageName": "[toLower(concat('das',parameters('resourceEnvironmentName'),'config'))]",
     "keyVaultAccessPolicies1": [
       {
         "objectId": "[parameters('microsoftAzureWebsitesRPObjectId')]",
@@ -148,42 +147,10 @@
           }
         }
       }
-    ],
-    "subnetServiceEndpointList": [
-      "Microsoft.Web",
-      "Microsoft.Sql",
-      "Microsoft.Storage",
-      "Microsoft.AzureCosmosDB"
     ]
   },
   "resources": [
-    {
-      "apiVersion": "2017-05-10",
-      "name": "[concat('virtual-network-west-europe', parameters('environments')[copyIndex()])]",
-      "type": "Microsoft.Resources/deployments",
-      "properties": {
-        "mode": "Incremental",
-        "templateLink": {
-          "uri": "[concat(variables('sharedDeploymentUrlBase'),'network.template.json')]",
-          "contentVersion": "1.0.0.0"
-        },
-        "parameters": {
-          "deploymentUrlBase": {
-            "value": "[variables('deploymentUrlBase')]"
-          },
-          "virtualNetworkName": {
-            "value": "[concat('das-',parameters('environments')[copyIndex()],'-shared-vnet-we')]"
-          },
-          "serviceEndpointList": {
-            "value": "[variables('subnetServiceEndpointList')]"
-          }
-        }
-      },
-      "copy": {
-        "name": "virtualNetworkCopy",
-        "count": "[length(parameters('environments'))]"
-      }
-    },
+
     {
       "apiVersion": "2017-05-10",
       "name": "key-vault",
@@ -242,23 +209,6 @@
       "dependsOn": [
         "key-vault"
       ]
-    },
-    {
-      "apiVersion": "2017-05-10",
-      "name": "configuration-storage-account",
-      "type": "Microsoft.Resources/deployments",
-      "properties": {
-        "mode": "Incremental",
-        "templateLink": {
-          "uri": "[concat(variables('deploymentUrlBase'),'storage-account-arm.json')]",
-          "contentVersion": "1.0.0.0"
-        },
-        "parameters": {
-          "storageAccountName": {
-            "value": "[variables('configurationStorageName')]"
-          }
-        }
-      }
     },
     {
       "apiVersion": "2017-05-10",

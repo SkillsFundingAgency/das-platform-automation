@@ -73,13 +73,16 @@
   },
   "variables": {
     "deploymentUrlBase": "https://raw.githubusercontent.com/SkillsFundingAgency/das-platform-building-blocks/as-vnet-integration/templates/",
-    "sharedARMStorageName": "[toLower(concat('das',parameters('environmentName'),'sharedstr'))]",
-    "resourceNamePrefix": "[toLower(concat('das-', parameters('environmentName'),'-shared'))]",
+    "sharedDeploymentUrlBase": "https://raw.githubusercontent.com/SkillsFundingAgency/das-platform-automation/shared_infrastructure/Shared-Infrastructure/Subscription/",
+    "environmentName": "[toLower(parameters('environmentName'))]",
+    "resourceNamePrefix": "[toLower(concat('das-', variables('environmentName'),'-shared'))]",
     "sharedAppServicePlanName": "[concat(variables('resourceNamePrefix'),'-asp')]",
     "serviceBusNamespaceName": "[concat(variables('resourceNamePrefix'),'-ns')]",
     "redisCacheName": "[concat(variables('resourceNamePrefix'),'-rds')]",
     "cdnProfileName": "[concat(variables('resourceNamePrefix'),'-cdn')]",
     "eventHubNamespaceName": "[concat(variables('resourceNamePrefix'),'-eh')]",
+    "configurationStorageName": "[concat(replace(variables('resourceNamePrefix'), '-',''), 'config')]",
+    "sharedARMStorageName": "[concat(replace(variables('resourceNamePrefix'), '-',''), 'str')]",
     "deployToASE": "[greater(length(parameters('aseHostingEnvironmentName')), 0)]",
     "appServicePlanSKUs": {
       "standard": {
@@ -101,12 +104,68 @@
         "nameSuffix": "ne"
       }
     },
-    "baseSqlServerName": "[toLower(concat('das-',parameters('environmentName'),'-shared-sql'))]",
-    "deployFailoverGroups": "[contains(createArray('pp', 'prd') , toLower(parameters('environmentName')))]",
+    "baseSqlServerName": "[toLower(concat('das-',variables('environmentName'),'-shared-sql'))]",
+    "deployFailoverGroups": "[contains(createArray('pp', 'prd') , toLower(variables('environmentName')))]",
     "primarySQLServerName": "[toLower(concat(variables('baseSQLServerName'), '-', variables('sqlServerLocationMap').primary.nameSuffix))]",
-    "secondarySQLServerName": "[toLower(concat(variables('baseSQLServerName'), '-', variables('sqlServerLocationMap').secondary.nameSuffix))]"
+    "secondarySQLServerName": "[toLower(concat(variables('baseSQLServerName'), '-', variables('sqlServerLocationMap').secondary.nameSuffix))]",
+    "virtualNetworkName": "[concat(variables('resourceNamePrefix'),'-vnet-we')]",
+    "subnetServiceEndpointList": [
+      "Microsoft.Web",
+      "Microsoft.Sql",
+      "Microsoft.Storage",
+      "Microsoft.AzureCosmosDB"
+    ]
   },
   "resources": [
+    {
+      "apiVersion": "2017-05-10",
+      "name": "[concat('virtual-network-west-europe', variables('environmentName'))]",
+      "type": "Microsoft.Resources/deployments",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(variables('sharedDeploymentUrlBase'),'network.template.json')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "deploymentUrlBase": {
+            "value": "[variables('deploymentUrlBase')]"
+          },
+          "virtualNetworkName": {
+            "value": "[variables('virtualNetworkName')]"
+          },
+          "serviceEndpointList": {
+            "value": "[variables('subnetServiceEndpointList')]"
+          }
+        }
+      }
+    },
+    {
+      "apiVersion": "2017-05-10",
+      "name": "configuration-storage-account",
+      "type": "Microsoft.Resources/deployments",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(variables('deploymentUrlBase'),'storage-account-arm.json')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "storageAccountName": {
+            "value": "[variables('configurationStorageName')]"
+          },
+          "subnetResourceIdList": {
+            "copy": [
+              {
+                "name": "value",
+                "count": "[length(reference(variables('virtualNetworkName')).outputs.subnetConfiguration.value)]",
+                "input": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), reference(variables('virtualNetworkName')).outputs.subnetConfiguration.value[copyIndex('value').name])]"
+              }
+            ]
+          }
+        }
+      }
+    },
     {
       "apiVersion": "2017-05-10",
       "name": "arm-shared-storage",
@@ -120,6 +179,15 @@
         "parameters": {
           "storageAccountName": {
             "value": "[variables('sharedARMStorageName')]"
+          },
+          "subnetResourceIdList": {
+            "copy": [
+              {
+                "name": "value",
+                "count": "[length(reference(variables('virtualNetworkName')).outputs.subnetConfiguration.value)]",
+                "input": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), reference(variables('virtualNetworkName')).outputs.subnetConfiguration.value[copyIndex('value').name])]"
+              }
+            ]
           }
         }
       }
@@ -163,6 +231,15 @@
           },
           "sqlStorageAccountName": {
             "value": "[variables('sharedARMStorageName')]"
+          },
+          "subnetResourceIdList": {
+            "copy": [
+              {
+                "name": "value",
+                "count": "[length(reference(variables('virtualNetworkName')).outputs.subnetConfiguration.value)]",
+                "input": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), reference(variables('virtualNetworkName')).outputs.subnetConfiguration.value[copyIndex('value').name])]"
+              }
+            ]
           }
         }
       },
@@ -239,7 +316,7 @@
             "value": "[variables('secondarySQLServerName')]"
           },
           "databases": {
-            "value": "[parameters('databaseConfiguration')[toUpper(parameters('environmentName'))].DatabaseResourceIds]"
+            "value": "[parameters('databaseConfiguration')[toUpper(variables('environmentName'))].DatabaseResourceIds]"
           }
         }
       },
