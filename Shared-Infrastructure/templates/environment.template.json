@@ -142,7 +142,7 @@
     },
     {
       "apiVersion": "2017-05-10",
-      "name": "[concat('getSubnetResourceIdList', variables('environmentName'))]",
+      "name": "get-subnet-resourceid-list",
       "type": "Microsoft.Resources/deployments",
       "properties": {
         "mode": "Incremental",
@@ -175,7 +175,7 @@
             "value": "[variables('configurationStorageName')]"
           },
           "subnetResourceIdList": {
-            "value": "[reference(concat('getSubnetResourceIdList', variables('environmentName'))).outputs.subnetResourceIdList.value]"
+            "value": "[reference('get-subnet-resourceid-list').outputs.subnetResourceIdList.value]"
           }
         }
       }
@@ -195,7 +195,7 @@
             "value": "[variables('sharedARMStorageName')]"
           },
           "subnetResourceIdList": {
-            "value": "[reference(concat('getSubnetResourceIdList', variables('environmentName'))).outputs.subnetResourceIdList.value]"
+            "value": "[reference('get-subnet-resourceid-list').outputs.subnetResourceIdList.value]"
           }
         }
       }
@@ -257,11 +257,11 @@
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
-          "sqlServerName": {
+          "serverName": {
             "value": "[if(variables('deployFailoverGroups'), variables('primarySQLServerName'), variables('baseSQLServerName'))]"
           },
           "subnetResourceIdList": {
-            "value": "[reference(concat('getSubnetResourceIdList', variables('environmentName'))).outputs.subnetResourceIdList.value]"
+            "value": "[reference('get-subnet-resourceid-list').outputs.subnetResourceIdList.value]"
           }
         }
       },
