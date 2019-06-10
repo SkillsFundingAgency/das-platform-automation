@@ -22,7 +22,7 @@
       {
         "name": "subnetResourceIdList",
         "count": "[length(parameters('subnetConfiguration'))]",
-        "input": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), parameters('subnetConfiguration')[copyIndex('subnetResourceIdList').name])]"
+        "input": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), parameters('subnetConfiguration')[copyIndex('subnetResourceIdList')].name)]"
       }
     ]
   },
