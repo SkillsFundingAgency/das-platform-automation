@@ -20,7 +20,7 @@ Both shared and application deployments consume templates from the [platform bui
 ## Logical view
 The diagram below is a logical representation of the deployment template structure.
 
-![logical_view](/images/logical_overview.png)
+![](images/logical_overview.png)
 
 ## Deployment
 
