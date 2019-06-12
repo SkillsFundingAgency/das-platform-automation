@@ -97,6 +97,15 @@
         "environmentVariable": "databaseConfiguration"
       }
     },
+    "gatewaySubnetCount": {
+      "type": "int",
+      "defaultValue": 1,
+      "maxValue": 1,
+      "metadata": {
+        "description": "The number of gateway subnets to provision",
+        "environmentVariable": "gatewaySubnetCount"
+      }
+    },
     "managementSubnetCount": {
       "type": "int",
       "defaultValue": 1,
@@ -302,6 +311,9 @@
           },
           "databaseConfiguration": {
             "value": "[parameters('databaseConfiguration')]"
+          },
+          "gatewaySubnetCount": {
+            "value": "[parameters('gatewaySubnetCount')]"
           },
           "managementSubnetCount": {
             "value": "[parameters('managementSubnetCount')]"

@@ -35,6 +35,20 @@
         "description": "The CIDR notation of the subnet address space"
       }
     },
+    "gatewaySubnetNamePrefix": {
+      "type": "string",
+      "defaultValue": "gw-sn",
+      "metadata": {
+        "description": "The prefix used for naming new gateway subnets."
+      }
+    },
+    "gatewaySubnetCount": {
+      "type": "int",
+      "defaultValue": 1,
+      "maxValue": 1,
+      "metadata": {
+        "description": "The number of gateway subnets to provision"
+      },
     "managementSubnetNamePrefix": {
       "type": "string",
       "defaultValue": "mgmt-sn",
@@ -110,12 +124,22 @@
         }
       },
       {
+        "name": "gatewaySubnetCopy",
+        "count": "[parameters('gatewaySubnetCount')]",
+        "input": {
+          "name": "[concat(parameters('gatewaySubnetNamePrefix'), '-', copyIndex('gatewaySubnetCopy'))]",
+          "properties": {
+            "addressPrefix": "[blocks.getNextAddressRange(parameters('virtualNetworkAddressSpacePrefix'), 0, copyIndex('gatewaySubnetCopy'), parameters('subnetAddressSpaceCIDR'))]"
+          }
+        }
+      },
+      {
         "name": "managementSubnetCopy",
         "count": "[parameters('managementSubnetCount')]",
         "input": {
           "name": "[concat(parameters('managementSubnetNamePrefix'), '-', copyIndex('managementSubnetCopy'))]",
           "properties": {
-            "addressPrefix": "[blocks.getNextAddressRange(parameters('virtualNetworkAddressSpacePrefix'), 0, copyIndex('managementSubnetCopy'), parameters('subnetAddressSpaceCIDR'))]"
+            "addressPrefix": "[blocks.getNextAddressRange(parameters('virtualNetworkAddressSpacePrefix'), 50, copyIndex('managementSubnetCopy'), parameters('subnetAddressSpaceCIDR'))]"
           }
         }
       },
@@ -144,7 +168,7 @@
         }
       }
     ],
-    "subnetConfiguration": "[concat(variables('managementSubnetCopy'), variables('externalSubnetCopy'), variables('internalSubnetCopy'))]"
+    "subnetConfiguration": "[concat(variables('gatewaySubnetCopy'), variables('managementSubnetCopy'), variables('externalSubnetCopy'), variables('internalSubnetCopy'))]"
   },
   "functions": [
     {
