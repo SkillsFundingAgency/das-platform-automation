@@ -10,7 +10,7 @@ The subscription layer owns resources that are shared horizontally across a subs
 **Note**: A subscription can contain one or more environments.
 
 ### Environment layer
-The environment layer owns resources that are shared vertically across an environment and are typically used to provide a platform for other indipendant applications. For example; App Service Plans, Virtual Networks, SQL Servers, ServiceBus etc.
+The environment layer owns resources that are shared vertically across an environment and are typically used to provide a platform for other independent applications. For example; App Service Plans, Virtual Networks, SQL Servers, ServiceBus etc.
 
 ## External dependencies
 There is a third layer that is not deployed by these templates. This is the application layer. Deployment templates for applications within this layer are typically stored with the [application code](https://github.com/SkillsFundingAgency/das-reservations/tree/master/azure) as they will share the same lifecycle. These applications will often depend on infrastructure deployed by templates in this repository.
