@@ -26,6 +26,7 @@
     },
     "microsoftAzureWebsitesRPObjectId": {
       "type": "string",
+      "defaultValue": "7fa23fd6-537e-4d28-b0ca-54d075cce842",
       "metadata": {
         "description": "Object Id of the Azure Websites RP",
         "environmentVariable": "microsoftAzureWebsitesRPObjectId"
@@ -132,6 +133,13 @@
         "description": "The number of internal subnets to provision.",
         "environmentVariable": "internalAppSubnetCount"
       }
+    },
+    "sqlAdminPasswordSeed": {
+      "type": "securestring",
+      "metadata": {
+        "description": "The seed used to generate passwords for sql server deployments.",
+        "environmentVariable": "sqlAdminPasswordSeed"
+      }
     }
   },
   "variables": {
@@ -207,6 +215,33 @@
       }
     ]
   },
+  "functions": [
+    {
+      "namespace": "blocks",
+      "members": {
+        "getPasswordFromSeed": {
+          "parameters": [
+            {
+              "name": "seed",
+              "type": "string"
+            },
+            {
+              "name": "name",
+              "type": "string"
+            },
+            {
+              "name": "environment",
+              "type": "string"
+            }
+          ],
+          "output": {
+            "type": "string",
+            "value": "[concat(toUpper(substring(parameters('environment'),0,1)), uniqueString(resourceGroup().id, parameters('name'), parameters('seed')), toLower(parameters('environment')), '!')]"
+          }
+        }
+      }
+    }
+  ],
   "resources": [
     {
       "apiVersion": "2017-05-10",
@@ -255,7 +290,7 @@
             "value": "[toLower(concat('das-', parameters('environments')[copyIndex()], '-shared-sql'))]"
           },
           "secretValue": {
-            "value": "[concat(toUpper(substring(parameters('environments')[copyIndex()],0,1)), uniqueString(resourceGroup().id, string(copyIndex()), parameters('environments')[copyIndex()]), toLower(substring(parameters('environments')[copyIndex()],sub(length(parameters('environments')[copyIndex()]), 1),1)), '!')]"
+            "value": "[blocks.getPasswordFromSeed(parameters('sqlAdminPasswordSeed'), toLower(concat('das-', parameters('environments')[copyIndex()], '-shared-sql')), uniqueString(parameters('environments')[copyIndex()]))]"
           }
         }
       },
