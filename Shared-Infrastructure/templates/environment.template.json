@@ -70,6 +70,14 @@
         "description": "Configuration object which describes the structure of failovergroups"
       }
     },
+    "gatewaySubnetCount": {
+      "type": "int",
+      "defaultValue": 1,
+      "maxValue": 1,
+      "metadata": {
+        "description": "The number of gateway subnets to provision"
+      }
+    },
     "managementSubnetCount": {
       "type": "int",
       "defaultValue": 1,
