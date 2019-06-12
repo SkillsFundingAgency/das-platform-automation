@@ -65,7 +65,7 @@
         "description": "The number of external subnets to provision"
       }
     },
-    "ineternalSubnetNamePrefix": {
+    "internalSubnetNamePrefix": {
       "type": "string",
       "defaultValue": "int-app-sn",
       "metadata": {
