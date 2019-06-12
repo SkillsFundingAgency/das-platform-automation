@@ -135,7 +135,7 @@
         "name": "internalSubnetCopy",
         "count": "[parameters('internalAppSubnetCount')]",
         "input": {
-          "name": "[concat(parameters('ineternalSubnetNamePrefix'), '-', copyIndex('internalSubnetCopy'))]",
+          "name": "[concat(parameters('internalSubnetNamePrefix'), '-', copyIndex('internalSubnetCopy'))]",
           "properties": {
             "addressPrefix": "[blocks.getNextAddressRange(parameters('virtualNetworkAddressSpacePrefix'), 200, copyIndex('internalSubnetCopy'), parameters('subnetAddressSpaceCIDR'))]",
             "serviceEndpoints": "[if(greater(length(parameters('serviceEndpointList')), 0), variables('serviceEndpoints'), variables('serviceEndpointsEmpty'))]",
