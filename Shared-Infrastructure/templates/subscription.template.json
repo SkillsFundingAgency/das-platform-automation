@@ -147,7 +147,7 @@
     "sharedDeploymentUrlBase": "https://raw.githubusercontent.com/SkillsFundingAgency/das-platform-automation/shared_infrastructure/Shared-Infrastructure/",
     "resourceNamePrefix": "[toLower(concat('das-', parameters('resourceEnvironmentName'),'-', parameters('serviceName')))]",
     "keyVaultName": "[concat(variables('resourceNamePrefix'),'-kv')]",
-    "keyVaultAccessPolicies1": [
+    "keyVaultAccessPolicies": [
       {
         "objectId": "[parameters('microsoftAzureWebsitesRPObjectId')]",
         "tenantId": "[subscription().tenantId]",
@@ -182,17 +182,6 @@
           ],
           "secrets": [
             "Set"
-          ]
-        }
-      }
-    ],
-    "keyVaultAccessPolicies": [
-      {
-        "objectId": "[parameters('microsoftAzureWebsitesRPObjectId')]",
-        "tenantId": "[subscription().tenantId]",
-        "permissions": {
-          "secrets": [
-            "Get"
           ]
         }
       }
