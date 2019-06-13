@@ -199,7 +199,7 @@
             "value": "[variables('virtualNetworkName')]"
           },
           "subnetConfiguration": {
-            "value": "[reference(concat('virtual-network-west-europe', variables('environmentName'))).outputs.subnetConfiguration.value]"
+            "value": "[reference(concat('virtual-network-west-europe-', variables('environmentName'))).outputs.subnetConfiguration.value]"
           }
         }
       }
