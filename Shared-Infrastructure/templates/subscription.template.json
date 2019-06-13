@@ -147,6 +147,7 @@
     "sharedDeploymentUrlBase": "https://raw.githubusercontent.com/SkillsFundingAgency/das-platform-automation/shared_infrastructure/Shared-Infrastructure/",
     "resourceNamePrefix": "[toLower(concat('das-', parameters('resourceEnvironmentName'),'-', parameters('serviceName')))]",
     "keyVaultName": "[concat(variables('resourceNamePrefix'),'-kv')]",
+    "automationAccountName": "[concat(variables('resourceNamePrefix'),'-aa')]",
     "keyVaultAccessPolicies": [
       {
         "objectId": "[parameters('microsoftAzureWebsitesRPObjectId')]",
@@ -358,6 +359,23 @@
         "key-vault",
         "secretsCopy"
       ]
+    },
+    {
+      "apiVersion": "2017-05-10",
+      "name": "azure-automation",
+      "type": "Microsoft.Resources/deployments",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(variables('deploymentUrlBase'),'automation-account.json')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "automationAccountName": {
+            "value": "[variables('automationAccountName')]"
+          }
+        }
+      }
     }
   ],
   "outputs": {}
