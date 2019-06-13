@@ -19,3 +19,9 @@ indent_size = 4
 
 [*.{cs}]
 indent_size = 4
+
+[*.png]
+trim_trailing_whitespace = none
+indent_style = none
+end_of_line = none
+insert_final_newline = none
