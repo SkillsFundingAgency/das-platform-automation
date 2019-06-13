@@ -44,7 +44,9 @@ param(
     [string[]]$EnvironmentNames = ($ENV:EnvironmentNames | ConvertFrom-Json),
     [Parameter(Mandatory = $false)]
     [ValidateSet("West Europe", "North Europe")]
-    [string]$Location = "West Europe"
+    [string]$Location = "West Europe",
+    [Parameter(Mandatory = $false)]
+    [switch]$AcceptDefaults
 )
 
 $TemplateFilePath = "$PSScriptRoot/templates/subscription.template.json"
@@ -127,8 +129,13 @@ try {
         $ParameterVariableValue = Get-Item -Path "ENV:$ParameterEnvironmentVariableName" -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Value
 
         if (!$ParameterVariableValue) {
-            if (!$ENV:TF_BUILD ) {
-                $ParameterVariableValue = Read-Host -Prompt "   -> Enter value for parameter [$($ParameterEnvironmentVariableType)]$($ParameterEnvironmentVariableName)"
+            if (!$ENV:TF_BUILD) {
+                if (($TemplateParameters.$Property.defaultValue -or ($TemplateParameters.$Property.defaultValue -ge 0)) -and $AcceptDefaults.IsPresent ) {
+                    $ParameterVariableValue = $TemplateParameters.$Property.defaultValue
+                }
+                else {
+                    $ParameterVariableValue = Read-Host -Prompt "   -> [$($ParameterEnvironmentVariableType)] $($ParameterEnvironmentVariableName)"
+                }
             }
             elseif ($ParameterEnvironmentVariableType -ne "securestring") {
                 throw "Could not find environment variable value for template parameter $Property"
