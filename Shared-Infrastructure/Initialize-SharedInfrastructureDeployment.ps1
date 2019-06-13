@@ -41,7 +41,7 @@ param(
     [string]$SubscriptionAbbreviation = "DEV",
     [Parameter(Mandatory = $false)]
     [ValidateSet("AT", "TEST", "TEST2", "DEMO", "PP", "PRD", "MO")]
-    [string[]]$EnvironmentNames = ($ENV:EnvironmentNames | ConvertFrom-Json),
+    [string[]]$EnvironmentNames = ($ENV:EnvironmentNames | ConvertFrom-Json -ErrorAction SilentlyContinue),
     [Parameter(Mandatory = $false)]
     [ValidateSet("West Europe", "North Europe")]
     [string]$Location = "West Europe",
@@ -54,9 +54,9 @@ $TemplateParametersFilePath = "$PSScriptRoot/templates/subscription.parameters.j
 
 try {
     # --- Are We Logged in?
-    $IsLoggedIn = (Get-AzureRmContext -ErrorAction SilentlyContinue).Account
+    $IsLoggedIn = (Get-AzContext -ErrorAction SilentlyContinue).Account
     if (!$IsLoggedIn) {
-        throw "You are not logged in. Run Add-AzureRmAccount to continue"
+        throw "You are not logged in. Run Add-AzAccount to continue"
     }
 
     # --- Create Resource Groups
@@ -66,9 +66,9 @@ try {
 
     $ResourceGroupList | ForEach-Object {
         Write-Host "- Creating Resource Group: $_"
-        $ResourceGroup = Get-AzureRmResourceGroup -Name $_ -Location $Location -ErrorAction SilentlyContinue
+        $ResourceGroup = Get-AzResourceGroup -Name $_ -Location $Location -ErrorAction SilentlyContinue
         if (!$ResourceGroup) {
-            $null = New-AzureRmResourceGroup -Name $_ -Location $Location -Confirm:$false
+            $null = New-AzResourceGroup -Name $_ -Location $Location -Confirm:$false
         }
     }
 
@@ -81,12 +81,12 @@ try {
         )
 
         # --- Get all shared SQL Servers in environment
-        $SqlServerResources = @(Get-AzureRmResource -Name "das-$($Environment.ToLower())-shared-sql*" -ResourceType "Microsoft.Sql/servers")
+        $SqlServerResources = @(Get-AzResource -Name "das-$($Environment.ToLower())-shared-sql*" -ResourceType "Microsoft.Sql/servers")
 
         # --- If there is more than one then find the primary
         if ($SqlServerResources.Count -gt 1) {
             $SqlServer = $SqlServerResources | Where-Object {
-                $FailoverGroup = Get-AzureRmSqlDatabaseFailoverGroup -ServerName $_.Name -ResourceGroupName $_.ResourceGroupName
+                $FailoverGroup = Get-AzSqlDatabaseFailoverGroup -ServerName $_.Name -ResourceGroupName $_.ResourceGroupName
                 if ($FailoverGroup -and $FailoverGroup.ReplicationRole -eq "Primary") {
                     return $_
                 }
@@ -101,7 +101,7 @@ try {
         }
 
         # --- Get all the databases in the server that aren't master
-        $Databases = Get-AzureRmSqlDatabase -ServerName $SqlServer.Name -ResourceGroupName $SqlServer.ResourceGroupName | Where-Object { $_.DatabaseName -ne "master" }
+        $Databases = Get-AzSqlDatabase -ServerName $SqlServer.Name -ResourceGroupName $SqlServer.ResourceGroupName | Where-Object { $_.DatabaseName -ne "master" }
 
         $DatabaseConfiguration.$Environment.DatabaseResourceIds = @($Databases.ResourceId)
         Write-Host "    - Adding $($Databases.Count) databases to $Environment failover group"
@@ -174,7 +174,7 @@ try {
             TemplateFile            = $TemplateFilePath
             DeploymentDebugLogLevel = "All"
         }
-        New-AzureRmResourceGroupDeployment @DeploymentParameters
+        New-AzResourceGroupDeployment @DeploymentParameters
     }
 }
 catch {
