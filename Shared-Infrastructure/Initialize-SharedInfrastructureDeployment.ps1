@@ -41,7 +41,7 @@ param(
     [string]$SubscriptionAbbreviation = "DEV",
     [Parameter(Mandatory = $false)]
     [ValidateSet("AT", "TEST", "TEST2", "DEMO", "PP", "PRD", "MO")]
-    [string[]]$EnvironmentNames = ($ENV:EnvironmentNames | ConvertFrom-Json -ErrorAction SilentlyContinue),
+    [string[]]$EnvironmentNames = ($ENV:EnvironmentNames | ConvertFrom-Json),
     [Parameter(Mandatory = $false)]
     [ValidateSet("West Europe", "North Europe")]
     [string]$Location = "West Europe",
@@ -57,6 +57,10 @@ try {
     $IsLoggedIn = (Get-AzContext -ErrorAction SilentlyContinue).Account
     if (!$IsLoggedIn) {
         throw "You are not logged in. Run Add-AzAccount to continue"
+    }
+
+    if (!$EnvironmentNames){
+        throw "No environment names found"
     }
 
     # --- Create Resource Groups
