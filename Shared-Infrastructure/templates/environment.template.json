@@ -151,7 +151,7 @@
   "resources": [
     {
       "apiVersion": "2017-05-10",
-      "name": "[concat('virtual-network-west-europe', variables('environmentName'))]",
+      "name": "[concat('virtual-network-west-europe-', variables('environmentName'))]",
       "type": "Microsoft.Resources/deployments",
       "properties": {
         "mode": "Incremental",
@@ -168,6 +168,9 @@
           },
           "serviceEndpointList": {
             "value": "[variables('subnetServiceEndpointList')]"
+          },
+          "gatewaySubnetCount": {
+            "value": "[parameters('gatewaySubnetCount')]"
           },
           "managementSubnetCount": {
             "value": "[parameters('managementSubnetCount')]"
