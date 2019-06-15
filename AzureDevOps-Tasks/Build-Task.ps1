@@ -11,8 +11,14 @@
     .PARAMETER Clean
     Clean package directories before building
 
-    .PARAMETER NoRestore
-    Don't restore packages. Can only be used with Clean.
+    .PARAMETER Build
+    Package an extension package
+
+    .PARAMETER Publish
+    Packge and publish an extension package to the marketplace
+
+    .PARAMETER AccessToken
+    A personal access token with enough privileges to publish the package
 
     .EXAMPLE
     Restore-TaskDependency -TaskRoot ./MyTask
@@ -21,14 +27,30 @@
     Restore-TaskDependency -TaskRoot ./MyTask -Clean
 
     .EXAMPLE
-    Restore-TaskDependency -TaskRoot ./MyTask -Clean -NoRestore
+    Restore-TaskDependency -TaskRoot ./MyTask -Clean -Build
+
+    .EXAMPLE
+    Restore-TaskDependency -TaskRoot ./MyTask -Clean -Build -Publish
+
+    .NOTES
+    Requirements:
+    The following applications must be installed an available in your PATH
+    - git
+    - tfx-cli
 #>
 [CmdletBinding()]
 Param(
     [Parameter(Mandatory = $true)]
     [System.IO.FileInfo]$TaskRoot,
     [Parameter(Mandatory = $false)]
-    [switch]$Clean
+    [switch]$Clean,
+    [Parameter(Mandatory = $false)]
+    [Parameter(Mandatory = $true, ParameterSetName = "Build")]
+    [switch]$Build,
+    [Parameter(Mandatory = $false, ParameterSetName = "Publish")]
+    [switch]$Publish,
+    [Parameter(Mandatory = $true, ParameterSetName = "Publish")]
+    [string]$AccessToken
 )
 
 # Default error action to stop
@@ -39,6 +61,7 @@ try {
     $ResolvedTaskRoot = (Resolve-Path -Path "$TaskRoot").Path
     $ConfigPath = "$($ResolvedTaskRoot)/dependency.json"
     $PackageTemp = "$($ENV:Temp)/$((New-Guid).ToString())"
+
     $null = New-Item -Path $PackageTemp -ItemType Directory -Force
     Write-Verbose -Message "ResolvedTaskRoot: $ResolvedTaskRoot"
     Write-Verbose -Message "ConfigPath: $ConfigPath"
@@ -58,6 +81,8 @@ try {
                 Get-ChildItem -Path "$($ResolvedTaskRoot)/$($_.Path)" -Recurse | Remove-Item -Recurse -Force
             }
         }
+
+        Remove-Item -Path "$PSScriptRoot/Release" -Force -Recurse -ErrorAction SilentlyContinue
     }
 
     foreach ($Package in $Config.Include | Sort-Object -Property Type) {
@@ -137,6 +162,15 @@ try {
                 throw "Unknown package type: $($Package.Type). Supported package types are [GitHub, NuGet, PowerShellGallery]"
             }
         }
+    }
+
+    if ($Build.IsPresent) {
+        & tfx extension create --manifest-globs "$ResolvedTaskRoot/vss-extension.json" --rev-version --output-path "$PSScriptRoot/Release"
+    }
+
+    if ($Publish.IsPresent) {
+        $ExtensionData = (Get-Content -Path "$ResolvedTaskRoot/vss-extension.json" -Raw | ConvertFrom-Json)
+        & tfx extension publish --manifest-globs "$ResolvedTaskRoot/vss-extension.json" --rev-version --auth-type pat --token $AccessToken --output-path "$PSScriptRoot/Release" --extension-id $ExtensionData.Id --publisher $Extension.Publisher
     }
 }
 catch {
