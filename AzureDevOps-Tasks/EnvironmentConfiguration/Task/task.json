@@ -50,9 +50,9 @@
             "type": "pickList",
             "label": "Azure Connection Type",
             "required": false,
-            "groupName": "azurestorage",            
+            "groupName": "azurestorage",
             "helpMarkDown": "",
-            "defaultValue": "ASM",
+            "defaultValue": "ARM",
             "options": {
                 "ASM": "Azure Classic",
                 "ARM": "Azure Resource Manager"
@@ -64,7 +64,7 @@
             "label": "Service Connection",
             "defaultValue": "",
             "required": true,
-            "groupName": "azurestorage",            
+            "groupName": "azurestorage",
             "helpMarkDown": "Azure Classic subscription.",
             "visibleRule": "ConnectedServiceNameSelector = ASM"
         },
@@ -74,7 +74,7 @@
             "label": "Service Connection",
             "defaultValue": "",
             "required": true,
-            "groupName": "azurestorage",            
+            "groupName": "azurestorage",
             "helpMarkDown": "Azure Resource Manager subscription.",
             "visibleRule": "ConnectedServiceNameSelector = ARM"
         },
@@ -84,7 +84,7 @@
             "label": "Storage Account",
             "defaultValue": "",
             "required": true,
-            "groupName": "azurestorage",            
+            "groupName": "azurestorage",
             "helpMarkDown": "Choose a pre-existing classic storage account.",
             "properties": {
                 "EditableOptions": "True"
@@ -97,7 +97,7 @@
             "label": "Storage Account",
             "defaultValue": "",
             "required": true,
-            "groupName": "azurestorage",            
+            "groupName": "azurestorage",
             "helpMarkDown": "Choose a pre-existing ARM storage account.",
             "properties": {
                 "EditableOptions": "True"
@@ -108,11 +108,11 @@
             "name": "TableName",
             "type": "string",
             "label": "Table Name",
-            "defaultValue": "",
+            "defaultValue": "configuration",
             "required": true,
-            "groupName": "azurestorage",            
+            "groupName": "azurestorage",
             "helpMarkDown": "Specify an existing table in the storage account."
-        }        
+        }
     ],
     "dataSourceBindings": [
         {

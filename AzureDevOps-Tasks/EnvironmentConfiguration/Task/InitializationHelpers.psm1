@@ -12,7 +12,9 @@ function Initialize-TaskDependencies {
         }
 
         # --- Explicity import the sdk before other modules
-        Import-Module -Name "$PSScriptRoot\ps_modules\VstsTaskSdk\VstsTaskSdk.psd1" -Global -Force
+        if (!$ENV:TF_BUILD){
+            Import-Module -Name "$PSScriptRoot\ps_modules\VstsTaskSdk\VstsTaskSdk.psd1" -Global
+        }
 
         $null = Get-ChildItem -Path "$PSScriptRoot\ps_modules\" -Directory | Where-Object {$_.Name -ne "VstsTaskSdk"} | ForEach-Object {
             Write-Verbose -Message "Importing Module $($_.Name)"

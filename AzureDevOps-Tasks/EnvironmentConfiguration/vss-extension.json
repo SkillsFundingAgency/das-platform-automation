@@ -1,8 +1,8 @@
 {
     "manifestVersion": 1,
-    "id": "GenerateEnvironmentConfiguration",
+    "id": "EnvironmentConfiguration",
     "name": "Generate Environment Configuration",
-    "version": "0.0.10",
+    "version": "0.0.29",
     "publisher": "chelnak",
     "targets": [
         {
@@ -18,18 +18,18 @@
     },
     "files": [
         {
-            "path": "Task"
+            "path": "task"
         }
     ],
     "contributions": [
         {
-            "id": "custom-build-release-task",
+            "id": "custom-build-task",
             "type": "ms.vss-distributed-task.task",
             "targets": [
                 "ms.vss-distributed-task.tasks"
             ],
             "properties": {
-                "name": "Task"
+                "name": "EnvironmentConfiguration"
             }
         }
     ]
