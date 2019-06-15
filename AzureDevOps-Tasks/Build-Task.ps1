@@ -20,6 +20,9 @@
     .PARAMETER AccessToken
     A personal access token with enough privileges to publish the package
 
+    .PARAMETER SkipRestore
+    Don't restore dependencies listed in dependency.json
+
     .EXAMPLE
     Restore-TaskDependency -TaskRoot ./MyTask
 
@@ -30,7 +33,10 @@
     Restore-TaskDependency -TaskRoot ./MyTask -Clean -Build
 
     .EXAMPLE
-    Restore-TaskDependency -TaskRoot ./MyTask -Clean -Build -Publish
+    Restore-TaskDependency -TaskRoot ./MyTask -Clean -Publish
+
+    .EXAMPLE
+    Restore-TaskDependency -TaskRoot ./MyTask -Publish -SkipRestore
 
     .NOTES
     Requirements:
@@ -50,7 +56,9 @@ Param(
     [Parameter(Mandatory = $false, ParameterSetName = "Publish")]
     [switch]$Publish,
     [Parameter(Mandatory = $true, ParameterSetName = "Publish")]
-    [string]$AccessToken
+    [string]$AccessToken,
+    [Parameter(Mandatory = $false)]
+    [switch]$SkipRestore
 )
 
 # Default error action to stop
@@ -70,10 +78,14 @@ try {
         throw "Could not find dependency.json at $ConfigPath"
     }
 
-    Write-Verbose -Message "Retrieving config definition from $ConfigPath"
+    Write-Verbose -Message "Retrieving config deinition from $ConfigPath"
     $Config = (Get-Content -Path $ConfigPath -Raw) | ConvertFrom-Json
 
-    if ($Clean.IsPresent) {
+    if ($Clean.IsPresent -and $SkipRestore.IsPresent){
+        Write-Warning -Message "Don't use Clean and SkipRestore together. Clean task will now be skipped!"
+    }
+
+    if ($Clean.IsPresent -and !$SkipRestore.IsPresent) {
         Write-Host "Cleaning package directories:"
         $Config.Include | Select-Object -Property Path -Unique | ForEach-Object {
             if ($_.Path) {
@@ -85,17 +97,19 @@ try {
         Remove-Item -Path "$PSScriptRoot/Release" -Force -Recurse -ErrorAction SilentlyContinue
     }
 
-    foreach ($Package in $Config.Include | Sort-Object -Property Type) {
-        Write-Verbose -Message "Processing package dependency $($Package.Name)"
-        Write-Verbose -Message "Clean package directories: $($NoResotre.IsPresent)"
+    if (!$SkipRestore.IsPresent) {
 
-        Write-Verbose -Message "Resolving package path"
-        [System.IO.FileInfo]$ResolvedPackagePath = "$($ResolvedTaskRoot)/$($Package.Path)"
-        Write-Verbose -Message "ResolvedPackagePath: $ResolvedPackagePath"
+        foreach ($Package in $Config.Include | Sort-Object -Property Type) {
+            Write-Verbose -Message "Processing package dependency $($Package.Name)"
+            Write-Verbose -Message "Clean package directories: $($NoResotre.IsPresent)"
+
+            Write-Verbose -Message "Resolving package path"
+            [System.IO.FileInfo]$ResolvedPackagePath = "$($ResolvedTaskRoot)/$($Package.Path)"
+            Write-Verbose -Message "ResolvedPackagePath: $ResolvedPackagePath"
 
 
-        switch ($Package.Type) {
-            'PSGallery' {
+            switch ($Package.Type) {
+                'PSGallery' {
 
                     $PackageInstallDirectory = "$PackageTemp/$($Package.Name)"
 
@@ -116,9 +130,9 @@ try {
                         }
                     }
 
-                break
-            }
-            'Nuget' {
+                    break
+                }
+                'Nuget' {
 
                     $PackageDestination = "$PackageTemp/$($Package.Name).$($Package.Version)"
 
@@ -141,25 +155,26 @@ try {
                         }
                     }
 
-                break
-            }
-            'GitHub' {
-                $RepositoryUrl = "https://github.com/$($Package.Name).git"
-                $RepositoryDestination = "$PackageTemp/$($Package.Name.Split("/")[1])"
-                Write-Host "[GitHub] Processing $($RepositoryUrl)"
-                & git.exe clone $RepositoryUrl $RepositoryDestination
-
-                if ($Package.Copy) {
-                    $Package.Copy | ForEach-Object {
-                        Write-Host "[GitHub] Copying dependency $_ to $($Package.Path)"
-                        Copy-Item -Path $RepositoryDestination/$_ -Destination $ResolvedPackagePath -Recurse -Force
-                    }
+                    break
                 }
+                'GitHub' {
+                    $RepositoryUrl = "https://github.com/$($Package.Name).git"
+                    $RepositoryDestination = "$PackageTemp/$($Package.Name.Split("/")[1])"
+                    Write-Host "[GitHub] Processing $($RepositoryUrl)"
+                    & git.exe clone $RepositoryUrl $RepositoryDestination
 
-                break
-            }
-            'Defaut' {
-                throw "Unknown package type: $($Package.Type). Supported package types are [GitHub, NuGet, PowerShellGallery]"
+                    if ($Package.Copy) {
+                        $Package.Copy | ForEach-Object {
+                            Write-Host "[GitHub] Copying dependency $_ to $($Package.Path)"
+                            Copy-Item -Path $RepositoryDestination/$_ -Destination $ResolvedPackagePath -Recurse -Force
+                        }
+                    }
+
+                    break
+                }
+                'Defaut' {
+                    throw "Unknown package type: $($Package.Type). Supported package types are [GitHub, NuGet, PowerShellGallery]"
+                }
             }
         }
     }
