@@ -2,9 +2,10 @@
 #>
 
 try {
+    Import-Module $PSScriptRoot\InitializationHelpers.psm1 -Force
 
-    Import-Module $PSScriptRoot\ps_modules\VstsAzureHelpers_ -Force
-    Import-Module $PSScriptRoot\ps_modules\InitializationHelpers.psm1 -Force
+    Initialize-TaskDependencies -Verbose:$VerbosePreference
+    Initialize-Azure
 
     Trace-VstsEnteringInvocation $MyInvocation
 
@@ -26,9 +27,6 @@ try {
             break
         }
     }
-
-    Initialize-TaskDependencies
-    Initialize-Azure
 
     $ConnectionString = Get-StorageAccountConnectionString -Name $AzureStorageAccount -Type $AzureConnectedServiceNameSelector
 

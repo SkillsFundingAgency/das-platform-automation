@@ -1,0 +1,42 @@
+{
+  "include": [
+    {
+      "type": "PSGallery",
+      "name": "VstsTaskSdk",
+      "version": "0.11.0",
+      "copy":[
+        "0.11.0"
+      ],
+      "path": "Task/ps_modules"
+
+    },
+    {
+      "type": "Nuget",
+      "name": "Newtonsoft.Json",
+      "version": "9.0.1",
+      "copy":[
+        "lib/netstandard1.0/*.dll"
+      ],
+      "path": "Task/Lib"
+    },
+    {
+      "type": "Nuget",
+      "name": "Newtonsoft.Json.Schema",
+      "version": "2.0.8",
+      "copy":[
+        "lib/netstandard1.3/*.dll"
+      ],
+      "path": "Task/Lib"
+    },
+    {
+      "type": "GitHub",
+      "name": "Microsoft/azure-pipelines-tasks",
+      "copy": [
+        "Tasks/Common/VstsAzureHelpers_",
+        "Tasks/Common/TlsHelper_"
+
+      ],
+      "path": "Task/ps_modules"
+    }
+  ]
+}
