@@ -4,23 +4,36 @@
 #>
 
 Param(
-    [Parameter()]
-    [String]$TaskRoot
+    [Parameter(Mandatory = $true)]
+    [System.IO.FileInfo]$TaskRoot,
+    [Parameter(Mandatory = $false)]
+    [switch]$Clean
 )
 
 # --- Initialize package sources
+Write-Verbose -Message "Initializing package provider: NuGet"
 $null = Find-PackageProvider -Name NuGet | Install-PackageProvider -Force
 $null = Register-PackageSource -Name nuget.org -Location https://www.nuget.org/api/v2 -ProviderName NuGet -Force
 
-$ResolvedConfigPath = (Resolve-Path -Path "$TaskRoot\common.json" -ErrorAction SilentlyContinue).Path
+Write-Verbose -Message "Resolving common paths.."
+$ResolvedTaskRoot = (Resolve-Path -Path "$TaskRoot").Path
+$ConfigPath = "$($ResolvedTaskRoot)/common.json"
+Write-Verbose "TaskRoot: $ResolvedTaskRoot"
+Write-Verbose "ConfigPath: $ConfigPath"
 
-if (!$ResolvedConfigPath) {
+if (!$ConfigPath) {
     throw "Could not find common.json at $ConfigPath"
 }
 
-$Config = (Get-Content -Path $ResolvedConfigPath -Raw) | ConvertFrom-Json
+Write-Verbose "Retrieving config definition from $ConfigPath"
+$Config = (Get-Content -Path $ConfigPath -Raw) | ConvertFrom-Json
 
 foreach ($Package in $Config.Include) {
+    Write-Verbose "Processing package dependency $($Package.Name)"
+
+    Write-Verbose "Resolving package path"
+    [System.IO.FileInfo]$ResolvedPackagePath = "$($ResolvedTaskRoot)/$($Package.Path)"
+    Write-Verbose "PackagePath: $ResolvedPackagePath"
 
     switch ($Package.Type) {
         'PSGallery' {
@@ -30,9 +43,13 @@ foreach ($Package in $Config.Include) {
                 throw "Could not find package with name $($Package.Name)"
             }
 
-            Write-Host "[PSGallery] Installing package $($Package.Name)"
-            $PowerShellModulePath = "$TaskRoot\$($Package.Path)"
-            Save-Module -Name $Package.Name -Path $PowerShellModulePath -Force
+            if ($Clean.IsPresent){
+                Write-Host "Cleaning package directory: $ResolvedPackagePath"
+                Get-ChildItem -Path "$ResolvedPackagePath" -Recurse | Remove-Item -Recurse -Force
+            }
+
+            Write-Host "[PSGallery] Installing package $($Package.Name) to $ResolvedPackagePath "
+            Save-Module -Name $Package.Name -Path $ResolvedPackagePath -Force
 
             break
         }
@@ -43,8 +60,13 @@ foreach ($Package in $Config.Include) {
                 throw "Could not find package with name $($Package.Name)"
             }
 
-            Write-Host "[NuGet] Installing package $($Package.Name)"
-            Install-Package -Name $Package.Name -ProviderName Nuget -Force
+            if ($Clean.IsPresent){
+                Write-Host "Cleaning package directory: $ResolvedPackagePath"
+                Get-ChildItem -Path $ResolvedPackagePath -Recurse | Remove-Item -Recurse -Force
+            }
+
+            Write-Host "[NuGet] Installing package $($Package.Name) to $ResolvedPackagePath"
+            Save-Package -Name $Package.Name -ProviderName Nuget -LiteralPath $ResolvedPackagePath -Force
 
             break
         }
@@ -58,13 +80,4 @@ foreach ($Package in $Config.Include) {
             throw "Unknown package type: $($Package.Type)"
         }
     }
-
-    # $CommonModulePath = "$ResolvedCommonRoot\$Module"
-    # if ((Test-Path -Path $CommonModulePath)) {
-    #     Write-Host "Adding $Module to $Destination"
-    #     Copy-Item -Path $CommonModulePath -Destination $Destination\$Module -Recurse
-    # }
-    # else {
-    #     Write-Error -Message "Could not find $CommonModulePath"
-    # }
 }
