@@ -3,9 +3,9 @@
     {
       "type": "PSGallery",
       "name": "VstsTaskSdk",
-      "version": "0.11.0",
+      "version": "0.8.1",
       "copy":[
-        "0.11.0"
+        "0.8.1"
       ],
       "path": "Task/ps_modules"
 
