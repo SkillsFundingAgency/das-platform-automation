@@ -172,6 +172,14 @@ try {
 
                     break
                 }
+                'Local' {
+                    if ($Package.Copy) {
+                        $Package.Copy | ForEach-Object {
+                            Write-Host "[Local] Copying dependency $_ to $($Package.Path)"
+                            Copy-Item -Path $ResolvedTaskRoot/$_ -Destination $ResolvedPackagePath -Recurse -Force
+                        }
+                    }
+                }
                 'Defaut' {
                     throw "Unknown package type: $($Package.Type). Supported package types are [GitHub, NuGet, PowerShellGallery]"
                 }
@@ -184,8 +192,7 @@ try {
     }
 
     if ($Publish.IsPresent) {
-        $ExtensionData = (Get-Content -Path "$ResolvedTaskRoot/vss-extension.json" -Raw | ConvertFrom-Json)
-        & tfx extension publish --manifest-globs "$ResolvedTaskRoot/vss-extension.json" --rev-version --auth-type pat --token $AccessToken --output-path "$PSScriptRoot/Release" --extension-id $ExtensionData.Id --publisher $Extension.Publisher
+        & tfx extension publish --manifest-globs "$ResolvedTaskRoot/vss-extension.json" --rev-version --auth-type pat --token $AccessToken --output-path "$PSScriptRoot/Release"
     }
 }
 catch {

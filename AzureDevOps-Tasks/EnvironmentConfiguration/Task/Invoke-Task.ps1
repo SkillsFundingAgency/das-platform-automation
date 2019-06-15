@@ -2,7 +2,7 @@
 #>
 
 try {
-    Import-Module $PSScriptRoot\InitializationHelpers.psm1 -Force
+    . $PSScriptRoot\InitializationHelpers.ps1
 
     Initialize-TaskDependencies -Verbose:$VerbosePreference
     Initialize-Azure
