@@ -2,7 +2,7 @@
     "manifestVersion": 1,
     "id": "EnvironmentConfiguration",
     "name": "Generate Environment Configuration",
-    "version": "0.0.39",
+    "version": "0.0.71",
     "publisher": "chelnak",
     "targets": [
         {
