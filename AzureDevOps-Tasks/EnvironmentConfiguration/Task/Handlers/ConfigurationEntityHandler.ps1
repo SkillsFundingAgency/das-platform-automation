@@ -10,6 +10,8 @@ function Test-EnvironmentConfigurationEntity {
     )
 
     try {
+        Trace-VstsEnteringInvocation $MyInvocation
+
         Write-Host "Validating configuration against schema"
         $ConfigurationObject = [Newtonsoft.Json.Linq.JToken]::Parse($Configuration)
         [Newtonsoft.Json.Schema.SchemaExtensions]::Validate($ConfigurationObject, $SchemaObject)
@@ -18,6 +20,9 @@ function Test-EnvironmentConfigurationEntity {
     }
     catch {
         throw "Could not validate configuration against the provided schema: $($_.Exception.InnerException.Message)"
+    }
+    finally {
+        Trace-VstsLeavingInvocation $MyInvocation
     }
 }
 
@@ -32,6 +37,8 @@ function New-EnvironmentConfigurationEntity {
     )
 
     try {
+        Trace-VstsEnteringInvocation $MyInvocation
+
         foreach ($SchemaPath in $SchemaDefinitionPath) {
 
             Write-Host "Resolving schema definition"
@@ -54,10 +61,13 @@ function New-EnvironmentConfigurationEntity {
     catch {
         throw $PSCmdlet.ThrowTerminatingError($_)
     }
+    finally {
+        Trace-VstsLeavingInvocation $MyInvocation
+    }
 }
 
 function New-EnvironmentConfigurationTableEntry {
-<#
+    <#
 #>
     [CmdletBinding()]
     Param(
@@ -69,21 +79,22 @@ function New-EnvironmentConfigurationTableEntry {
         [String]$TargetFilename,
         [Parameter(Mandatory = $True)]
         [ValidateNotNullOrEmpty()]
-        [String]$ConnectionString,
-        [Parameter(Mandatory = $False)]
+        [String]$StorageAccount,
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [String]$EnvironmentName,
         [Parameter(Mandatory = $False)]
         [ValidateNotNullOrEmpty()]
-        [String]$TableName = "Configuration",
+        [String]$TableName = "configuration",
         [Parameter(Mandatory = $False)]
         [ValidateNotNullOrEmpty()]
         [String]$Version = "1.0"
     )
 
     try {
-        $EnvironmentName = (Get-VstsTaskVariable -Name EnvironmentName).ToUpper()
+        Trace-VstsEnteringInvocation $MyInvocation
 
+        # --- TODO: Test if source path is a directory
         if (!$SourcePath.EndsWith("/")) {
             $SourcePath = "$($SourcePath)/"
         }
@@ -94,21 +105,25 @@ function New-EnvironmentConfigurationTableEntry {
         foreach ($Schema in $Schemas) {
 
             $Configuration = New-EnvironmentConfigurationEntity -SchemaDefinitionPath $Schema
+            Write-Host "Setting entity"
+
+            # --- TODO: Don't need to call Get-Item here
             $RowKey = "$((Get-Item -Path $Schema).BaseName.Replace('.schema',''))_$($Version)"
 
             $SetEntityParameters = @{
-                ConnectionType   = $null
-                ConnectionString = $ConnectionString
+                StorageAccount = $StorageAccount
                 TableName        = $TableName
                 PartitionKey     = $EnvironmentName
                 RowKey           = $RowKey
                 Configuration    = $Configuration
             }
-
             Set-TableStorageEntity @SetEntityParameters
         }
     }
     catch {
-        throw $_
+        throw $PSCmdlet.ThrowTerminatingError($_)
+    }
+    finally {
+        Trace-VstsLeavingInvocation $MyInvocation
     }
 }

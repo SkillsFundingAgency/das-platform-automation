@@ -12,6 +12,9 @@ function Get-SchemaPropertyValue {
     )
 
     try {
+
+        Trace-VstsEnteringInvocation $MyInvocation
+
         if ($PropertyObject.ExtensionData.ContainsKey("environmentVariable")) {
             $TaskVariableParameters = @{
                 Name   = $PropertyObject.ExtensionData.Item("environmentVariable").Value
@@ -35,6 +38,9 @@ function Get-SchemaPropertyValue {
     catch {
         throw "Could not get property from object [ $($PropertyObject.ExtensionData.Item("environmentVariable").Value) ] : $_"
     }
+    finally {
+        Trace-VstsEnteringInvocation $MyInvocation
+    }
 }
 
 function Expand-SchemaProperty {
@@ -45,60 +51,72 @@ function Expand-SchemaProperty {
         $PropertyObject
     )
 
-    $ProcessedProperties = @{}
+    try {
 
-    foreach ($Key in $PropertyObject.Keys) {
+        Trace-VstsEnteringInvocation $MyInvocation
 
-        $Property = $PropertyObject.Item($Key)
-        Switch ($Property.Type.ToString()) {
+        $ProcessedProperties = @{ }
 
-            'Object' {
-                Write-Host "    - Object property: $($Key)"
-                $PropertyValue = Expand-SchemaProperty -PropertyObject $Property.Properties
-                break
+        foreach ($Key in $PropertyObject.Keys) {
+
+            $Property = $PropertyObject.Item($Key)
+            Switch ($Property.Type.ToString()) {
+
+                'Object' {
+                    Write-Host "    - Object property: $($Key)"
+                    $PropertyValue = Expand-SchemaProperty -PropertyObject $Property.Properties
+                    break
+                }
+
+                'Array' {
+                    Write-Host "        - Property: [Array]$($Key)"
+                    $ArrayString = Get-SchemaPropertyValue -PropertyObject $Property
+                    $DeserializedObject = [Newtonsoft.Json.JsonConvert]::DeserializeObject($ArrayString)
+                    $PropertyValue = [System.Array]$DeserializedObject
+                    break
+                }
+
+                'String' {
+                    Write-Host "        - property: [String]$($Key)"
+                    $PropertyValue = Get-SchemaPropertyValue -PropertyObject $Property
+                    break
+                }
+
+                'Integer' {
+                    Write-Host "        - property: [Integer]$($Key)"
+                    $PropertyValue = Get-SchemaPropertyValue -PropertyObject $Property -AsInt
+                    break
+                }
+
+                'Number' {
+                    Write-Host "        - property: [Number]$($Key)"
+                    $PropertyValue = [Decimal]::Parse((Get-SchemaPropertyValue -PropertyObject $Property))
+                    break
+                }
+
+                'Boolean' {
+                    Write-Host "        - property: [Bool]$($Key)"
+                    $PropertyValue = Get-SchemaPropertyValue -PropertyObject $Property -AsBool
+                    break
+                }
+
+                Default {
+                    $PropertyValue = "Undefined"
+                    break
+                }
+
             }
 
-            'Array' {
-                Write-Host "        - Property: [Array]$($Key)"
-                $ArrayString = Get-SchemaPropertyValue -PropertyObject $Property
-                $DeserializedObject = [Newtonsoft.Json.JsonConvert]::DeserializeObject($ArrayString)
-                $PropertyValue = [System.Array]$DeserializedObject
-                break
-            }
-
-            'String' {
-                Write-Host "        - property: [String]$($Key)"
-                $PropertyValue = Get-SchemaPropertyValue -PropertyObject $Property
-                break
-            }
-
-            'Integer' {
-                Write-Host "        - property: [Integer]$($Key)"
-                $PropertyValue = Get-SchemaPropertyValue -PropertyObject $Property -AsInt
-                break
-            }
-
-            'Number' {
-                Write-Host "        - property: [Number]$($Key)"
-                $PropertyValue = [Decimal]::Parse((Get-SchemaPropertyValue -PropertyObject $Property))
-                break
-            }
-
-            'Boolean' {
-                Write-Host "        - property: [Bool]$($Key)"
-                $PropertyValue = Get-SchemaPropertyValue -PropertyObject $Property -AsBool
-                break
-            }
-
-            Default {
-                $PropertyValue = "Undefined"
-                break
-            }
-
+            $ProcessedProperties.Add($Key, $PropertyValue)
         }
 
-        $ProcessedProperties.Add($Key, $PropertyValue)
-    }
+        Write-Output $ProcessedProperties
 
-    $ProcessedProperties
+    }
+    catch {
+        throw $PScmdlet.ThrowTerminatingError($_)
+    }
+    finally {
+        Trace-VstsLeavingInvocation $MyInvocation
+    }
 }
