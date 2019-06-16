@@ -14,7 +14,7 @@ try {
         $TableName = Get-VstsInput -Name TableName -Require
 
         $StorageAccount = Get-VstsInput -Name StorageAccountName -Require
-        $ServiceEndpointName = Get-VstsaInput -Name ServiceConnectionName -require
+        $ServiceEndpointName = Get-VstsInput -Name ServiceConnectionName -require
 
         # --- Variables
         $EnvironmentName = (Get-VstsTaskVariable -Name EnvironmentName).ToUpper()
