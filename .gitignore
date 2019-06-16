@@ -1,6 +1,6 @@
 .vscode/
 node_modules/
 package-lock.json
-AzureDevOps-Tasks/**/Task/Lib/
-AzureDevOps-Tasks/**/Task/ps_modules/
-AzureDevOps-Tasks/**/Release/
+Azure-Pipelines-Tasks/**/Task/Lib/
+Azure-Pipelines-Tasks/**/Task/ps_modules/
+Azure-Pipelines-Tasks/**/Release/
