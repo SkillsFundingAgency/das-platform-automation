@@ -1,8 +1,8 @@
 {
     "id": "7c21ef57-08a3-4dab-a647-1c790f76ad19",
-    "name": "GenerateConfiguration",
-    "friendlyName": "Generate Configuration",
-    "description": "Generate and validate configuration from a schema",
+    "name": "InjectConfiguration",
+    "friendlyName": "Inject Configuration",
+    "description": "Generate, validate and inject custom application configuration in to table storage.",
     "helpMarkDown": "",
     "category": "Utility",
     "author": "Craig Gumbley",
@@ -10,9 +10,9 @@
         "Release"
     ],
     "version": {
-        "Major": 0,
+        "Major": 1,
         "Minor": 0,
-        "Patch": 5
+        "Patch": 0
     },
     "groups": [
         {
@@ -46,53 +46,16 @@
             "helpMarkDown": "Names of the schemas to process. Wildcards are accepted."
         },
         {
-            "name": "ConnectedServiceNameSelector",
-            "type": "pickList",
-            "label": "Azure Connection Type",
-            "required": false,
-            "groupName": "azurestorage",
-            "helpMarkDown": "",
-            "defaultValue": "ARM",
-            "options": {
-                "ASM": "Azure Classic (Deprecated)",
-                "ARM": "Azure Resource Manager"
-            }
-        },
-        {
-            "name": "ASM",
-            "type": "connectedService:Azure",
-            "label": "Service Connection",
-            "defaultValue": "",
-            "required": true,
-            "groupName": "azurestorage",
-            "helpMarkDown": "Azure Classic subscription.",
-            "visibleRule": "ConnectedServiceNameSelector = ASM"
-        },
-        {
-            "name": "ARM",
+            "name": "ServiceConnectionName",
             "type": "connectedService:AzureRM",
             "label": "Service Connection",
             "defaultValue": "",
             "required": true,
             "groupName": "azurestorage",
-            "helpMarkDown": "Azure Resource Manager subscription.",
-            "visibleRule": "ConnectedServiceNameSelector = ARM"
+            "helpMarkDown": "Azure Resource Manager subscription."
         },
         {
-            "name": "StorageAccount",
-            "type": "pickList",
-            "label": "Storage Account",
-            "defaultValue": "",
-            "required": true,
-            "groupName": "azurestorage",
-            "helpMarkDown": "Choose a pre-existing classic storage account.",
-            "properties": {
-                "EditableOptions": "True"
-            },
-            "visibleRule": "ConnectedServiceNameSelector = ASM"
-        },
-        {
-            "name": "StorageAccountRM",
+            "name": "StorageAccountName",
             "type": "pickList",
             "label": "Storage Account",
             "defaultValue": "",
@@ -101,8 +64,7 @@
             "helpMarkDown": "Choose a pre-existing ARM storage account.",
             "properties": {
                 "EditableOptions": "True"
-            },
-            "visibleRule": "ConnectedServiceNameSelector = ARM"
+            }
         },
         {
             "name": "TableName",
@@ -111,22 +73,17 @@
             "defaultValue": "configuration",
             "required": true,
             "groupName": "azurestorage",
-            "helpMarkDown": "Specify an existing table in the storage account."
+            "helpMarkDown": "Specify a table in the storage account. If the table does not exist, it will get created."
         }
     ],
     "dataSourceBindings": [
         {
-            "target": "StorageAccount",
-            "endpointId": "$(ASM)",
-            "dataSourceName": "AzureStorageServiceNames"
-        },
-        {
-            "target": "StorageAccountRM",
-            "endpointId": "$(ARM)",
+            "target": "StorageAccountName",
+            "endpointId": "$(ServiceConnectionName)",
             "dataSourceName": "AzureStorageAccountRM"
         }
     ],
-    "instanceNameFormat": "Process schemas in $(SourcePath)",
+    "instanceNameFormat": "Inject Configuration",
     "execution": {
         "PowerShell3": {
             "target": "Invoke-Task.ps1"
