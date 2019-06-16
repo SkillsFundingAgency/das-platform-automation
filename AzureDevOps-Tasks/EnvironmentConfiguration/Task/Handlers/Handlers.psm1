@@ -3,16 +3,19 @@ Get-ChildItem -Path $PSScriptRoot -Filter *.ps1 -File | ForEach-Object {
     . $_.FullName
 }
 
-# --- Configuration Handlers
-Export-ModuleMember -Function Test-EnvironmentConfigurationEntity
-Export-ModuleMember -Function Test-EnvironmentConfigurationEntity
-Export-ModuleMember -Function New-EnvironmentConfigurationEntity
-Export-ModuleMember -Function New-EnvironmentConfigurationTableEntry
+Export-ModuleMember -Function @(
+    # --- Configuration Handlers
+    'Test-EnvironmentConfigurationEntity',
+    'Test-EnvironmentConfigurationEntity',
+    'New-EnvironmentConfigurationEntity',
+    'New-EnvironmentConfigurationTableEntry',
 
-# --- Schema Property Handlers
-Export-ModuleMember -Function Get-SchemaPropertyValue
-Export-ModuleMember -Function Expand-SchemaProperty
+    # --- Schema Property Handlers
+    'Get-SchemaPropertyValue',
+    'Expand-SchemaProperty',
 
-# --- Storage Account Handlers
-Export-ModuleMember -Function Set-TableStorageEntity
-Export-ModuleMember -Function Get-StorageAccountConnectionString
+    # --- Storage Account Handlers
+    'Set-TableStorageEntity',
+    'Get-StorageAccountConnectionString'
+)
+
