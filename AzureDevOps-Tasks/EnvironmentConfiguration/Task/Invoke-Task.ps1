@@ -1,50 +1,47 @@
 <#
 #>
-
 try {
-    . $PSScriptRoot\InitializationHelpers.ps1
-
-    Initialize-TaskDependencies -Verbose:$VerbosePreference
-    Initialize-Azure
-
     Trace-VstsEnteringInvocation $MyInvocation
 
-    $SourcePath = Get-VstsInput -Name SourcePath -Require
-    $TargetFilename = Get-VstsInput -Name TargetFilename -Require
-    $AzureConnectedServiceNameSelector = Get-VstsInput -Name ConnectedServiceNameSelector -Require
-    $TableName = Get-VstsInput -Name TableName -Require
-    $EnvironmentName = (Get-VstsTaskVariable -Name EnvironmentName).ToUpper()
+    Import-Module -Name $PSScriptRoot\InitializationHelpers.psm1 -Force
+    Initialize-TaskDependencies -Verbose:$VerbosePreference
 
-    switch ($AzureConnectedServiceNameSelector) {
-        "ARM" {
-            $AzureStorageAccount = Get-VstsInput -Name StorageAccountRM -Require
-            $ServiceEndpointName = Get-VstsInput -Name ARM -require
-            break
+    if ($ENV:TF_BUILD) {
+
+        # --- Inputs
+        $SourcePath = Get-VstsInput -Name SourcePath -Require
+        $TargetFilename = Get-VstsInput -Name TargetFilename -Require
+        $TableName = Get-VstsInput -Name TableName -Require
+
+        $StorageAccount = Get-VstsInput -Name StorageAccountName -Require
+        $ServiceEndpointName = Get-VstsaInput -Name ServiceConnectionName -require
+
+        # --- Variables
+        $EnvironmentName = (Get-VstsTaskVariable -Name EnvironmentName).ToUpper()
+        if (!$EnvironmentName) {
+            $EnvironmentName = (Get-VstsTaskVariable -Name RELEASE_ENVIRONMENTNAME).ToUpper()
         }
-        "ASM" {
-            $AzureStorageAccount = Get-VstsInput -Name StorageAccount -Require
-            $ServiceEndpointName = Get-VstsInput -Name ASM -require
-            break
-        }
+
+        Write-Host "Im here"
+
+        # --- Init
+        $Endpoint = Get-VstsEndpoint -Name $ServiceEndpointName -Require
+        Initialize-AzModule -Endpoint $Endpoint -AzVersion 1.6.0
     }
 
-    $ConnectionString = Get-StorageAccountConnectionString -Name $AzureStorageAccount -Type $AzureConnectedServiceNameSelector
-
     $NewEnvironmentConfigurationTableEntryParameters = @{
-        SourcePath       = $SourcePath
-        TargetFilename   = $TargetFilename
-        ConnectionString = $ConnectionString
-        TableName        = $TableName
-        EnvironmentName  = $EnvironmentName
+        SourcePath      = $SourcePath
+        TargetFilename  = $TargetFilename
+        StorageAccount  = $StorageAccount
+        TableName       = $TableName
+        EnvironmentName = $EnvironmentName
     }
 
     New-EnvironmentConfigurationTableEntry @NewEnvironmentConfigurationTableEntryParameters
 }
 catch {
-    throw  $_
+    Write-Error -Message "$_" -ErrorAction Stop
 }
 finally {
-    Import-Module $PSScriptRoot\ps_modules\VstsAzureHelpers_
-    Remove-EndpointSecrets
-    Disconnect-AzureAndClearContext -ErrorAction SilentlyContinue
+    Trace-VstsLeavingInvocation $MyInvocation
 }
