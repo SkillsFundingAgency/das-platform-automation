@@ -22,8 +22,6 @@ try {
             $EnvironmentName = (Get-VstsTaskVariable -Name RELEASE_ENVIRONMENTNAME).ToUpper()
         }
 
-        Write-Host "Im here"
-
         # --- Init
         $Endpoint = Get-VstsEndpoint -Name $ServiceEndpointName -Require
         Initialize-AzModule -Endpoint $Endpoint -AzVersion 1.6.0
