@@ -1,3 +1,30 @@
+function Get-StorageAccountKey {
+    <#
+#>
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [String]$Name
+    )
+
+    try {
+        Trace-VstsEnteringInvocation $MyInvocation
+
+        $StorageAccount = Get-AzResource -Name $Name -ResourceType "Microsoft.Storage/storageAccounts" -ErrorAction Stop
+        $StorageAccountKey = (Get-AzStorageAccountKey -ResourceGroupName $StorageAccount.ResourceGroupName -Name $Name)[0].Value
+
+        Write-Output $StorageAccountKey
+
+    }
+    catch {
+        throw $PSCmdlet.ThrowTerminatingError($_)
+    }
+    finally {
+        Trace-VstsLeavingInvocation $MyInvocation
+    }
+}
+
 function Set-TableStorageEntity {
     <#
 	#>
@@ -5,7 +32,7 @@ function Set-TableStorageEntity {
     Param(
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String]$ConnectionString,
+        [String]$StorageAccount,
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [String]$TableName,
@@ -22,59 +49,33 @@ function Set-TableStorageEntity {
 
     try {
 
-        $StorageContext = New-AzureStorageContext -StorageAccountName $StorageAccountName -StorageAccountKey $StorageAccountKey
-        $StorageTable = Get-AzureStorageTable -Context $StorageContext -Name $TableName
+        Trace-VstsEnteringInvocation $MyInvocation
+        $StorageAccountKey = Get-StorageAccountKey -Name $StorageAccount
+        $StorageContext = New-AzStorageContext -StorageAccountName $StorageAccount -StorageAccountKey $StorageAccountKey
 
-        $Entity = ($StorageTable.CloudTable.Execute([Microsoft.WindowsAzure.Storage.Table.TableOperation]::Retrieve($PartitionKey, $RowKey))).Result
+        $StorageTable = Get-AzStorageTable -Context $StorageContext -Name $TableName
+        if (!$StorageTable){
+            $StorageTable = New-AzStorageTable -Context $StorageContext -Name $TableName
+        }
+
+        $Entity = ($StorageTable.CloudTable.Execute([Microsoft.Azure.Cosmos.Table.TableOperation]::Retrieve($PartitionKey, $RowKey), $null, $null)).Result
 
         if ($Entity) {
-            Write-Host "Updating existing entity"
+            Write-Host "Updating existing entity [$RowKey]"
             $Entity.Properties["Data"].StringValue = $Configuration
-            $null = $StorageTable.CloudTable.Execute([Microsoft.WindowsAzure.Storage.Table.TableOperation]::InsertOrReplace($Entity))
+            $null = $StorageTable.CloudTable.Execute([Microsoft.Azure.Cosmos.Table.TableOperation]::InsertOrReplace($Entity))
         }
         else {
-            Write-Host "Creating a new entity"
-            $Entity = [Microsoft.WindowsAzure.Storage.Table.DynamicTableEntity]::new($PartitionKey, $RowKey)
+            Write-Host "Creating a new entity [$RowKey]"
+            $Entity = [Microsoft.Azure.Cosmos.Table.DynamicTableEntity]::new($PartitionKey, $RowKey)
             $Entity.Properties.Add("Data", $Configuration)
-            $null = $StorageTable.CloudTable.Execute([Microsoft.WindowsAzure.Storage.Table.TableOperation]::Insert($Entity))
+            $null = $StorageTable.CloudTable.Execute([Microsoft.Azure.Cosmos.Table.TableOperation]::Insert($Entity))
         }
     }
     catch {
         throw $PSCmdlet.ThrowTerminatingError($_)
     }
-}
-
-function Get-StorageAccountConnectionString {
-    <#
-#>
-    [CmdletBinding()]
-    Param(
-        [Parameter(Mandatory = $true)]
-        [ValidateNotNullOrEmpty()]
-        [String]$Name,
-        [Parameter(Mandatory = $true)]
-        [ValidateSet("ARM", "ASM")]
-        [String]$Type
-    )
-
-    try {
-        switch ($Type) {
-            'ARM' {
-                $StorageAccount = Get-AzureRmResource -Name $Name -ResourceType "Microsoft.Storage/storageAccounts" -ErrorAction Stop
-                $StorageAccountKey = (Get-AzureRmStorageAccountKey -ResourceGroupName $StorageAccount.ResourceGroupName -Name $Name)[0].Value
-                break
-            }
-
-            'ASM' {
-                $StorageAccountKey = (Get-AzureStorageKey -StorageAccountName $Name).Primary
-                break
-            }
-        }
-
-        Write-Output $StorageAccountKey
-
-    }
-    catch {
-        throw "Could not retrieve storage account for $($Name): $($_.Exception.Message)"
+    finally {
+        Trace-VstsLeavingInvocation $MyInvocation
     }
 }
