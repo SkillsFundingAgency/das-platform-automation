@@ -33,6 +33,10 @@
     "PaymentsNumber": {
       "type": "number",
       "environmentVariable": "PaymentsNumber"
+    },
+    "PaymentsArray": {
+      "type": "array",
+      "environmentVariable": "PaymentsArray"
     }
   },
   "additionalProperties": false,
