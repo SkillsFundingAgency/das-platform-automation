@@ -20,11 +20,13 @@
   "variables": {
     "copy": [
       {
-        "name": "subnetResourceIdList",
-        "count": "[length(parameters('subnetConfiguration'))]",
+        "name": "subnetResourceIdListCopy",
+        "count": "[if(greater(length(parameters('subnetConfiguration')), 0), length(parameters('subnetConfiguration')), 1)]",
         "input": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), parameters('subnetConfiguration')[copyIndex('subnetResourceIdList')].name)]"
       }
-    ]
+    ],
+    "emptyArray": [],
+    "subnetResourceIdList": "[if(greater(parameters('subnetConfiguration'), 0), variables('subnetResourceIdListCopy'), variables('emptyArray'))]"
   },
   "resources": [],
   "outputs": {

@@ -44,7 +44,7 @@
     },
     "gatewaySubnetCount": {
       "type": "int",
-      "defaultValue": 1,
+      "defaultValue": 0,
       "maxValue": 1,
       "metadata": {
         "description": "The number of gateway subnets to provision"
@@ -74,7 +74,7 @@
     },
     "externalAppSubnetCount": {
       "type": "int",
-      "defaultValue": 1,
+      "defaultValue": 0,
       "maxValue": 10,
       "metadata": {
         "description": "The number of external subnets to provision"
@@ -89,7 +89,7 @@
     },
     "internalAppSubnetCount": {
       "type": "int",
-      "defaultValue": 1,
+      "defaultValue": 0,
       "maxValue": 10,
       "metadata": {
         "description": "The number of internal subnets to provision."
@@ -126,7 +126,7 @@
       },
       {
         "name": "gatewaySubnetCopy",
-        "count": "[parameters('gatewaySubnetCount')]",
+        "count": "[if(greater(parameters('gatewaySubnetCount'), 0), parameters('gatewaySubnetCount'), 1)]",
         "input": {
           "name": "[concat(parameters('gatewaySubnetNamePrefix'), '-', copyIndex('gatewaySubnetCopy'))]",
           "properties": {
@@ -146,7 +146,7 @@
       },
       {
         "name": "externalSubnetCopy",
-        "count": "[parameters('externalAppSubnetCount')]",
+        "count": "[if(greater(parameters('externalAppSubnetCount'), 0), parameters('externalAppSubnetCount'), 1)]",
         "input": {
           "name": "[concat(parameters('externalSubnetNamePrefix'), '-', copyIndex('externalSubnetCopy'))]",
           "properties": {
@@ -158,7 +158,7 @@
       },
       {
         "name": "internalSubnetCopy",
-        "count": "[parameters('internalAppSubnetCount')]",
+        "count": "[if(greater(parameters('internalAppSubnetCount'), 0), parameters('internalAppSubnetCount'), 1)]",
         "input": {
           "name": "[concat(parameters('internalSubnetNamePrefix'), '-', copyIndex('internalSubnetCopy'))]",
           "properties": {
@@ -169,7 +169,11 @@
         }
       }
     ],
-    "subnetConfiguration": "[concat(variables('gatewaySubnetCopy'), variables('managementSubnetCopy'), variables('externalSubnetCopy'), variables('internalSubnetCopy'))]"
+    "emptyArray": [],
+    "gatewaySubnet": "[if(greater(parameters('gatewaySubnetCount'), 0), variables('gatewaySubnetCopy'), variables('emptyArray'))]",
+    "externalSubnet": "[if(greater(parameters('externalAppSubnetCount'), 0), variables('externalSubnetCopy'), variables('emptyArray'))]",
+    "internalSubnet": "[if(greater(parameters('internalAppSubnetCount'), 0), variables('internalSubnetCopy'), variables('emptyArray'))]",
+    "subnetConfiguration": "[concat(variables('managementSubnetCopy'), variables('gatewaySubnet'), variables('externalSubnet'), variables('internalSubnet'))]"
   },
   "functions": [
     {
