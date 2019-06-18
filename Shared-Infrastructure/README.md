@@ -44,8 +44,8 @@ For example:
 "resourceEnvironmentName": {
     "type": "string",
     "metadata": {
-    "description": "Base environment name. E.g. DEV. PP, PRD, MO. ",
-    "environmentVariable": "resourceEnvironmentName"
+        "description": "Base environment name. E.g. DEV. PP, PRD, MO. ",
+        "environmentVariable": "resourceEnvironmentName"
     }
 }
 ```
