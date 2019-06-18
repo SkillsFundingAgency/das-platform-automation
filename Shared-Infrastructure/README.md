@@ -25,7 +25,7 @@ The diagram below is a logical representation of the deployment template structu
 ## Deployment
 
 ### Azure DevOps deployments
-This is the primary method used to deploy the infrastructure. Configuration is stored securely either in the build definition or variable groups and versioned artefacts are used when deploying.
+This is the primary method used to deploy the infrastructure. Configuration is stored securely either in the build definition or variable groups and versioned artifacts are used when deploying.
 
 ### Local deployment
 To deploy from your local machine run the script below. If matching environment variables are not found, you will be prompted for the values.
