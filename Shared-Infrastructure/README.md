@@ -20,7 +20,7 @@ Both shared and application deployments consume templates from the [platform bui
 ## Logical view
 The diagram below is a logical representation of the deployment template structure.
 
-![ApprenticeshipsSharedInfrastructure](https://github.com/SkillsFundingAgency/das-platform-automation/blob/shared_infrastructure/Shared-Infrastructure/images/ApprenticeshipsSharedInfrastructure.jpg)
+![ApprenticeshipsSharedInfrastructure](images/ApprenticeshipsSharedInfrastructure.png)
 
 ## Deployment
 
