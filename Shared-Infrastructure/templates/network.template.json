@@ -2,12 +2,6 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "deploymentUrlBase": {
-      "type": "string",
-      "metadata": {
-        "description": "The base Url for building block templates."
-      }
-    },
     "virtualNetworkName": {
       "type": "string",
       "metadata": {
@@ -104,6 +98,7 @@
     }
   },
   "variables": {
+    "deploymentUrlBase": "https://raw.githubusercontent.com/SkillsFundingAgency/das-platform-building-blocks/master/templates/",
     "subnetDelegations": [
       {
         "name": "webapp",
@@ -214,7 +209,7 @@
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "[concat(parameters('deploymentUrlBase'),'virtual-network.json')]",
+          "uri": "[concat(variables('deploymentUrlBase'),'virtual-network.json')]",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {

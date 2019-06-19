@@ -148,6 +148,8 @@
     "resourceNamePrefix": "[toLower(concat('das-', parameters('resourceEnvironmentName'),'-', parameters('serviceName')))]",
     "keyVaultName": "[concat(variables('resourceNamePrefix'),'-kv')]",
     "automationAccountName": "[concat(variables('resourceNamePrefix'),'-aa')]",
+    "mgmtManagementSubnetCount": 1,
+    "virtualNetworkName": "[concat(variables('resourceNamePrefix'),'-vnet-we')]",
     "keyVaultAccessPolicies": [
       {
         "objectId": "[parameters('microsoftAzureWebsitesRPObjectId')]",
@@ -233,6 +235,26 @@
     }
   ],
   "resources": [
+    {
+      "apiVersion": "2017-05-10",
+      "name": "[concat('virtual-network-west-europe-', variables('resourceNamePrefix'))]",
+      "type": "Microsoft.Resources/deployments",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(variables('sharedDeploymentUrlBase'),'templates/network.template.json')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "virtualNetworkName": {
+            "value": "[variables('virtualNetworkName')]"
+          },
+          "managementSubnetCount": {
+            "value": "[variables('mgmtManagementSubnetCount')]"
+          }
+        }
+      }
+    },
     {
       "apiVersion": "2017-05-10",
       "name": "key-vault",
