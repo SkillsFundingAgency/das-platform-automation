@@ -22,7 +22,7 @@
       {
         "name": "subnetResourceIdListCopy",
         "count": "[if(greater(length(parameters('subnetConfiguration')), 0), length(parameters('subnetConfiguration')), 1)]",
-        "input": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), parameters('subnetConfiguration')[copyIndex('subnetResourceIdListCopy')].name)]"
+        "input": "[if(greater(length(parameters('subnetConfiguration')), 0), resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), parameters('subnetConfiguration')[copyIndex('subnetResourceIdListCopy')].name), json('null'))]"
       }
     ],
     "emptyArray": [],
