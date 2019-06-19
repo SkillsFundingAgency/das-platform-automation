@@ -100,7 +100,7 @@
     },
     "gatewaySubnetCount": {
       "type": "int",
-      "defaultValue": 1,
+      "defaultValue": 0,
       "maxValue": 1,
       "metadata": {
         "description": "The number of gateway subnets to provision",
@@ -118,7 +118,7 @@
     },
     "externalAppSubnetCount": {
       "type": "int",
-      "defaultValue": 1,
+      "defaultValue": 0,
       "maxValue": 10,
       "metadata": {
         "description": "The number of external subnets to provision",
@@ -127,7 +127,7 @@
     },
     "internalAppSubnetCount": {
       "type": "int",
-      "defaultValue": 1,
+      "defaultValue": 0,
       "maxValue": 10,
       "metadata": {
         "description": "The number of internal subnets to provision.",
