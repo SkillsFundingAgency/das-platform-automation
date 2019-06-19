@@ -26,7 +26,7 @@
       }
     ],
     "emptyArray": [],
-    "subnetResourceIdList": "[if(greater(parameters('subnetConfiguration'), 0), variables('subnetResourceIdListCopy'), variables('emptyArray'))]"
+    "subnetResourceIdList": "[if(greater(length(parameters('subnetConfiguration')), 0), variables('subnetResourceIdListCopy'), variables('emptyArray'))]"
   },
   "resources": [],
   "outputs": {
