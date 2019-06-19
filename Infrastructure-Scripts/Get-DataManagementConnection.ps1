@@ -39,17 +39,17 @@ $New-SqlDBAccountParameters = @{
 [CmdletBinding()]
 param (
     [Parameter(Mandatory = $true)]
-	[String]$ServerName,
-	[Parameter(Mandatory = $true)]
-	[String]$ReadOnlyReplica,
-	[Parameter(Mandatory = $true)]
+    [String]$ServerName,
+    [Parameter(Mandatory = $true)]
+    [String]$ReadOnlyReplica,
+    [Parameter(Mandatory = $true)]
     [String]$KVSecretName,
     [Parameter(Mandatory = $false)]
     [String]$AzureFirewallName = "AzureWebAppFirewall",
     [Parameter(Mandatory = $true)]
     [String]$DataBaseName,
-	[Parameter(Mandatory = $true)]
-	[String]$WareHouseDatabase,
+    [Parameter(Mandatory = $true)]
+    [String]$WareHouseDatabase,
     [Parameter(Mandatory = $true)]
     [String]$SqlServiceAccountName,
     [Parameter(Mandatory = $true)]
@@ -66,7 +66,7 @@ function Get-RandomPassword {
 }
 
 try {
-	$AgentIP = (Invoke-WebRequest ifconfig.me/ip -UseBasicParsing).Content.Trim()
+    $AgentIP = (Invoke-WebRequest ifconfig.me/ip -UseBasicParsing).Content.Trim()
     $ServiceAccountSecretName = "$SqlServiceAccountName".ToLower()
     $ServerFQDN = "$ServerName.database.windows.net"
 
@@ -86,15 +86,15 @@ try {
         throw "Could not retrieve secure password for $ServerName"
     }
 
-	# --- Add agent IP exception to the firewall
-	Write-Host "Updating firewall rule with agent ip: $AgentIP"
-	$FirewallUpdateParameters = @{
-		StartIPAddress = $AgentIp
-		EndIPAddress = $AgentIp
-		FirewallRuleName = $AzureFirewallName
-		ServerName = $ServerName
-		ResourceGroupName = $ServerResource.ResourceGroupName
-	}
+    # --- Add agent IP exception to the firewall
+    Write-Host "Updating firewall rule with agent ip: $AgentIP"
+    $FirewallUpdateParameters = @{
+        StartIPAddress    = $AgentIp
+        EndIPAddress      = $AgentIp
+        FirewallRuleName  = $AzureFirewallName
+        ServerName        = $ServerName
+        ResourceGroupName = $ServerResource.ResourceGroupName
+    }
 
     if (!(Get-AzureRmSqlServerFirewallRule -ServerName $ServerName -ResourceGroupName $ServerResource.ResourceGroupName -FirewallRuleName $AzureFirewallName -ErrorAction SilentlyContinue)) {
         $null = New-AzureRmSqlServerFirewallRule @FirewallUpdateParameters
@@ -103,9 +103,9 @@ try {
         $null = Set-AzureRmSqlServerFirewallRule @FirewallUpdateParameters
     }
 
-	# --- Retrieve or set service account password
-	Write-Host "Creating service account: $SqlServiceAccountName"
-	$ServiceAccountPassword = (Get-AzureKeyVaultSecret -VaultName $KeyVaultName -Name $ServiceAccountSecretName).SecretValueText
+    # --- Retrieve or set service account password
+    Write-Host "Creating service account: $SqlServiceAccountName"
+    $ServiceAccountPassword = (Get-AzureKeyVaultSecret -VaultName $KeyVaultName -Name $ServiceAccountSecretName).SecretValueText
     if (!$ServiceAccountPassword) {
         $ServiceAccountPassword = Get-RandomPassword
         $SecureAccountPassword = $ServiceAccountPassword | ConvertTo-SecureString -AsPlainText -Force
@@ -132,35 +132,35 @@ try {
         Query           = $Query
     }
 
-	Invoke-Sqlcmd @SQLCmdParameters
+    Invoke-Sqlcmd @SQLCmdParameters
 
-	$ServiceName = $DataBaseName.Split("-")[2]
+    $ServiceName = $DataBaseName.Split("-")[2]
     $CredName = "$($ServiceName)DBRCred"
 
     Write-Host "Creating encryped Credential: $CredName using $SqlServiceAccountName"
 
-	$Query = @"
+    $Query = @"
 	CREATE DATABASE SCOPED CREDENTIAL "$($CredName)"  WITH IDENTITY = '$($SqlServiceAccountName)',
 	SECRET =  '$($ServiceAccountPassword)'
 "@
 
-	$SQLCmdParameters = @{
-		ServerInstance  = $ServerFQDN
-		Database        = $WareHouseDatabase
-		Username        = $SqlServerUserName
-		Password        = $SqlServerPassword
-		OutputSqlErrors = $true
-		Query           = $Query
-}
-	Invoke-Sqlcmd @SQLCmdParameters
+    $SQLCmdParameters = @{
+        ServerInstance  = $ServerFQDN
+        Database        = $WareHouseDatabase
+        Username        = $SqlServerUserName
+        Password        = $SqlServerPassword
+        OutputSqlErrors = $true
+        Query           = $Query
+    }
+    Invoke-Sqlcmd @SQLCmdParameters
 
 
-	$ConectionName = "$($ServiceName)DBConnection"
+    $ConectionName = "$($ServiceName)DBConnection"
     $ReadOnlyReplicaFQN = "$($ReadonlyReplica).database.windows.net"
 
     Write-Host "Creating Extenal Data Source to: $DataBaseName on $ReadOnlyReplicaFQN using $CredName"
 
-	$Query = @"
+    $Query = @"
 	CREATE EXTERNAL DATA SOURCE "$($ConectionName)" WITH
     (TYPE = RDBMS,
     LOCATION = '$($ReadOnlyReplicaFQN)',
@@ -169,24 +169,24 @@ try {
 ) ;
 "@
 
-	$SQLCmdParameters = @{
-		ServerInstance  = $ServerFQDN
-		Database        = $WareHouseDatabase
-		Username        = $SqlServerUserName
-		Password        = $SqlServerPassword
-		OutputSqlErrors = $true
-		Query           = $Query
-}
+    $SQLCmdParameters = @{
+        ServerInstance  = $ServerFQDN
+        Database        = $WareHouseDatabase
+        Username        = $SqlServerUserName
+        Password        = $SqlServerPassword
+        OutputSqlErrors = $true
+        Query           = $Query
+    }
 
-	Invoke-Sqlcmd @SQLCmdParameters
+    Invoke-Sqlcmd @SQLCmdParameters
 
 }
 catch {
     throw "$_"
 }
 finally {
-	$ServerResource = Get-AzureRmResource -Name $ServerName -ResourceType "Microsoft.Sql/servers"
+    $ServerResource = Get-AzureRmResource -Name $ServerName -ResourceType "Microsoft.Sql/servers"
     if ((Get-AzureRmSqlServerFirewallRule -ServerName $ServerName -ResourceGroupName $ServerResource.ResourceGroupName -FirewallRuleName $AzureFirewallName -ErrorAction SilentlyContinue)) {
         $null = Remove-AzureRmSqlServerFirewallRule -FirewallRuleName $AzureFirewallName -ServerName $ServerName -ResourceGroupName $ServerResource.ResourceGroupName
-	}
+    }
 }
