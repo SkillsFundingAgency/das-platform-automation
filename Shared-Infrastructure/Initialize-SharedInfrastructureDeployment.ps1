@@ -182,5 +182,5 @@ try {
     }
 }
 catch {
-    throw $_.Exception
+    $PSCmdlet.ThrowTerminatingError($_)
 }
