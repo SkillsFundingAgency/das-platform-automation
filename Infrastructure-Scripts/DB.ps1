@@ -140,8 +140,8 @@ try {
     Write-Host "Creating encryped Credential: $CredName using $SqlServiceAccountName"
 
     $Query = @"
-	CREATE DATABASE SCOPED CREDENTIAL "$($CredName)"  WITH IDENTITY = '$($SqlServiceAccountName)',
-	SECRET =  '$($ServiceAccountPassword)'
+	    CREATE DATABASE SCOPED CREDENTIAL "$($CredName)"  WITH IDENTITY = '$($SqlServiceAccountName)',
+	    SECRET =  '$($ServiceAccountPassword)'
 "@
 
     $SQLCmdParameters = @{
@@ -161,12 +161,12 @@ try {
     Write-Host "Creating Extenal Data Source to: $DataBaseName on $ReadOnlyReplicaFQN using $CredName"
 
     $Query = @"
-	CREATE EXTERNAL DATA SOURCE "$($ConectionName)" WITH
-    (TYPE = RDBMS,
-    LOCATION = '$($ReadOnlyReplicaFQN)',
-    DATABASE_NAME = '$($DataBaseName)',
-    CREDENTIAL =  "$($CredName)",
-) ;
+	    CREATE EXTERNAL DATA SOURCE "$($ConectionName)" WITH
+        (TYPE = RDBMS,
+        LOCATION = '$($ReadOnlyReplicaFQN)',
+        DATABASE_NAME = '$($DataBaseName)',
+        CREDENTIAL =  "$($CredName)",
+    ) ;
 "@
 
     $SQLCmdParameters = @{
