@@ -1,39 +1,36 @@
 <#
-.SYNOPSIS
-Create A Sql Database Service Account Automation
+    .SYNOPSIS
+    Create A Sql Database Service Account Automation
 
-.DESCRIPTION
-Create A Sql Database Service Account Automation
+    .DESCRIPTION
+    Create A Sql Database Service Account Automation
 
-.PARAMETER ServerName
-Name of the SQL Server
+    .PARAMETER ServerName
+    Name of the SQL Server
 
-.PARAMETER AzureFireWallName
-Name of the temporary Sql Server FireWall rule created (Optional)
+    .PARAMETER AzureFireWallName
+    Name of the temporary Sql Server FireWall rule created (Optional)
 
-.PARAMETER SqlServiceAccountName
-The name of the service account to be created.
+    .PARAMETER SqlServiceAccountName
+    The name of the service account to be created.
 
-.PARAMETER Environment
-The Environment of the New Service account,
+    .PARAMETER Environment
+    The Environment of the New Service account,
 
-.PARAMETER KeyVaultName
-The name of the Keyvault for the Environment
+    .PARAMETER KeyVaultName
+    The name of the Keyvault for the Environment
 
+    .EXAMPLE
+    $New-SqlDBAccountParameters = @{
+        ServerName = $ServerName
+        ReadOnlyReplica = $ReadOnlyReplica
+        DataBaseName = $DataBaseName
+        WareHouseDatabase = $WareHouseDatabase
+        SqlServiceAccountName = $SqlServiceAccountName
+        Environment = $Environment
+        KeyVaultName = $KeyVaultName}
 
-.EXAMPLE
-$New-SqlDBAccountParameters = @{
-	 ServerName = $ServerName
-	 ReadOnlyReplica = $ReadOnlyReplica
-	 DataBaseName = $DataBaseName
-	 WareHouseDatabase = $WareHouseDatabase
-     SqlServiceAccountName = $SqlServiceAccountName
-     Environment = $Environment
-     KeyVaultName = $KeyVaultName
-}
-
-.\New-SqlDbServiceAccount.ps1 @New-SqlDBAccountParameters
-
+    .\New-SqlDbServiceAccount.ps1 @New-SqlDBAccountParameters
 #>
 
 [CmdletBinding()]
@@ -140,8 +137,8 @@ try {
     Write-Host "Creating encryped Credential: $CredName using $SqlServiceAccountName"
 
     $Query = @"
-	CREATE DATABASE SCOPED CREDENTIAL "$($CredName)"  WITH IDENTITY = '$($SqlServiceAccountName)',
-	SECRET =  '$($ServiceAccountPassword)'
+        CREATE DATABASE SCOPED CREDENTIAL "$($CredName)"  WITH IDENTITY = '$($SqlServiceAccountName)',
+        SECRET =  '$($ServiceAccountPassword)'
 "@
 
     $SQLCmdParameters = @{
@@ -161,12 +158,12 @@ try {
     Write-Host "Creating Extenal Data Source to: $DataBaseName on $ReadOnlyReplicaFQN using $CredName"
 
     $Query = @"
-	CREATE EXTERNAL DATA SOURCE "$($ConectionName)" WITH
-    (TYPE = RDBMS,
-    LOCATION = '$($ReadOnlyReplicaFQN)',
-    DATABASE_NAME = '$($DataBaseName)',
-    CREDENTIAL =  "$($CredName)",
-) ;
+        CREATE EXTERNAL DATA SOURCE "$($ConectionName)" WITH
+        (TYPE = RDBMS,
+        LOCATION = '$($ReadOnlyReplicaFQN)',
+        DATABASE_NAME = '$($DataBaseName)',
+        CREDENTIAL =  "$($CredName)",
+    ) ;
 "@
 
     $SQLCmdParameters = @{
