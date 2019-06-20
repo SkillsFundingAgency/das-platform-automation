@@ -20,20 +20,17 @@
     .PARAMETER KeyVaultName
     The name of the Keyvault for the Environment
 
-
     .EXAMPLE
     $New-SqlDBAccountParameters = @{
-	    ServerName = $ServerName
-	    ReadOnlyReplica = $ReadOnlyReplica
-	    DataBaseName = $DataBaseName
-	    WareHouseDatabase = $WareHouseDatabase
+        ServerName = $ServerName
+        ReadOnlyReplica = $ReadOnlyReplica
+        DataBaseName = $DataBaseName
+        WareHouseDatabase = $WareHouseDatabase
         SqlServiceAccountName = $SqlServiceAccountName
         Environment = $Environment
-        KeyVaultName = $KeyVaultName
-    }
+        KeyVaultName = $KeyVaultName}
 
     .\New-SqlDbServiceAccount.ps1 @New-SqlDBAccountParameters
-
 #>
 
 [CmdletBinding()]
