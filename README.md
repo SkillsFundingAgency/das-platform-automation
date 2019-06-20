@@ -13,6 +13,7 @@
 - [Code Layout and Formatting](#code-layout-and-formatting)
     - [EditorConfig](#editorconfig)
         - [EditorConfig Installation](#editorconfig-installation)
+        - [Using EditorConfig](#using-editorconfig)
     - [VS Code Settings](#vs-code-settings)
 - [Documentation](#documentation)
     - [Comment Based Help](#comment-based-help)
@@ -49,7 +50,7 @@ Use the following as a checklist for creating new helper scripts.
 |Should| Adhere to .editorconfig. | Stored in .editorconfig |
 |Should| Adhere to .vscode settings. | Stored in .vscode/settings.json|
 |Should| Use a forward slash ('/') in paths. | This is to ensure compatibility on both Windows and Linux platforms. |
-|Should| Use -ErrorAction per cmdlet. |   |
+|Should| Use -ErrorAction per cmdlet. | This is to ensure useful errors are not suppressed globally. |
 |Should NOT| Use aliases. | This can cause less readable code. |
 |Should NOT | Hard code credentials (especially plain text). | Expose sensitive information. |
 |Should NOT | Use Write-Host. | As explained by [Jeffrey Snover](http://www.jsnover.com/blog/2013/12/07/write-host-considered-harmful/) and [Don Jones](https://www.itprotoday.com/powershell/what-do-not-do-powershell-part-1) |
@@ -66,13 +67,26 @@ This section provides an overview of the following:
 
 ## EditorConfig
 
-In order to maintain a consistent coding style an EditorConfig file is used to define the coding style to be used. The file **.editorconfig** contains the required styles. The EditorConfig file defines styles such as indentation size, indentation style, newline rules and more.
+In order to maintain a consistent coding style an EditorConfig file is used to define the coding style to be used. The file `.editorconfig` contains the required styles. The EditorConfig file defines styles such as indentation size, indentation style, newline rules and more.
 
 ### EditorConfig Installation
 
-EditorConfig can be installed as a VS Code extension. Search for and install **EditorConfig for VS Code**. The VS Code Marketplace has more information [here](https://marketplace.visualstudio.com/items?itemName=EditorConfig.EditorConfig).
+EditorConfig can be installed as a Visual Studio Code extension. Search for and install `EditorConfig for VS Code`. The VS Code Marketplace has more information [here](https://marketplace.visualstudio.com/items?itemName=EditorConfig.EditorConfig).
 
-For further information on EditorConfig [EditorConfig](https://editorconfig.org/)
+For further information view the official website: [EditorConfig](https://editorconfig.org/)
+
+### Using EditorConfig
+
+The settings in the `.editorconfig` file are automatically applied when saving files in your branch. For example, the line `insert_final_newline = true` will automatically insert a new file at the end of a file.
+
+To troubleshoot EditorConfig and see what is being applied to your file, click `OUTPUT` in Visual Studio Code and in the drop down select `Editorconfig`. This will provide an output of what EditorConfig is applying. The following is an example of a final newline being inserted:
+
+~~~~
+das-platform-automation/Infrastructure-Scripts/Get-AzStorageAccountConnectionString.ps1: Using EditorConfig core...
+Infrastructure-Scripts/Get-AzStorageAccountConnectionString.ps1: setEndOfLine(LF)
+Infrastructure-Scripts/Get-AzStorageAccountConnectionString.ps1: editor.action.trimTrailingWhitespace
+Infrastructure-Scripts/Get-AzStorageAccountConnectionString.ps1: insertFinalNewline(LF)
+~~~~
 
 ## VS Code Settings
 
