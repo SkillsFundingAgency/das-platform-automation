@@ -14,6 +14,7 @@
     - [EditorConfig](#editorconfig)
         - [EditorConfig Installation](#editorconfig-installation)
         - [Using EditorConfig](#using-editorconfig)
+        - [Troubleshooting EditorConfig](#troubleshooting-editorconfig)
     - [VS Code Settings](#vs-code-settings)
 - [Documentation](#documentation)
     - [Comment Based Help](#comment-based-help)
@@ -62,22 +63,38 @@ This section provides an overview of the following:
 
 | Section Header | Description |
 | - | - |
-| EditorConfig | Provides an overview of how EditorConfig is used to enforce a consistant readable format. |
+| EditorConfig | Provides an overview of how EditorConfig is used to enforce a consistant coding style. |
 | VS Code Settings | Provides an overview of how settings.json can be used to enforce consistency for VS Code settings. |
 
 ## EditorConfig
 
-In order to maintain a consistent coding style an EditorConfig file is used to define the coding style to be used. The file `.editorconfig` contains the required styles. The EditorConfig file defines styles such as indentation size, indentation style, newline rules and more.
+In order to maintain a consistent coding style, an EditorConfig file is used. The file `.editorconfig` contains the required styles. The EditorConfig file defines styles such as indentation size, indentation style, newline rules etc. The full list of supported properties in VS Code can be found [here.](https://github.com/editorconfig/editorconfig-vscode#supported-properties).
+
+`Tip: Ensure this is applied before committing and/or raising a pull request`
 
 ### EditorConfig Installation
 
 EditorConfig can be installed as a Visual Studio Code extension. Search for and install `EditorConfig for VS Code`. The VS Code Marketplace has more information [here](https://marketplace.visualstudio.com/items?itemName=EditorConfig.EditorConfig).
 
-For further information view the official website: [EditorConfig](https://editorconfig.org/)
+For further information view the official website [here.](https://editorconfig.org/)
 
 ### Using EditorConfig
 
-The settings in the `.editorconfig` file are automatically applied when saving files in your branch. For example, the line `insert_final_newline = true` will automatically insert a new file at the end of a file.
+The EditorConfig extension is activated whenever you open a new text editor, switch tabs into an existing one or focus into the editor you already have open. When activated, it uses EditorConfig to resolve the configuration for that particular file and applies any relevant editor settings.
+
+The following styles are applied on save:
+
+- end_of_line
+- insert_final_newline
+- trim_trailing_whitespace
+
+The following styles are applied by using Format Document (Shift + Alt + F on Windows):
+
+- indent_style
+- indent_size
+- tab_width
+
+### Troubleshooting EditorConfig
 
 To troubleshoot EditorConfig and see what is being applied to your file, click `OUTPUT` in Visual Studio Code and in the drop down select `Editorconfig`. This will provide an output of what EditorConfig is applying. The following is an example of a final newline being inserted:
 
