@@ -1,8 +1,14 @@
 param(
     [object]$WebhookData
 )
-Write-Output "Incoming Request: `n$WebhookData"
-$RequestData = $WebhookData | ConvertFrom-Json -Depth 10
+$RequestData = ($WebhookData.RequestBody) | ConvertFrom-Json
+
+Write-Output "Incoming Request: `n$($WebhookData.RequestBody)"
+
+if ($WebhookData.RequestHeader.'X-GitHub-Event' -eq "ping") {
+    Write-Output "pong"
+    exit
+}
 
 $SlackSecurityAlertWebhook = Get-AutomationVariable -Name 'SlackSecurityAlertWebhook'
 
@@ -56,9 +62,9 @@ $SlackWebhookBody = @{
     icon_emoji  = ":github:"
     attachments = @( 
         @{
-            text        = $Text
-            fields      = $Fields
-            color       = $Colour
+            text   = $Text
+            fields = $Fields
+            color  = $Colour
         }
     )
 }
