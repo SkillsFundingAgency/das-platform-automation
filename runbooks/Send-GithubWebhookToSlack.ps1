@@ -1,9 +1,8 @@
 param(
     [object]$WebhookData
 )
-
+Write-Output "Incoming Request: `n$WebhookData"
 $RequestData = $WebhookData | ConvertFrom-Json -Depth 10
-Write-Host "$RequestData"
 
 $SlackSecurityAlertWebhook = Get-AutomationVariable -Name 'SlackSecurityAlertWebhook'
 
@@ -57,7 +56,6 @@ $SlackWebhookBody = @{
     icon_emoji  = ":github:"
     attachments = @( 
         @{
-            author_icon = "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png"
             text        = $Text
             fields      = $Fields
             color       = $Colour
