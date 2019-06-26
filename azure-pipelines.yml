@@ -26,7 +26,7 @@ stages:
             workingDirectory: $(System.DefaultWorkingDirectory)
           - task: PowerShell@2
             inputs:
-              filePath: "Tests/Invoke-Tests.ps1"
+              filePath: "tests/Invoke-Tests.ps1"
           - task: PublishTestResults@2
             displayName: "Publish Test Results **/TEST-*.xml"
             inputs:
@@ -50,7 +50,7 @@ stages:
             workingDirectory: $(System.DefaultWorkingDirectory)
           - task: PowerShell@2
             inputs:
-              filePath: "Tests/Invoke-Tests.ps1"
+              filePath: "tests/Invoke-Tests.ps1"
               pwsh: true
           - task: PublishTestResults@2
             displayName: "Publish Test Results **/TEST-*.xml"
@@ -82,4 +82,4 @@ stages:
                   tagSource: "manual"
                   tag: "$(Build.BuildNumber)"
                   addChangeLog: true
-                  assets: "$(System.DefaultWorkingDirectory)/Infrastructure-Scripts/**/*.ps1"
+                  assets: "$(System.DefaultWorkingDirectory)/infrastructure-scripts/**/*.ps1"

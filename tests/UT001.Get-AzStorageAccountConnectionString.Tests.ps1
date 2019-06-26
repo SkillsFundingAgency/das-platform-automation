@@ -1,5 +1,5 @@
-$Config = Get-Content $PSScriptRoot\..\Tests\Unit.Tests.Config.json -Raw | ConvertFrom-Json
-Set-Location $PSScriptRoot\..\Infrastructure-Scripts\
+$Config = Get-Content $PSScriptRoot\..\tests\Unit.Tests.Config.json -Raw | ConvertFrom-Json
+Set-Location $PSScriptRoot\..\infrastructure-scripts\
 
 Describe "Get-AzStorageAccountConnectionString Unit Tests" -Tags @("Unit") {
 

@@ -42,7 +42,7 @@ Use the following as a checklist for creating new helper scripts.
 |Should| Work locally and on build agents.| Scripts should work on any environment not just build agents. |
 |Should| Contain minimal yet descriptive inline comments. | Consider using Write-Verbose or Write-Debug, useful for progress or status information. |
 |Should| Contain comment based help.| For example a Synopsis, Description and Example(s). |
-|Should| Have a Pester unit test which passes all tests.| Save in Tests folder. |
+|Should| Have a Pester unit test which passes all tests.| Save in tests folder. |
 |Should| Pester unit test filename to start UTxxx. | Increment by one. |
 |Should| Use Az module cmdlets only.| This is the Microsoft intended PowerShell module for interacting with Azure. Replaces AzureRM module. |
 |Should| Follow the naming covention. | See [Naming Conventions](#naming-conventions)    |
