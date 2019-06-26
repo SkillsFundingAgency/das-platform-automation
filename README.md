@@ -63,7 +63,7 @@ This section provides an overview of the following:
 
 | Section Header | Description |
 | - | - |
-| EditorConfig | Provides an overview of how EditorConfig is used to enforce a consistant coding style. |
+| EditorConfig | Provides an overview of how EditorConfig is used to enforce a consistent coding style. |
 | VS Code Settings | Provides an overview of how settings.json can be used to enforce consistency for VS Code settings. |
 
 ## EditorConfig
