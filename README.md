@@ -1,6 +1,13 @@
 # das-platform-automation
+PowerShell helper scripts to be used locally and in Azure Pipelines for the Digital Apprenticeship Service (DAS). It includes the following:
 
-[![Build Status](https://dev.azure.com/sfa-gov-uk/Apprenticeships%20Service%20Cloud%20Platform/_apis/build/status/das-platform-automation?branchName=master)](https://dev.azure.com/sfa-gov-uk/Apprenticeships%20Service%20Cloud%20Platform/_build/latest?definitionId=1538&branchName=master)
+- A checklist for creating new scripts including "shoulds" and "should not".
+- Code layout and formatting guidance.
+- Writing Pester tests and using PSScriptAnalyzer to ensure best practise.
+
+|Build Status|
+|-|
+|[![Build Status](https://dev.azure.com/sfa-gov-uk/Apprenticeships%20Service%20Cloud%20Platform/_apis/build/status/das-platform-automation?branchName=master)](https://dev.azure.com/sfa-gov-uk/Apprenticeships%20Service%20Cloud%20Platform/_build/latest?definitionId=1538&branchName=master)|
 
 ## Contents
 
@@ -8,14 +15,13 @@
 
 - [das-platform-automation](#das-platform-automation)
     - [Contents](#contents)
-    - [About](#about)
 - [Helper Script Checklist](#helper-script-checklist)
 - [Code Layout and Formatting](#code-layout-and-formatting)
     - [EditorConfig](#editorconfig)
         - [EditorConfig Installation](#editorconfig-installation)
         - [Using EditorConfig](#using-editorconfig)
         - [Troubleshooting EditorConfig](#troubleshooting-editorconfig)
-    - [VS Code Settings](#vs-code-settings)
+    - [Visual Studio Code Workspace Settings](#visual-studio-code-workspace-settings)
 - [Documentation](#documentation)
     - [Comment Based Help](#comment-based-help)
     - [Naming Conventions](#naming-conventions)
@@ -27,17 +33,14 @@
     - [PSScriptAnalyzer](#psscriptanalyzer)
         - [Introduction](#introduction-1)
         - [How it's Used](#how-its-used-1)
+    - [Using Scripts in Azure Pipelines](#using-scripts-in-azure-pipelines)
 - [References and Further Reading](#references-and-further-reading)
 
 <!-- /TOC -->
 
-## About
-
-This repository contains PowerShell helper scripts to be used locally and in Azure Pipelines for the Digital Apprenticeship Service (DAS). It also includes a checklist for creating new helper scripts, a code layout and formatting guide, script documentation and testing details.
-
 # Helper Script Checklist
 
-Use the following as a checklist for creating new helper scripts.
+Use the following as a checklist when creating new helper scripts:
 
 |Requirement| Description                     | Additional Notes
 |-| - | - |
@@ -63,8 +66,8 @@ This section provides an overview of the following:
 
 | Section Header | Description |
 | - | - |
-| EditorConfig | Provides an overview of how EditorConfig is used to enforce a consistent coding style. |
-| VS Code Settings | Provides an overview of how settings.json can be used to enforce consistency for VS Code settings. |
+| EditorConfig | Provides an overview of how EditorConfig is used to enforce a consistent coding style, as well as how to install and use the EditorConfig extension in Visual Studio Code.  |
+| Visual Studio Code Workspace Settings | Provides an overview of how the Visual Studio Code (VS Code) Workspace Settings are used to ensure specific settings are shared across the team. This is to enforce consistency across VS Code installs. |
 
 ## EditorConfig
 
@@ -105,9 +108,9 @@ Infrastructure-Scripts/Get-AzStorageAccountConnectionString.ps1: editor.action.t
 Infrastructure-Scripts/Get-AzStorageAccountConnectionString.ps1: insertFinalNewline(LF)
 ~~~~
 
-## VS Code Settings
+## Visual Studio Code Workspace Settings
 
-TO DO
+The Visual Studio Code (VS Code) Workspace settings are located under the `.vscode/settings.json`. The settings are scoped to the open workspace and overrides the user scope. The settings are applied when the workspace is opened. The settings used are specific to PowerShell code formatting.
 
 # Documentation
 
@@ -159,14 +162,36 @@ This section provides an overview of the following:
 
 | Section Header | Description |
 | - | - |
-| Pester | Provides an introduction to Pester and how it is used to test the infrastructure scripts.  |
+| Pester | Provides an introduction to Pester, how it is used to test the infrastructure scripts and how to write a Pester test.  |
 | PSScriptAnalyzer | Provides an introduction to PSScriptAnalyzer and how it is used to check code quality.  |
 
 ## Pester
 
 ### Introduction
 
+Pester is a test framework for PowerShell. It provides a language that allows you to define test cases, and the `Invoke-Pester` cmdlet to execute these tests and report the results. It is used to run a series of automated tests to ensure a new piece of code passes the defined criteria.
+
 ### How it's Used
+
+Pester is used to automate testing of the scripts under `infrastructure-scripts`. while working with a local branch of das-platform-automation, Pester can be invoked locally without having to commit changes to the remote repository. This is useful to ensure tests pass before running a build in Azure Pipelines with a pull request to master or a merge of the branch into master.
+
+By default, Invoke-Pester runs all *.Tests.ps1 files. For example, to run all Pester tests in the tests folder run the following:
+
+~~~~powershell
+# Change directory into tests folder
+cd ..\das-platform-automation\tests\
+# Run Pester
+Invoke-Pester
+~~~~
+
+To run a specific test file:
+
+~~~~powershell
+# Change directory into tests folder
+cd ..\das-platform-automation\tests\
+# Run Pester
+Invoke-Pester -Script .\UT001.Get-AzStorageAccountConnectionString.Tests.ps1
+~~~~
 
 ### How to Write a Pester Unit Test
 
@@ -175,6 +200,12 @@ This section provides an overview of the following:
 ### Introduction
 
 ### How it's Used
+
+## Using Scripts in Azure Pipelines
+
+Awaiting Microsoft to fix bug with the GitHub release task:
+https://developercommunity.visualstudio.com/content/problem/612300/download-github-release-repository-drop-down-not-s.html
+https://github.com/microsoft/azure-pipelines-tasks/issues/10685
 
 # References and Further Reading
 
