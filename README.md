@@ -177,7 +177,7 @@ Pester is used to automate testing of the scripts under `infrastructure-scripts`
 
 By default, Invoke-Pester runs all *.Tests.ps1 files. For example, to run all Pester tests in the tests folder run the following:
 
-~~~~
+~~~~powershell
 # Change directory into tests folder
 cd ..\das-platform-automation\tests\
 # Run Pester
@@ -186,7 +186,7 @@ Invoke-Pester
 
 To run a specific test file:
 
-~~~~
+~~~~powershell
 # Change directory into tests folder
 cd ..\das-platform-automation\tests\
 # Run Pester
