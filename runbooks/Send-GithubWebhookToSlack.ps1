@@ -22,13 +22,13 @@ $Fields = @(
         value = $RequestData.alert.affected_package_name
     }
 )
-    
+
 
 switch ($RequestData.action) {
     'create' {
         $Colour = "danger"
         $Text = "New Security Vulnerability Alert"
-        $Fields += @(        
+        $Fields += @(
             @{
                 title = "Affected Range"
                 value = $RequestData.alert.affected_range
@@ -40,6 +40,10 @@ switch ($RequestData.action) {
             @{
                 title = "External Reference"
                 value = $RequestData.alert.external_reference
+            },
+            @{
+                title = "External Identifier"
+                value = $RequestData.alert.external_identifier
             }
         )
 
@@ -60,7 +64,7 @@ switch ($RequestData.action) {
 $SlackWebhookBody = @{
     username    = "Github"
     icon_emoji  = ":github:"
-    attachments = @( 
+    attachments = @(
         @{
             text   = $Text
             fields = $Fields
