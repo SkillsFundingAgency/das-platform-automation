@@ -8,7 +8,19 @@ pr: none
 
 
 stages:
+  - stage: Versioning
+    dependsOn: []
+    jobs:
+      - job: "GitVersion"
+        pool:
+          name: "DAS - Continuous Integration"
+        steps:
+          - task: gittools.gitversion-preview.gitversion-task.GitVersion@5
+            displayName: GitVersion
+            inputs:
+              configFilePath: GitVersion.yml
   - stage: Test
+    dependsOn: []
     jobs:
       - job: "Windows_PS51_Build_DAS_Continuous_Deployment"
         pool:
@@ -60,6 +72,10 @@ stages:
             condition: succeededOrFailed()
 
   - stage: Release
+    dependsOn:
+      - Versioning
+      - Test
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
     jobs:
     - deployment: "GitHubRelease"
       displayName: "Create Release in GitHub"
@@ -70,12 +86,7 @@ stages:
         runOnce:
           deploy:
             steps:
-              - task: gittools.gitversion-preview.gitversion-task.GitVersion@5
-                displayName: GitVersion
-                inputs:
-                  configFilePath: GitVersion.yml
               - task: GitHubRelease@0
-                condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
                 inputs:
                   gitHubConnection: "SFA"
                   repositoryName: "$(Build.Repository.Name)"
