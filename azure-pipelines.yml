@@ -71,7 +71,7 @@ stages:
         runOnce:
           deploy:
             steps:
-              - task: GitVersion@4
+              - task: gittools.gitversion-preview.gitversion-task.GitVersion@5
                 displayName: GitVersion
               - task: GitHubRelease@0
                 inputs:
