@@ -182,6 +182,7 @@ By default, Invoke-Pester runs all *.Tests.ps1 files. For example, to run all Pe
 ~~~~powershell
 # Change directory into tests folder
 cd ..\das-platform-automation\tests\
+
 # Run Pester
 Invoke-Pester
 ~~~~
@@ -191,6 +192,7 @@ To run a specific test file:
 ~~~~powershell
 # Change directory into tests folder
 cd ..\das-platform-automation\tests\
+
 # Run Pester
 Invoke-Pester -Script .\UT001.Get-AzStorageAccountConnectionString.Tests.ps1
 ~~~~
@@ -211,6 +213,7 @@ You can also run PSScriptAnalyzer manually while writing scripts:
 ~~~~powershell
 # Change directory into infrastructure-scripts folder
 cd ..\das-platform-automation\infrastructure-scripts\
+
 # Exclude rules as per the QT001.Qaulity.Tests.ps1 script
 $Rules = Get-ScriptAnalyzerRule
 $ExcludeRules = @(
@@ -218,6 +221,7 @@ $ExcludeRules = @(
     "PSAvoidUsingEmptyCatchBlock",
     "PSAvoidUsingPlainTextForPassword"
 )
+
 # Run PSScriptAnalyzer against example script with verbose output
 Invoke-ScriptAnalyzer -Path .\Get-AzStorageAccountConnectionString.ps1 -ExcludeRule $ExcludeRules -Verbose
 ~~~~
