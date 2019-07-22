@@ -32,7 +32,7 @@ PowerShell helper scripts to be used locally and in Azure Pipelines for the Digi
     - [PSScriptAnalyzer](#psscriptanalyzer)
         - [Introduction](#introduction-1)
         - [How it's Used](#how-its-used-1)
-    - [Using Scripts in Azure Pipelines](#using-scripts-in-azure-pipelines)
+    - [Using GitHub Releases in Azure Pipelines](#using-scripts-in-azure-pipelines)
 - [References and Further Reading](#references-and-further-reading)
 
 <!-- /TOC -->
