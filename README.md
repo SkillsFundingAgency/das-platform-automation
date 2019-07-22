@@ -171,6 +171,8 @@ This section provides an overview of the following:
 
 Pester is a test framework for PowerShell. It provides a language that allows you to define test cases, and the `Invoke-Pester` cmdlet to execute these tests and report the results. It is used to run a series of automated tests to ensure a new piece of code passes the defined criteria.
 
+Read more about [Pester](https://github.com/pester/Pester)
+
 ### How it's Used
 
 Pester is used to automate testing of the scripts under `infrastructure-scripts`. while working with a local branch of das-platform-automation, Pester can be invoked locally without having to commit changes to the remote repository. This is useful to ensure tests pass before running a build in Azure Pipelines with a pull request to master or a merge of the branch into master.
@@ -193,23 +195,44 @@ cd ..\das-platform-automation\tests\
 Invoke-Pester -Script .\UT001.Get-AzStorageAccountConnectionString.Tests.ps1
 ~~~~
 
-### How to Write a Pester Unit Test
-
 ## PSScriptAnalyzer
 
 ### Introduction
+PSScriptAnalyzer is a static code checker for Windows PowerShell modules and scripts. PSScriptAnalyzer checks the quality of Windows PowerShell code by running a set of rules. The rules are based on PowerShell best practices identified by PowerShell Team and the community.
+
+Read more about [PSScriptAnalyzer](https://github.com/PowerShell/PSScriptAnalyzer)
 
 ### How it's Used
 
-## Using Scripts in Azure Pipelines
+The script `QT001.Quality.Tests.ps1` under the tests folder imports all .ps1 files under the infrastructure-scripts folder, for each of those .ps1 files a Pester test called `Script code quality tests` is run to confirm that each script passes the included PSScriptAnalyzer rules. If one or more rule fails then the Pester test fails, and therefore the build in Azure DevOps will also fail.
+
+You can also run PSScriptAnalyzer manually while writing scripts:
+
+~~~~powershell
+# Change directory into infrastructure-scripts folder
+cd ..\das-platform-automation\infrastructure-scripts\
+# Exclude rules as per the QT001.Qaulity.Tests.ps1 script
+$Rules = Get-ScriptAnalyzerRule
+$ExcludeRules = @(
+    "PSAvoidUsingWriteHost",
+    "PSAvoidUsingEmptyCatchBlock",
+    "PSAvoidUsingPlainTextForPassword"
+)
+# Run PSScriptAnalyzer against example script with verbose output
+Invoke-ScriptAnalyzer -Path .\Get-AzStorageAccountConnectionString.ps1 -ExcludeRule $ExcludeRules -Verbose
+~~~~
+
+## Using GitHub Releases in Azure Pipelines
 
 Awaiting Microsoft to fix bug with the GitHub release task:
-https://developercommunity.visualstudio.com/content/problem/612300/download-github-release-repository-drop-down-not-s.html
-https://github.com/microsoft/azure-pipelines-tasks/issues/10685
+- https://developercommunity.visualstudio.com/content/problem/612300/download-github-release-repository-drop-down-not-s.html
+- https://github.com/microsoft/azure-pipelines-tasks/issues/10685
 
 # References and Further Reading
 
 | Reference | URL |
 | -- | -- |
 | The PowerShell Best Practices and Style Guide | https://poshcode.gitbooks.io/powershell-practice-and-style/ |
-| Overview of PowerShell Code Quality | https://mathieubuisson.github.io/powershell-code-quality-pscodehealth/  |
+| Overview of PowerShell Code Quality | https://mathieubuisson.github.io/powershell-code-quality-pscodehealth/ |
+| Pester GitHub| https://github.com/pester/Pester
+| PSScriptAnalyzer | https://github.com/PowerShell/PSScriptAnalyzer
