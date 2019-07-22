@@ -29,7 +29,6 @@ PowerShell helper scripts to be used locally and in Azure Pipelines for the Digi
     - [Pester](#pester)
         - [Introduction](#introduction)
         - [How it's Used](#how-its-used)
-        - [How to Write a Pester Unit Test](#how-to-write-a-pester-unit-test)
     - [PSScriptAnalyzer](#psscriptanalyzer)
         - [Introduction](#introduction-1)
         - [How it's Used](#how-its-used-1)
