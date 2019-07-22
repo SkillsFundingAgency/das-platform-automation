@@ -60,7 +60,6 @@ stages:
             condition: succeededOrFailed()
 
   - stage: Release
-    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
     jobs:
     - deployment: "GitHubRelease"
       displayName: "Create Release in GitHub"
@@ -76,6 +75,7 @@ stages:
                 inputs:
                   configFilePath: GitVersion.yml
               - task: GitHubRelease@0
+                condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
                 inputs:
                   gitHubConnection: "SFA"
                   repositoryName: "$(Build.Repository.Name)"
