@@ -32,7 +32,10 @@ PowerShell helper scripts to be used locally and in Azure Pipelines for the Digi
     - [PSScriptAnalyzer](#psscriptanalyzer)
         - [Introduction](#introduction-1)
         - [How it's Used](#how-its-used-1)
-    - [Using GitHub Releases in Azure Pipelines](#using-scripts-in-azure-pipelines)
+- [GitHub Releases and Versioning](#github-releases-and-versioning)
+    - [GitHub Releases](#github-releases)
+        - [Azure DevOps GitHub Release Task](#azure-devops-github-release-task)
+    - [Release Versioning](#release-versioning)
 - [References and Further Reading](#references-and-further-reading)
 
 <!-- /TOC -->
@@ -225,11 +228,34 @@ $ExcludeRules = @(
 Invoke-ScriptAnalyzer -Path .\Get-AzStorageAccountConnectionString.ps1 -ExcludeRule $ExcludeRules -Verbose
 ~~~~
 
-## Using GitHub Releases in Azure Pipelines
+# GitHub Releases and Versioning
+
+This section provides an overview of the following:
+
+| Section Header | Description |
+| - | - |
+| GitHub Releases | This section provides an overview of how the das-platform-automation repository can be used as a release within Azure DevOps. It also provides information of how to use the Azure DevOps GitHub Release Task within a release pipeline. |
+| Release Versioning | This section provides an overview of how to ensure a consistent release versioning policy is used and that releases to GitHub are appropriately incremented. |
+
+## GitHub Releases
+
+The das-platform-automation repository is published as a release on GitHub.com [here]([PSScriptAnalyzer](https://github.com/PowerShell/PSScriptAnalyzer)). The releases provide release notes including changes made to the current release and links to the assets. Using GitHub releases enables the use of the Azure DevOps GitHub Release Task so that the scripts in das-platform-automation are made available for use in the Azure DevOps Pipelines.
+
+### Azure DevOps GitHub Release Task
 
 Awaiting Microsoft to fix bug with the GitHub release task:
 - https://developercommunity.visualstudio.com/content/problem/612300/download-github-release-repository-drop-down-not-s.html
 - https://github.com/microsoft/azure-pipelines-tasks/issues/10685
+
+## Release Versioning
+
+To ensure a consistent release versioning policy, the following can be used as a reference:
+
+| Increment Type | When to use | How to use |
+| -- | -- | -- |
+| Major | Breaking changes | Add `+semver: major` to pull request title. |
+| Minor | New scripts | Add `+semver: minor` to pull request title. |
+| Patch | Non-breaking updates to existing scripts | Not required, automatically incremented for every merge if a major or minor is not defined. |
 
 # References and Further Reading
 
