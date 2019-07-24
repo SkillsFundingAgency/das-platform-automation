@@ -234,12 +234,12 @@ This section provides an overview of the following:
 
 | Section Header | Description |
 | - | - |
-| GitHub Releases | This section provides an overview of how the das-platform-automation repository can be used as a release within Azure DevOps. It also provides information of how to use the Azure DevOps GitHub Release Task within a release pipeline. |
-| Release Versioning | This section provides an overview of how to ensure a consistent release versioning policy is used and that releases to GitHub are appropriately incremented. |
+| GitHub Releases | This section provides an overview of the das-platform-automation repository release and how to use the Azure DevOps GitHub Release Task within a release pipeline. |
+| Release Versioning | This section provides an overview of how to ensure a consistent release versioning policy is used, and GitHub releases are appropriately incremented. |
 
 ## GitHub Releases
 
-The das-platform-automation repository is published as a release on GitHub.com [here]([PSScriptAnalyzer](https://github.com/PowerShell/PSScriptAnalyzer)). The releases provide release notes including changes made to the current release and links to the assets. Using GitHub releases enables the use of the Azure DevOps GitHub Release Task so that the scripts in das-platform-automation are made available for use in the Azure DevOps Pipelines.
+The das-platform-automation repository is published as a release on GitHub.com [here]([PSScriptAnalyzer](https://github.com/PowerShell/PSScriptAnalyzer)). Releases provide a list of changes made to specific releases as well as links to the assets available. Using GitHub releases enables the use of the Azure DevOps GitHub Release Task so that the scripts in das-platform-automation are made available for use in the Azure DevOps Pipelines.
 
 ### Azure DevOps GitHub Release Task
 
@@ -249,13 +249,13 @@ Awaiting Microsoft to fix bug with the GitHub release task:
 
 ## Release Versioning
 
-To ensure a consistent release versioning policy, the following can be used as a reference:
+To ensure a consistent release versioning policy the following can be used as a reference:
 
 | Increment Type | When to use | How to use |
 | -- | -- | -- |
-| Major | Breaking changes | Add `+semver: major` to pull request title. |
-| Minor | New scripts | Add `+semver: minor` to pull request title. |
-| Patch | Non-breaking updates to existing scripts | Not required, automatically incremented for every merge if a major or minor is not defined. |
+| Major | Breaking changes to scripts | Add `+semver: major` to pull request title. |
+| Minor | Addition of new scripts | Add `+semver: minor` to pull request title. |
+| Patch | Non-breaking changes to existing scripts | Automatically incremented for every merge if a major or minor is not defined. |
 
 # References and Further Reading
 
