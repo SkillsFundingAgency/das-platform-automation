@@ -16,7 +16,7 @@ Describe "Set-ArmTemplateOutputVariables.ps1 Unit Tests" -Tags @("Unit") {
         }
     }
 
-    Context "The parameter 'ArmOutput' input was valid" {
+    Context "The parameter 'ArmOutput' JSON input in valid" {
         It "Should set variables" {
             $ArmOutput = '{"testOutput":{"type":"String","value":"testOutputValue"}}'
             .\Set-ArmTemplateOutputVariables.ps1 -ArmOutput $ArmOutput | Should Contain "Outputs set as pipeline variables successfully."

@@ -3,8 +3,8 @@
     Takes ARM template output(s) and converts into Azure DevOps variables.
 
     .DESCRIPTION
-    Takes ARM template output(s), usually from the  Azure resource group deployment task in Azure DevOps,
-    and creates Azure DevOps variables of the same output name so that the values can be used in subsequent pipeline tasks.
+    Takes ARM template output(s), usually from the Azure resource group deployment task in Azure DevOps.
+    Creates Azure DevOps variables of the same output name so that the values can be used in subsequent pipeline tasks.
 
     .PARAMETER ArmOutput
     The JSON output from the ARM template to convert into variables.
