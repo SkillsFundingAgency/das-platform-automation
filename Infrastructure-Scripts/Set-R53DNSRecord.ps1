@@ -50,6 +50,6 @@ for ($i -eq 0; $i -lt $PropogationCheckTimeoutSeconds; $i++) {
     Start-Sleep -Seconds 1
 }
 
-if ($i -eq $PropogationCheckTimeoutSeconds) {
+if (!$Propogated) {
     throw "Timed out waiting for DNS propogation"
 }
