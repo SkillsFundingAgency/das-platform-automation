@@ -12,8 +12,9 @@ param(
 
 Import-Module AWSPowershell.NetCore
 
-$DNSRecordName = $DNSRecordName.ToLower()
-$DNSRecordValue = $DNSRecordValue.ToLower()
+$PropogationCheckTimeoutSeconds = 300
+$DNSRecordName = $DNSRecordName.ToLower().Replace(" ", "")
+$DNSRecordValue = $DNSRecordValue.ToLower().Replace(" ", "")
 
 $SupportedHostedZones = @(
     "education.gov.uk",
@@ -31,7 +32,24 @@ if (@($HostedZoneName).Count -gt 1) {
 
 $R53HostedZone = Get-R53HostedZones | Where-Object { $_.Name -eq "$HostedZoneName." }
 
-if(!$R53HostedZone){
+if (!$R53HostedZone) {
     throw "Hosted zone $HostedZoneName could not be found in R53"
 }
 
+
+## Check for existing record
+
+## Create/Update Record
+
+
+for ($i -eq 0; $i -lt $PropogationCheckTimeoutSeconds; $i++) {
+    $Propogated = Resolve-DnsName $DNSRecordName -ErrorAction SilentlyContinue
+    if ($Propogated) {
+        break
+    }
+    Start-Sleep -Seconds 1
+}
+
+if ($i -eq $PropogationCheckTimeoutSeconds) {
+    throw "Timed out waiting for DNS propogation"
+}
