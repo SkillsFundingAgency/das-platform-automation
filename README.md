@@ -257,6 +257,8 @@ To ensure a consistent release versioning policy the following can be used as a 
 | Minor | Addition of new scripts | Add `+semver: minor` to pull request title. |
 | Patch | Non-breaking changes to existing scripts | Automatically incremented for every merge if a major or minor is not defined. |
 
+[GitVersion](https://gitversion.readthedocs.io/en/latest/) is used to achieve release versioning. Read more about [Version Incrementing](https://gitversion.readthedocs.io/en/latest/more-info/version-increments/).
+
 # References and Further Reading
 
 | Reference | URL |
