@@ -4,12 +4,13 @@ Set-Location $PSScriptRoot\..\Infrastructure-Scripts\
 Describe "New-AzStorageAccountContainer.ps1 Unit Tests" -Tags @("Unit") {
 
     Context "Storage Account does not exist" {
+
         It "The specified Storage Account was not found in the subscription, throw an error" {
             Mock Get-AzResource -MockWith { Return $null }
             { .\New-AzStorageAccountContainer.ps1 -Location $Config.location -Name $Config.storageAccountName -ContainerName $Config.containerName } | Should throw "Could not find storage account $($Config.storageAccountName)"
             Assert-MockCalled -CommandName 'Get-AzResource' -Times 1 -Scope It
-
         }
+
     }
 
     Context "Storage Account exists" {

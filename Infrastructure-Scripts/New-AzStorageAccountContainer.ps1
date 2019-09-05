@@ -71,6 +71,7 @@ try {
         Write-Output ("##vso[task.setvariable variable=StorageConnectionString; issecret=true;]$($ConnectionString)")
     }
 }
+
 catch {
     throw $_
 }
