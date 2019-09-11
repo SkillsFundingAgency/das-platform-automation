@@ -247,13 +247,13 @@ The das-platform-automation repository is published as a release on GitHub.com. 
 To use the das-platform-automation repository as a GitHub Release Task follow these steps:
 
 - Edit a Pipeline
-- Add a new Artifact to a Pipeline using the `GitHub Release Task` artifact type. 
-- Select the appropriate `Service connection` in the dropdown. 
-- Use the ellipses button to open the `Select a repository` picker window. 
+- Add a new Artifact to a Pipeline using the `GitHub Release Task` artifact type.
+- Select the appropriate `Service connection` in the dropdown.
+- Use the ellipses button to open the `Select a repository` picker window.
 - Search for `SkillsFundingAgency/das-platform-automation` and click the result.
 - Click the `Add` button
 
-You can now use assets in the das-platform-automation releases in Azure Pipelines tasks. 
+You can now use assets in the das-platform-automation releases in Azure Pipelines tasks.
 
 ## Release Versioning
 
