@@ -4,5 +4,6 @@
   "storageAccountName": "dastestpestersa",
   "outputVariable": "StorageConnectionString",
   "statuscakeTestName": "MyStatuscakeTest",
-  "statuscakeTestUrl": "https://www.testurl.com/"
+  "statuscakeTestUrl": "https://www.testurl.com/",
+  "tableName" : "myTable"
 }
