@@ -240,13 +240,20 @@ This section provides an overview of the following:
 
 ## GitHub Releases
 
-The das-platform-automation repository is published as a release on GitHub.com [here]([PSScriptAnalyzer](https://github.com/PowerShell/PSScriptAnalyzer)). Releases provide a list of changes made to specific releases as well as links to the assets available. Using GitHub releases enables the use of the Azure DevOps GitHub Release Task so that the scripts in das-platform-automation are made available for use in the Azure DevOps Pipelines.
+The das-platform-automation repository is published as a release on GitHub.com. Releases provide a list of changes made to a specific release as well as links to the assets available. Using GitHub releases enables the use of the Azure DevOps GitHub Release Task so that the scripts in das-platform-automation can be consumed within Azure Pipeline deployments.
 
 ### Azure DevOps GitHub Release Task
 
-Awaiting Microsoft to fix bug with the GitHub release task:
-- https://developercommunity.visualstudio.com/content/problem/612300/download-github-release-repository-drop-down-not-s.html
-- https://github.com/microsoft/azure-pipelines-tasks/issues/10685
+To use the das-platform-automation repository as a GitHub Release Task follow these steps:
+
+- Edit a Pipeline
+- Add a new Artifact to a Pipeline using the `GitHub Release Task` artifact type.
+- Select the appropriate `Service connection` in the dropdown.
+- Use the ellipses button to open the `Select a repository` picker window.
+- Search for `SkillsFundingAgency/das-platform-automation` and click the result.
+- Click the `Add` button
+
+You can now use assets in the das-platform-automation releases in Azure Pipelines tasks.
 
 ## Release Versioning
 
