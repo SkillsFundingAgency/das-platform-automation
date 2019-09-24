@@ -39,7 +39,6 @@ Describe "Set-AzResourceGroupTags.ps1 Unit Tests" -Tags @("Unit") {
             Assert-MockCalled -CommandName 'Get-AzResourceGroup' -Times 1 -Scope It
             Assert-MockCalled -CommandName 'Set-AzResourceGroup' -Times 1 -Scope It
         }
-
     }
 
 }
