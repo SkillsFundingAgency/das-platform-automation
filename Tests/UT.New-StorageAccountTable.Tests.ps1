@@ -49,7 +49,7 @@ Describe "New-StorageAccountTable Unit Tests" -Tags @("Unit") {
             return $storageContext
         }
 
-        Mock Get-AzureStorageTable -MockWith {
+        Mock Get-AzStorageTable -MockWith {
             $ErrorId = ' ResourceNotFoundException,Microsoft.WindowsAzure.Commands.Storage.Table.Cmdlet.GetAzureStorageTableCommand'
             $TargetObject = 'ResourceNotFoundException'
             $ErrorCategory = [System.Management.Automation.ErrorCategory]::OpenError
@@ -70,7 +70,7 @@ Describe "New-StorageAccountTable Unit Tests" -Tags @("Unit") {
             Assert-MockCalled -CommandName 'Get-AzStorageAccount' -Times 1 -Scope It
             Assert-MockCalled -CommandName  'Get-AzStorageAccountKey' -Times 1 -Scope It
             Assert-MockCalled -CommandName  'New-AzStorageContext' -Times 1 -Scope It
-            Assert-MockCalled -CommandName  'Get-AzureStorageTable' -Times 1 -Scope It
+            Assert-MockCalled -CommandName  'Get-AzStorageTable' -Times 1 -Scope It
             Assert-MockCalled -CommandName 'New-AzStorageTable' -Times 1 -Scope It
         }
 
@@ -100,7 +100,7 @@ Describe "New-StorageAccountTable Unit Tests" -Tags @("Unit") {
             return $storageContext
         }
 
-        Mock Get-AzureStorageTable -MockWith {
+        Mock Get-AzStorageTable -MockWith {
             $tableName = $Config.tableName
             return $tableName
         }
@@ -116,7 +116,7 @@ Describe "New-StorageAccountTable Unit Tests" -Tags @("Unit") {
             Assert-MockCalled -CommandName 'Get-AzStorageAccount' -Times 1 -Scope It
             Assert-MockCalled -CommandName  'Get-AzStorageAccountKey' -Times 1 -Scope It
             Assert-MockCalled -CommandName  'New-AzStorageContext' -Times 1 -Scope It
-            Assert-MockCalled -CommandName  'Get-AzureStorageTable' -Times 1 -Scope It
+            Assert-MockCalled -CommandName  'Get-AzStorageTable' -Times 1 -Scope It
             Assert-MockCalled -CommandName 'New-AzStorageTable' -Times 0 -Scope It
         }
 
