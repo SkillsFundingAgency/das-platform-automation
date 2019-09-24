@@ -3,6 +3,9 @@
   "resourceGroupName": "das-test-pester-rg",
   "storageAccountName": "dastestpestersa",
   "outputVariable": "StorageConnectionString",
+  "environment": "Dev/Test",
+  "parentBusinessTag": "Apprenticeships",
+  "serviceOffering": "AS Manage your apprenticeships",
   "statuscakeTestName": "MyStatuscakeTest",
   "statuscakeTestUrl": "https://www.testurl.com/",
   "tableName" : "myTable"
