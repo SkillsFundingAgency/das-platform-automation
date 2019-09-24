@@ -48,7 +48,7 @@ try {
     # --- Create Table Storage.
     $Key = (Get-AzStorageAccountKey -ResourceGroupName $ResourceGroup -Name $StorageAccount)[0].Value
     $ctx = New-AzStorageContext -StorageAccountName $StorageAccount -StorageAccountKey $key
-    Get-AzureStorageTable -Name $TableName -Context $ctx -ErrorVariable ev -ErrorAction SilentlyContinue
+    Get-AzStorageTable -Name $TableName -Context $ctx -ErrorVariable ev -ErrorAction SilentlyContinue
     if ($ev) {
         Write-Output $ev
         $result = New-AzStorageTable -Name $TableName -Context $ctx
