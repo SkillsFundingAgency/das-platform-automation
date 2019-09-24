@@ -1,6 +1,6 @@
 <#
     .SYNOPSIS
-    Creates an Azure Storage Table in a Storage Account if there is not one with the supplied Name.
+    Creates an Azure Storage Table in a Storage Account if there is not one with the supplied Name.cd
 
     .DESCRIPTION
     Creates an Azure Storage Table in a Storage Account if there is not one with the supplied Name.
@@ -48,14 +48,14 @@ try {
     # --- Create Table Storage.
     $Key = (Get-AzStorageAccountKey -ResourceGroupName $ResourceGroup -Name $StorageAccount)[0].Value
     $ctx = New-AzStorageContext -StorageAccountName $StorageAccount -StorageAccountKey $key
-    Get-AzStorageTable -Name $TableName -Context $ctx -ErrorVariable ev -ErrorAction SilentlyContinue
-    if ($ev) {
-        Write-Output $ev
-        $result = New-AzStorageTable -Name $TableName -Context $ctx
-        Write-Output ($result)
-    }
-    else {
-        Write-Output "Storage Account $StorageAccount Already Contains a Table called $TableName"
+    $TableExists = Get-AzStorageTable -Name $TableName -Context $ctx  -ErrorAction SilentlyContinue
+    if (!$TableExists) {
+        try {
+            $null = New-AzStorageTable -Name $TableName -Context $ctx
+        }
+        catch {
+            throw "Could not create Table $TableName : $_"
+        }
     }
 }
 
