@@ -13,14 +13,11 @@
 
     .PARAMETER TableName
     The Name of the table to be create.
-.
 
     .EXAMPLE
     .\New-StorageAccountTables.ps1 -ResourceGroup rgname -StorageAccount saname -TableName tablename
 
     Creates new Table in Table storage
-
-.
 #>
 
 [CmdletBinding()]
@@ -31,8 +28,9 @@ Param(
     [Parameter(Mandatory = $true)]
     [ValidateNotNullOrEmpty()]
     [String]$StorageAccount,
-    [Parameter(Mandatory = $false)]
-    [string]$TableName
+    [Parameter(Mandatory = $true)]
+    [ValidateNotNullOrEmpty()]
+    [String]$TableName
 )
 
 try {
@@ -47,10 +45,11 @@ try {
     if (!$StorageAccountExists) {
         throw "Storage Account $StorageAccount does not exist."
     }
-
-    # --- Create Table Storage.
-    $ctx =  $(Get-AzStorageAccount -ResourceGroupName $ResourceGroup -Name $StorageAccount).Context
-    New-AzStorageTable –Name $TableName -Context $ctx
+      # --- Create Table Storage.
+      $Key = (Get-AzStorageAccountKey -ResourceGroupName $ResourceGroup -Name $StorageAccount)[0].Value
+      $ctx = New-AzStorageContext -StorageAccountName $StorageAccount -StorageAccountKey $key
+      $result = New-AzStorageTable -Name $TableName -Context $ctx
+      Write-Output ($result)
 }
 
 catch {

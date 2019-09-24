@@ -37,14 +37,29 @@ Describe "New-StorageAccountTable Unit Tests" -Tags @("Unit") {
         }
 
         Mock Get-AzStorageAccountKey -MockWith {
-            $ctx = [Microsoft.WindowsAzure.Commands.Common.Storage.LazyAzureStorageContext]
-            return $ctx
+            $KeyArr = @()
+            1..2 | ForEach-Object {
+                $KeyArr += [Microsoft.Azure.Management.Storage.Models.StorageAccountKey]::new("Key$_", "Key$_", 1)
+            }
+            return $KeyArr
+        }
+
+        Mock New-AzStorageContext -MockWith  {
+            $storageContext = [Microsoft.WindowsAzure.Commands.Common.Storage.AzureStorageContext]::EmptyContextInstance
+            return $storageContext
+        }
+
+        Mock  New-AzStorageTable -MockWith {
+            $value = "Table End Point: $($Config.storageAccountName)"
+            return $value
         }
 
         It "All Stages of the script should be called " {
-            {./New-StorageAccountTable -ResourceGroup $Config.resourceGroupName -StorageAccount $Config.storageAccountName -TableName $Config.tableName} | Should -BeLike ""
+            ./New-StorageAccountTable -ResourceGroup $Config.resourceGroupName -StorageAccount $Config.storageAccountName -TableName $Config.tableName
             Assert-MockCalled -CommandName 'Get-AzResourceGroup' -Times 1 -Scope It
-            Assert-MockCalled -CommandName 'Get-AzStorageAccount' -Times 2 -Scope It
+            Assert-MockCalled -CommandName 'Get-AzStorageAccount' -Times 1 -Scope It
+            Assert-MockCalled -CommandName  'Get-AzStorageAccountKey' -Times 1 -Scope It
+            Assert-MockCalled -CommandName  'New-AzStorageContext' -Times 1 -Scope It
             Assert-MockCalled -CommandName 'New-AzStorageTable' -Times 1 -Scope It
         }
 
