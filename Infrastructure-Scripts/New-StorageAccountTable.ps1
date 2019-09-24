@@ -1,9 +1,9 @@
 <#
     .SYNOPSIS
-    Return either the primary or secondary connection string for a Storage Account and write to a Azure Pipelines variable.
+    Creates an Azure Storage Table in a Storage Account if there is not one with the supplied Name.
 
     .DESCRIPTION
-    Return either the primary or secondary connection string for a Storage Account and write to a Azure Pipelines variable.
+    Creates an Azure Storage Table in a Storage Account if there is not one with the supplied Name.
 
     .PARAMETER ResourceGroup
     The name of the Resource Group that contains the Storage Account.
