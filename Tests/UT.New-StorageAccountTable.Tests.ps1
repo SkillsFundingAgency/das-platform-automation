@@ -45,7 +45,8 @@ Describe "New-StorageAccountTable Unit Tests" -Tags @("Unit") {
         }
 
         Mock New-AzStorageContext -MockWith  {
-            $storageContext = [Microsoft.WindowsAzure.Commands.Common.Storage.AzureStorageContext]::EmptyContextInstance
+            #$storageContext = [Microsoft.WindowsAzure.Commands.Common.Storage.AzureStorageContext]::EmptyContextInstance
+            $storageContext = [Microsoft.Azure.Commands.Common.Authentication.Abstractions.IStorageContex]::EmptyContextInstance
             return $storageContext
         }
 
