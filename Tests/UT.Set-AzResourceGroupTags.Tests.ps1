@@ -7,12 +7,14 @@ Describe "Set-AzResourceGroupTags.ps1 Unit Tests" -Tags @("Unit") {
         It "Should create a new Resource Group with 3 tags" {
             Mock Get-AzResourceGroup -MockWith { Return $null }
             Mock New-AzResourceGroup -MockWith {
-                $Tags = New-Object 'system.collections.generic.dictionary[string,string]'
-                $Tags.Add("Environment", $Config.environment)
-                $Tags.Add("Parent Business", $Config.parentBusinessTag)
-                $Tags.Add("Service Offering", $Config.serviceOffering)
-                $ResourceGroup = [Microsoft.Azure.Management.ResourceManager.Models.ResourceGroup]::new($Config.location, $null, $Config.resourceGroupName, $null, $null, $Tags)
-                return $ResourceGroup
+                return @{
+                    "ResourceGroupName" = $Config.resourceGroupName
+                    "Tags"              = @{
+                        Environment        = $Config.environment
+                        'Parent Business'  = $Config.parentBusinessTag
+                        'Service Offering' = $Config.serviceOffering
+                    }
+                }
             }
             $Result = ./Set-AzResourceGroupTags -ResourceGroupName $Config.resourceGroupName -Environment $Config.environment -ParentBusiness $Config.parentBusinessTag -ServiceOffering $Config.serviceOffering
             $Result.Tags.Count | Should Be 3
