@@ -48,8 +48,15 @@ try {
       # --- Create Table Storage.
       $Key = (Get-AzStorageAccountKey -ResourceGroupName $ResourceGroup -Name $StorageAccount)[0].Value
       $ctx = New-AzStorageContext -StorageAccountName $StorageAccount -StorageAccountKey $key
-      $result = New-AzStorageTable -Name $TableName -Context $ctx
-      Write-Output ($result)
+      Get-AzureStorageTable -Name $TableName -Context $ctx -ErrorVariable ev -ErrorAction SilentlyContinue
+      if ($ev) {
+          write-output $ev
+         $result = New-AzStorageTable -Name $TableName -Context $ctx
+         Write-Output ($result)
+      }
+      else {
+        Write-Output "Storage Account $StorageAccount Already Contains a Table called $TableName"
+      }
 }
 
 catch {
