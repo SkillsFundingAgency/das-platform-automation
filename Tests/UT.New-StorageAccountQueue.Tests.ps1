@@ -24,7 +24,7 @@ Describe "New-StorageAccountQueue Unit Tests" -Tags @("Unit") {
         }
     }
 
-    Context "Resource Group and Storage Account Exists, Queue name does not exists." {
+    Context "Resource Group and Storage Account Exists, Queue name does not exist." {
 
         Mock Get-AzResourceGroup -MockWith {
             $ResourceGroupExist = [Microsoft.Azure.Management.ResourceManager.Models.ResourceGroup]::new("West Europe", $null, $Config.resourceGroupName)
