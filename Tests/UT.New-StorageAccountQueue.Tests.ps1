@@ -110,7 +110,7 @@ Describe "New-StorageAccountQueue Unit Tests" -Tags @("Unit") {
             return $value
         }
 
-        It "All Stages of the script should be called " {
+        It "All stages of the script should be called" {
             ./New-StorageAccountQueue -ResourceGroup $Config.resourceGroupName -StorageAccount $Config.storageAccountName -QueueName $Config.queueName
             Assert-MockCalled -CommandName 'Get-AzResourceGroup' -Times 1 -Scope It
             Assert-MockCalled -CommandName 'Get-AzStorageAccount' -Times 1 -Scope It
