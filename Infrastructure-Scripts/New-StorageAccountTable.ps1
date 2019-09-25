@@ -51,7 +51,8 @@ try {
     $TableExists = Get-AzStorageTable -Name $TableName -Context $ctx  -ErrorAction SilentlyContinue
     if (!$TableExists) {
         try {
-            $null = New-AzStorageTable -Name $TableName -Context $ctx
+            $result = New-AzStorageTable -Name $TableName -Context $ctx
+            Write-Output $result
         }
         catch {
             throw "Could not create Table $TableName : $_"
