@@ -1,6 +1,6 @@
 <#
     .SYNOPSIS
-    Creates an Azure Storage Table in a Storage Account if there is not one with the supplied Name.cd
+    Creates an Azure Storage Table in a Storage Account if there is not one with the supplied Name.
 
     .DESCRIPTION
     Creates an Azure Storage Table in a Storage Account if there is not one with the supplied Name.
