@@ -3,7 +3,7 @@
     Creates an Azure Storage Queue in a Storage Account if there is not one with the supplied name.
 
     .DESCRIPTION
-    Creates an Azure Storage Queue in a Storage Account if there is not one with the supplied Name.
+    Creates an Azure Storage Queue in a Storage Account if there is not one with the supplied name.
 
     .PARAMETER ResourceGroup
     The name of the Resource Group that contains the Storage Account.
