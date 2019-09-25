@@ -12,7 +12,7 @@
     The name of the Storage Account.
 
     .PARAMETER QueueName
-    The Name of the table to be create.
+    The name of the table to be created.
 
     .EXAMPLE
     .\New-StorageAccountQueue.ps1 -ResourceGroup rgname -StorageAccount saname -QueueName tablename
