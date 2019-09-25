@@ -45,6 +45,7 @@ try {
     if (!$StorageAccountExists) {
         throw "Storage Account $StorageAccount does not exist."
     }
+    
     # --- Create Table Storage.
     $Key = (Get-AzStorageAccountKey -ResourceGroupName $ResourceGroup -Name $StorageAccount)[0].Value
     $ctx = New-AzStorageContext -StorageAccountName $StorageAccount -StorageAccountKey $key
