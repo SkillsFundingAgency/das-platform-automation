@@ -106,7 +106,7 @@ Describe "New-StorageAccountContainer Unit Tests" -Tags @("Unit") {
         }
 
         Mock Get-AzStorageQueue -MockWith {
-            $queueName = $Config.queueName
+            $queueName = $Config.containerName
             return $queueName
         }
 
@@ -204,7 +204,7 @@ Describe "New-StorageAccountContainer Unit Tests" -Tags @("Unit") {
         }
 
         Mock Get-AzStorageTable -MockWith {
-            $tableName = $Config.tableName
+            $tableName = $Config.containerName
             return $tableName
         }
 
