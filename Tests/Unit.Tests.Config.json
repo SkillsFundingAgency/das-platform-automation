@@ -8,6 +8,5 @@
   "serviceOffering": "AS Manage your apprenticeships",
   "statuscakeTestName": "MyStatuscakeTest",
   "statuscakeTestUrl": "https://www.testurl.com/",
-  "tableName" : "myTable",
-  "queueName" : "queueName"
+  "containerName": "acontainer"
 }
