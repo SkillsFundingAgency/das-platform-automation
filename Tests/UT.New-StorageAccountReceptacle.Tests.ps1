@@ -1,17 +1,17 @@
 $Config = Get-Content $PSScriptRoot\..\Tests\Unit.Tests.Config.json -Raw | ConvertFrom-Json
 Set-Location $PSScriptRoot\..\Infrastructure-Scripts\
 
-Describe "New-StorageAccountContainer Unit Tests" -Tags @("Unit") {
+Describe "New-StorageAccountReceptacle Unit Tests" -Tags @("Unit") {
 
-    Context "Invalid Container Type is passed as parameter"{
-        It "If an Invalid ContainerType parameter is passed then an error should be thrown" {
-            { ./New-StorageAccountContainer -ResourceGroup $Config.resourceGroupName -StorageAccount $Config.storageAccountName -ContainerType blob -ContainerName $Config.containerName } | Should throw
+    Context "Invalid Receptacle Type is passed as parameter"{
+        It "If an Invalid ReceptacleType parameter is passed then an error should be thrown" {
+            { ./New-StorageAccountReceptacle -ResourceGroup $Config.resourceGroupName -StorageAccount $Config.storageAccountName -ReceptacleType blob -ReceptacleName $Config.receptacleName } | Should throw
         }
     }
         Context "Resource Group does not exist" {
         It "The specified Resource Group was not found in the subscription, throw an error" {
             Mock Get-AzResourceGroup -MockWith { Return $null }
-            { ./New-StorageAccountContainer -ResourceGroup $Config.resourceGroupName -StorageAccount $Config.storageAccountName -ContainerType queue -ContainerName $Config.containerName } | Should throw "Resource Group $($Config.resourceGroupName) does not exist."
+            { ./New-StorageAccountReceptacle -ResourceGroup $Config.resourceGroupName -StorageAccount $Config.storageAccountName -ReceptacleType queue -ReceptacleName $Config.receptacleName } | Should throw "Resource Group $($Config.resourceGroupName) does not exist."
             Assert-MockCalled -CommandName 'Get-AzResourceGroup' -Times 1 -Scope It
         }
     }
@@ -23,13 +23,13 @@ Describe "New-StorageAccountContainer Unit Tests" -Tags @("Unit") {
                 return $ResourceGroupExist
             }
             Mock Get-AzStorageAccount -MockWith { Return $null }
-            { ./New-StorageAccountContainer -ResourceGroup $Config.resourceGroupName -StorageAccount $Config.storageAccountName -ContainerType queue -ContainerName $Config.containerName} | Should throw "Storage Account $($Config.storageAccountName) does not exist."
+            { ./New-StorageAccountReceptacle -ResourceGroup $Config.resourceGroupName -StorageAccount $Config.storageAccountName -ReceptacleType queue -ReceptacleName $Config.receptaclename} | Should throw "Storage Account $($Config.storageAccountName) does not exist."
             Assert-MockCalled -CommandName 'Get-AzResourceGroup' -Times 1 -Scope It
             Assert-MockCalled -CommandName 'Get-AzStorageAccount' -Times 1 -Scope It
         }
     }
 
-    Context "Resource Group and Storage Account Exists, ContainerType is Queue and the ContainerName does not exists." {
+    Context "Resource Group and Storage Account Exists, ReceptacleType is Queue and the ReceptacleName does not exists." {
 
         Mock Get-AzResourceGroup -MockWith {
             $ResourceGroupExist = [Microsoft.Azure.Management.ResourceManager.Models.ResourceGroup]::new("West Europe", $null, $Config.resourceGroupName)
@@ -70,7 +70,7 @@ Describe "New-StorageAccountContainer Unit Tests" -Tags @("Unit") {
         }
 
         It "All Stages of the script should be called " {
-            ./New-StorageAccountContainer -ResourceGroup $Config.resourceGroupName -StorageAccount $Config.storageAccountName -ContainerType queue -ContainerName $Config.ContainerName
+            ./New-StorageAccountReceptacle -ResourceGroup $Config.resourceGroupName -StorageAccount $Config.storageAccountName -ReceptacleType queue -ReceptacleName $Config.ReceptacleName
             Assert-MockCalled -CommandName 'Get-AzResourceGroup' -Times 1 -Scope It
             Assert-MockCalled -CommandName 'Get-AzStorageAccount' -Times 1 -Scope It
             Assert-MockCalled -CommandName  'Get-AzStorageAccountKey' -Times 1 -Scope It
@@ -80,7 +80,7 @@ Describe "New-StorageAccountContainer Unit Tests" -Tags @("Unit") {
         }
 
     }
-    Context "Resource Group and Storage Account Exists, Container Type is queue and the ContainerName already exists" {
+    Context "Resource Group and Storage Account Exists, Receptacle Type is queue and the ReceptacleName already exists" {
 
         Mock Get-AzResourceGroup -MockWith {
             $ResourceGroupExist = [Microsoft.Azure.Management.ResourceManager.Models.ResourceGroup]::new("West Europe", $null, $Config.resourceGroupName)
@@ -106,7 +106,7 @@ Describe "New-StorageAccountContainer Unit Tests" -Tags @("Unit") {
         }
 
         Mock Get-AzStorageQueue -MockWith {
-            $queueName = $Config.containerName
+            $queueName = $Config.receptacleName
             return $queueName
         }
 
@@ -116,7 +116,7 @@ Describe "New-StorageAccountContainer Unit Tests" -Tags @("Unit") {
         }
 
         It "All Stages of the script should be called " {
-            ./New-StorageAccountContainer -ResourceGroup $Config.resourceGroupName -StorageAccount $Config.storageAccountName -ContainerType queue -ContainerName $Config.ContainerName
+            ./New-StorageAccountReceptacle -ResourceGroup $Config.resourceGroupName -StorageAccount $Config.storageAccountName -ReceptacleType queue -ReceptacleName $Config.receptacleName
             Assert-MockCalled -CommandName 'Get-AzResourceGroup' -Times 1 -Scope It
             Assert-MockCalled -CommandName 'Get-AzStorageAccount' -Times 1 -Scope It
             Assert-MockCalled -CommandName  'Get-AzStorageAccountKey' -Times 1 -Scope It
@@ -127,7 +127,7 @@ Describe "New-StorageAccountContainer Unit Tests" -Tags @("Unit") {
 
     }
 
-    Context "Resource Group and Storage Account Exists,Container Type is Table and ContainerName name does not exists." {
+    Context "Resource Group and Storage Account Exists,Receptacle Type is Table and ReceptacleName name does not exists." {
 
         Mock Get-AzResourceGroup -MockWith {
             $ResourceGroupExist = [Microsoft.Azure.Management.ResourceManager.Models.ResourceGroup]::new("West Europe", $null, $Config.resourceGroupName)
@@ -168,7 +168,7 @@ Describe "New-StorageAccountContainer Unit Tests" -Tags @("Unit") {
         }
 
         It "All Stages of the script should be called " {
-            ./New-StorageAccountContainer -ResourceGroup $Config.resourceGroupName -StorageAccount $Config.storageAccountName -ContainerType table -ContainerName $Config.containerName
+            ./New-StorageAccountReceptacle -ResourceGroup $Config.resourceGroupName -StorageAccount $Config.storageAccountName -ReceptacleType table -ReceptacleName $Config.receptacleName
             Assert-MockCalled -CommandName 'Get-AzResourceGroup' -Times 1 -Scope It
             Assert-MockCalled -CommandName 'Get-AzStorageAccount' -Times 1 -Scope It
             Assert-MockCalled -CommandName  'Get-AzStorageAccountKey' -Times 1 -Scope It
@@ -204,7 +204,7 @@ Describe "New-StorageAccountContainer Unit Tests" -Tags @("Unit") {
         }
 
         Mock Get-AzStorageTable -MockWith {
-            $tableName = $Config.containerName
+            $tableName = $Config.receptacleName
             return $tableName
         }
 
@@ -214,7 +214,7 @@ Describe "New-StorageAccountContainer Unit Tests" -Tags @("Unit") {
         }
 
         It "All Stages of the script should be called " {
-            ./New-StorageAccountContainer -ResourceGroup $Config.resourceGroupName -StorageAccount $Config.storageAccountName -ContainerType table -ContainerName $Config.containerName
+            ./New-StorageAccountReceptacle -ResourceGroup $Config.resourceGroupName -StorageAccount $Config.storageAccountName -ReceptacleType table -ReceptacleName $Config.receptacleName
             Assert-MockCalled -CommandName 'Get-AzResourceGroup' -Times 1 -Scope It
             Assert-MockCalled -CommandName 'Get-AzStorageAccount' -Times 1 -Scope It
             Assert-MockCalled -CommandName  'Get-AzStorageAccountKey' -Times 1 -Scope It
