@@ -8,5 +8,5 @@
   "serviceOffering": "AS Manage your apprenticeships",
   "statuscakeTestName": "MyStatuscakeTest",
   "statuscakeTestUrl": "https://www.testurl.com/",
-  "tableName" : "myTable"
+  "receptacleName": "areceptacle"
 }
