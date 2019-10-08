@@ -294,6 +294,12 @@ The following is an example of a valid script path:
 $(System.DefaultWorkingDirectory)/das-platform-automation/Set-AzResourceGroupTags.ps1
 ```
 
+**_Note:_**  The assets to be included within a GitHub release are defined within `azure-pipelines.yml` as part of the `Release` stage. The GitHub Release task will use the following path to include all `*.ps1` files within the Infrastructure-Scripts folder, you do not need to include the folder name `Infrastructure-Scripts` when referencing a script:
+
+```
+assets: "$(System.DefaultWorkingDirectory)/Infrastructure-Scripts/**/*.ps1"
+```
+
 ## Task Groups Preference
 
 A task group encapsulates a sequence of tasks, already defined in a build or a release pipeline, into a single reusable task that can be added to a build or release pipeline.
@@ -313,6 +319,8 @@ The following are guidelines for creating a new task group:
 - Provide a detailed description.
 - Use variables for the parameter default values.
 - For any tasks that require a service connection, use a variable, for example `$(ARMSubscription)`. Create new pipeline variables for each service connection name.
+
+There is an example task group `Create and Tag Resource Group` that can be used as a reference. Within the Azure DevOps project `Digital Apprenticeship Service`, navigate to Pipelines > Task Groups > select `Create and Tag Resource Group`.
 
 # References and Further Reading
 
