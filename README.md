@@ -1,7 +1,7 @@
 # das-platform-automation
 PowerShell helper scripts to be used locally and in Azure Pipelines for the Digital Apprenticeship Service (DAS). It includes the following:
 
-- A checklist for creating new scripts including "shoulds" and "should not".
+- A checklist for creating new scripts including "shoulds" and "should nots".
 - Code layout and formatting guidance.
 - Writing Pester tests and using PSScriptAnalyzer to ensure best practise.
 
@@ -34,8 +34,11 @@ PowerShell helper scripts to be used locally and in Azure Pipelines for the Digi
         - [How it's Used](#how-its-used-1)
 - [GitHub Releases and Versioning](#github-releases-and-versioning)
     - [GitHub Releases](#github-releases)
-        - [Azure DevOps GitHub Release Task](#azure-devops-github-release-task)
     - [Release Versioning](#release-versioning)
+- [Using das-platform-automation in Azure Pipelines](#using-das-platform-automation-in-azure-pipelines)
+    - [Azure DevOps GitHub Release Task](#azure-devops-github-release-task)
+    - [Reference a GitHub Release Asset in an Azure PowerShell Task](#reference-a-github-release-asset-in-an-azure-powershell-task)
+    - [Task Groups Preference](#task-groups-preference)
 - [References and Further Reading](#references-and-further-reading)
 
 <!-- /TOC -->
@@ -146,18 +149,18 @@ To ensure a consistant readable format, use the following naming conventions:
 | Global variables               | Pascal    | $Global:$Variable |
 | Parameter variables            | Pascal    | $ParameterVariable |
 | Local Variables                | Pascal    | $LocalVariable |
-| Language keywords              | lowercase    | foreach, -eq, try, catch, switch |
+| Language keywords              | lowercase | foreach, -eq, try, catch, switch |
 | Process block keywords | lowercase | begin, process, end |
 | Keywords in comment-based help | UPPERCASE | .SYPNOSIS, .EXAMPLE |
 | Two letter acronyms            | UPPERCASE acronym    | VMName |
 | Three letter (or more) acronyms | Pascal    | AbcName |
 | Constants / Built-in Variables | Pascal and uppercase acronym    | Microsoft maintains Pascal in their built-in variables, i.e. $PSVersionTable, $PSScriptRoot. Tab autocomplete in PowerShell for reference. |
 | Constants / Built-in Variables - Exceptions | camel | Keep camel case for built-in variables, i.e. $true, $false, $null. Tab autocomplete in PowerShell for reference. |
-| Module Names                   | Pascal    ||
-| Function or cmdlet names       | Pascal    ||
-| Class Names                    | Pascal    ||
-| Attribute Names                | Pascal    ||
-| Public fields or properties    | Pascal    ||
+| Module Names                   | Pascal    | MyModule |
+| Function or cmdlet names       | Pascal    | Get-FunctionName |
+| Class Names                    | Pascal    | MyClass |
+| Attribute Names                | Pascal    | MyAttribute |
+| Public fields or properties    | Pascal    | $FieldOrProperty |
 
 # Testing
 
@@ -217,7 +220,7 @@ You can also run PSScriptAnalyzer manually while writing scripts:
 # Change directory into infrastructure-scripts folder
 cd ..\das-platform-automation\infrastructure-scripts\
 
-# Exclude rules as per the QT001.Qaulity.Tests.ps1 script
+# Exclude rules as per the QT001.Quality.Tests.ps1 script
 $Rules = Get-ScriptAnalyzerRule
 $ExcludeRules = @(
     "PSAvoidUsingWriteHost",
@@ -242,19 +245,6 @@ This section provides an overview of the following:
 
 The das-platform-automation repository is published as a release on GitHub.com. Releases provide a list of changes made to a specific release as well as links to the assets available. Using GitHub releases enables the use of the Azure DevOps GitHub Release Task so that the scripts in das-platform-automation can be consumed within Azure Pipeline deployments.
 
-### Azure DevOps GitHub Release Task
-
-To use the das-platform-automation repository as a GitHub Release Task follow these steps:
-
-- Edit a Pipeline
-- Add a new Artifact to a Pipeline using the `GitHub Release Task` artifact type.
-- Select the appropriate `Service connection` in the dropdown.
-- Use the ellipses button to open the `Select a repository` picker window.
-- Search for `SkillsFundingAgency/das-platform-automation` and click the result.
-- Click the `Add` button
-
-You can now use assets in the das-platform-automation releases in Azure Pipelines tasks.
-
 ## Release Versioning
 
 To ensure a consistent release versioning policy the following can be used as a reference:
@@ -266,6 +256,71 @@ To ensure a consistent release versioning policy the following can be used as a 
 | Patch | Non-breaking changes to existing scripts | Automatically incremented for every merge if a major or minor is not defined. |
 
 [GitVersion](https://gitversion.readthedocs.io/en/latest/) is used to achieve release versioning. Read more about [Version Incrementing](https://gitversion.readthedocs.io/en/latest/more-info/version-increments/).
+
+# Using das-platform-automation in Azure Pipelines
+
+This section provides an overview of the following:
+
+| Section Header | Description |
+| - | - |
+| Azure DevOps GitHub Release Task | This section provides steps for using das-platform-automation GitHub releases as a pipeline artifact using the `GitHub Release Task` artifact type. |
+| Reference a GitHub Release Asset in an Azure PowerShell Task | This section provides a breakdown of how to reference a GitHub release asset within an Azure PowerShell task. |
+| Task Groups Preference | This section provides an overview of task groups and a preference for using them with Azure Pipelines. |
+
+## Azure DevOps GitHub Release Task
+
+To use the das-platform-automation repository as a GitHub Release Task follow these steps:
+
+- Edit a Pipeline.
+- Add a new Artifact to a Pipeline using the `GitHub Release Task` artifact type.
+- Select the appropriate `Service connection` in the dropdown.
+- Use the ellipses button to open the `Select a repository` picker window.
+- Search for `SkillsFundingAgency/das-platform-automation` and click the result.
+- Click the `Add` button.
+
+You can now use assets in the das-platform-automation releases in Azure Pipelines tasks.
+
+## Reference a GitHub Release Asset in an Azure PowerShell Task
+
+To use one of the PowerShell scripts from a das-platform-automation release artifact use the `Azure PowerShell` task and version `4.* (preview)`. This has support for the Az cmdlets. The script path is comprised of the following:
+
+- Predefined variable `$(System.DefaultWorkingDirectory)`
+- Source alias of the artifact, for example `das-platform-automation`
+- PowerShell script filename
+
+The following is an example of a valid script path:
+
+```powershell
+$(System.DefaultWorkingDirectory)/das-platform-automation/Set-AzResourceGroupTags.ps1
+```
+
+**_Note:_**  The assets to be included within a GitHub release are defined within `azure-pipelines.yml` as part of the `Release` stage. The GitHub Release task will use the following path to include all `*.ps1` files within the Infrastructure-Scripts folder, you do not need to include the folder name `Infrastructure-Scripts` when referencing a script:
+
+```
+assets: "$(System.DefaultWorkingDirectory)/Infrastructure-Scripts/**/*.ps1"
+```
+
+## Task Groups Preference
+
+A task group encapsulates a sequence of tasks, already defined in a build or a release pipeline, into a single reusable task that can be added to a build or release pipeline.
+
+The preference for using das-platform-automation GitHub release assets is to create a task group for any repeating pipeline tasks so that there is a consistency with variables, increased reusability and improved centralised management of tasks.
+
+A task group can be created by following these steps:
+
+- Edit an existing Azure release pipeline.
+- Edit the tasks of an existing stage.
+- Select one or more existing tasks.
+- Right click a select task and click `Create task group`.
+- The task group can now be amended.
+
+The following are guidelines for creating a new task group:
+
+- Provide a detailed description.
+- Use variables for the parameter default values.
+- For any tasks that require a service connection, use a variable, for example `$(ARMSubscription)`. Create new pipeline variables for each service connection name.
+
+There is an example task group `Create and Tag Resource Group` that can be used as a reference. Within the Azure DevOps project `Digital Apprenticeship Service`, navigate to Pipelines > Task Groups > select `Create and Tag Resource Group`.
 
 # References and Further Reading
 
