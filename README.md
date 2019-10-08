@@ -1,4 +1,4 @@
-# 1. das-platform-automation
+# das-platform-automation
 PowerShell helper scripts to be used locally and in Azure Pipelines for the Digital Apprenticeship Service (DAS). It includes the following:
 
 - A checklist for creating new scripts including "shoulds" and "should nots".
@@ -9,41 +9,41 @@ PowerShell helper scripts to be used locally and in Azure Pipelines for the Digi
 |-|
 |[![Build Status](https://dev.azure.com/sfa-gov-uk/Apprenticeships%20Service%20Cloud%20Platform/_apis/build/status/das-platform-automation?branchName=master)](https://dev.azure.com/sfa-gov-uk/Apprenticeships%20Service%20Cloud%20Platform/_build/latest?definitionId=1538&branchName=master)|
 
-## 1.1. Contents
+## Contents
 
 <!-- TOC -->
 
-- [1. das-platform-automation](#1-das-platform-automation)
-    - [1.1. Contents](#11-contents)
-- [2. Helper Script Checklist](#2-helper-script-checklist)
-- [3. Code Layout and Formatting](#3-code-layout-and-formatting)
-    - [3.1. EditorConfig](#31-editorconfig)
-        - [3.1.1. EditorConfig Installation](#311-editorconfig-installation)
-        - [3.1.2. Using EditorConfig](#312-using-editorconfig)
-        - [3.1.3. Troubleshooting EditorConfig](#313-troubleshooting-editorconfig)
-    - [3.2. Visual Studio Code Workspace Settings](#32-visual-studio-code-workspace-settings)
-- [4. Documentation](#4-documentation)
-    - [4.1. Comment Based Help](#41-comment-based-help)
-    - [4.2. Naming Conventions](#42-naming-conventions)
-- [5. Testing](#5-testing)
-    - [5.1. Pester](#51-pester)
-        - [5.1.1. Introduction](#511-introduction)
-        - [5.1.2. How it's Used](#512-how-its-used)
-    - [5.2. PSScriptAnalyzer](#52-psscriptanalyzer)
-        - [5.2.1. Introduction](#521-introduction)
-        - [5.2.2. How it's Used](#522-how-its-used)
-- [6. GitHub Releases and Versioning](#6-github-releases-and-versioning)
-    - [6.1. GitHub Releases](#61-github-releases)
-    - [6.2. Release Versioning](#62-release-versioning)
-- [7. Using das-platform-automation in Azure Pipelines](#7-using-das-platform-automation-in-azure-pipelines)
-    - [7.1. Azure DevOps GitHub Release Task](#71-azure-devops-github-release-task)
-    - [7.2. Reference a GitHub Release Asset in an Azure PowerShell Task](#72-reference-a-github-release-asset-in-an-azure-powershell-task)
-    - [7.3. Task Groups Preference](#73-task-groups-preference)
-- [8. References and Further Reading](#8-references-and-further-reading)
+- [das-platform-automation](#das-platform-automation)
+    - [Contents](#contents)
+- [Helper Script Checklist](#helper-script-checklist)
+- [Code Layout and Formatting](#code-layout-and-formatting)
+    - [EditorConfig](#editorconfig)
+        - [EditorConfig Installation](#editorconfig-installation)
+        - [Using EditorConfig](#using-editorconfig)
+        - [Troubleshooting EditorConfig](#troubleshooting-editorconfig)
+    - [Visual Studio Code Workspace Settings](#visual-studio-code-workspace-settings)
+- [Documentation](#documentation)
+    - [Comment Based Help](#comment-based-help)
+    - [Naming Conventions](#naming-conventions)
+- [Testing](#testing)
+    - [Pester](#pester)
+        - [Introduction](#introduction)
+        - [How it's Used](#how-its-used)
+    - [PSScriptAnalyzer](#psscriptanalyzer)
+        - [Introduction](#introduction-1)
+        - [How it's Used](#how-its-used-1)
+- [GitHub Releases and Versioning](#github-releases-and-versioning)
+    - [GitHub Releases](#github-releases)
+    - [Release Versioning](#release-versioning)
+- [Using das-platform-automation in Azure Pipelines](#using-das-platform-automation-in-azure-pipelines)
+    - [Azure DevOps GitHub Release Task](#azure-devops-github-release-task)
+    - [Reference a GitHub Release Asset in an Azure PowerShell Task](#reference-a-github-release-asset-in-an-azure-powershell-task)
+    - [Task Groups Preference](#task-groups-preference)
+- [References and Further Reading](#references-and-further-reading)
 
 <!-- /TOC -->
 
-# 2. Helper Script Checklist
+# Helper Script Checklist
 
 Use the following as a checklist when creating new helper scripts:
 
@@ -66,7 +66,7 @@ Use the following as a checklist when creating new helper scripts:
 |Should NOT | Use Write-Host. | As explained by [Jeffrey Snover](http://www.jsnover.com/blog/2013/12/07/write-host-considered-harmful/) and [Don Jones](https://www.itprotoday.com/powershell/what-do-not-do-powershell-part-1) |
 |Should NOT | Set global error actions. | Using a global error action, particularly to suppress errors will hinder troubleshooting.  |
 
-# 3. Code Layout and Formatting
+# Code Layout and Formatting
 
 This section provides an overview of the following:
 
@@ -75,19 +75,19 @@ This section provides an overview of the following:
 | EditorConfig | Provides an overview of how EditorConfig is used to enforce a consistent coding style, as well as how to install and use the EditorConfig extension in Visual Studio Code.  |
 | Visual Studio Code Workspace Settings | Provides an overview of how the Visual Studio Code (VS Code) Workspace Settings are used to ensure specific settings are shared across the team. This is to enforce consistency across VS Code installs. |
 
-## 3.1. EditorConfig
+## EditorConfig
 
 In order to maintain a consistent coding style, an EditorConfig file is used. The file `.editorconfig` contains the required styles. The EditorConfig file defines styles such as indentation size, indentation style, newline rules etc. The full list of supported properties in VS Code can be found [here.](https://github.com/editorconfig/editorconfig-vscode#supported-properties).
 
 `Tip: Ensure this is applied before committing and/or raising a pull request`
 
-### 3.1.1. EditorConfig Installation
+### EditorConfig Installation
 
 EditorConfig can be installed as a Visual Studio Code extension. Search for and install `EditorConfig for VS Code`. The VS Code Marketplace has more information [here](https://marketplace.visualstudio.com/items?itemName=EditorConfig.EditorConfig).
 
 For further information view the official website [here.](https://editorconfig.org/)
 
-### 3.1.2. Using EditorConfig
+### Using EditorConfig
 
 The EditorConfig extension is activated whenever you open a new text editor, switch tabs into an existing one or focus into the editor you already have open. When activated, it uses EditorConfig to resolve the configuration for that particular file and applies any relevant editor settings.
 
@@ -103,7 +103,7 @@ The following styles are applied by using Format Document (Shift + Alt + F on Wi
 - indent_size
 - tab_width
 
-### 3.1.3. Troubleshooting EditorConfig
+### Troubleshooting EditorConfig
 
 To troubleshoot EditorConfig and see what is being applied to your file, click `OUTPUT` in Visual Studio Code and in the drop down select `Editorconfig`. This will provide an output of what EditorConfig is applying. The following is an example of a final newline being inserted:
 
@@ -114,11 +114,11 @@ Infrastructure-Scripts/Get-AzStorageAccountConnectionString.ps1: editor.action.t
 Infrastructure-Scripts/Get-AzStorageAccountConnectionString.ps1: insertFinalNewline(LF)
 ~~~~
 
-## 3.2. Visual Studio Code Workspace Settings
+## Visual Studio Code Workspace Settings
 
 The Visual Studio Code (VS Code) Workspace settings are located under the `.vscode/settings.json`. The settings are scoped to the open workspace and overrides the user scope. The settings are applied when the workspace is opened. The settings used are specific to PowerShell code formatting.
 
-# 4. Documentation
+# Documentation
 
 This section provides an overview of the following:
 
@@ -127,7 +127,7 @@ This section provides an overview of the following:
 | Comment Based Help | Provides an overview of what help should be used in the infrastructure scripts. |
 | Naming Conventions | Provides a table containing the case type to use for identifiers as well as examples of each. |
 
-## 4.1. Comment Based Help
+## Comment Based Help
 
 Scripts and functions should contain comment based help that is compatible with **Get-Help**.
 
@@ -140,7 +140,7 @@ The help should consist of the following elements:
 
 For further information see [about_Comment_Based_Help](https://github.com/PowerShell/PowerShell-Docs/blob/staging/reference/5.1/Microsoft.PowerShell.Core/About/about_Comment_Based_Help.md)
 
-## 4.2. Naming Conventions
+## Naming Conventions
 
 To ensure a consistant readable format, use the following naming conventions:
 
@@ -162,7 +162,7 @@ To ensure a consistant readable format, use the following naming conventions:
 | Attribute Names                | Pascal    | MyAttribute |
 | Public fields or properties    | Pascal    | $FieldOrProperty |
 
-# 5. Testing
+# Testing
 
 This section provides an overview of the following:
 
@@ -171,15 +171,15 @@ This section provides an overview of the following:
 | Pester | Provides an introduction to Pester, how it is used to test the infrastructure scripts and how to write a Pester test.  |
 | PSScriptAnalyzer | Provides an introduction to PSScriptAnalyzer and how it is used to check code quality.  |
 
-## 5.1. Pester
+## Pester
 
-### 5.1.1. Introduction
+### Introduction
 
 Pester is a test framework for PowerShell. It provides a language that allows you to define test cases, and the `Invoke-Pester` cmdlet to execute these tests and report the results. It is used to run a series of automated tests to ensure a new piece of code passes the defined criteria.
 
 Read more about [Pester](https://github.com/pester/Pester)
 
-### 5.1.2. How it's Used
+### How it's Used
 
 Pester is used to automate testing of the scripts under `infrastructure-scripts`. while working with a local branch of das-platform-automation, Pester can be invoked locally without having to commit changes to the remote repository. This is useful to ensure tests pass before running a build in Azure Pipelines with a pull request to master or a merge of the branch into master.
 
@@ -203,14 +203,14 @@ cd ..\das-platform-automation\tests\
 Invoke-Pester -Script .\UT.Get-AzStorageAccountConnectionString.Tests.ps1
 ~~~~
 
-## 5.2. PSScriptAnalyzer
+## PSScriptAnalyzer
 
-### 5.2.1. Introduction
+### Introduction
 PSScriptAnalyzer is a static code checker for Windows PowerShell modules and scripts. PSScriptAnalyzer checks the quality of Windows PowerShell code by running a set of rules. The rules are based on PowerShell best practices identified by PowerShell Team and the community.
 
 Read more about [PSScriptAnalyzer](https://github.com/PowerShell/PSScriptAnalyzer)
 
-### 5.2.2. How it's Used
+### How it's Used
 
 The script `QT001.Quality.Tests.ps1` under the tests folder imports all .ps1 files under the infrastructure-scripts folder, for each of those .ps1 files a Pester test called `Script code quality tests` is run to confirm that each script passes the included PSScriptAnalyzer rules. If one or more rule fails then the Pester test fails, and therefore the build in Azure DevOps will also fail.
 
@@ -232,7 +232,7 @@ $ExcludeRules = @(
 Invoke-ScriptAnalyzer -Path .\Get-AzStorageAccountConnectionString.ps1 -ExcludeRule $ExcludeRules -Verbose
 ~~~~
 
-# 6. GitHub Releases and Versioning
+# GitHub Releases and Versioning
 
 This section provides an overview of the following:
 
@@ -241,11 +241,11 @@ This section provides an overview of the following:
 | GitHub Releases | This section provides an overview of the das-platform-automation repository release and how to use the Azure DevOps GitHub Release Task within a release pipeline. |
 | Release Versioning | This section provides an overview of how to ensure a consistent release versioning policy is used, and GitHub releases are appropriately incremented. |
 
-## 6.1. GitHub Releases
+## GitHub Releases
 
 The das-platform-automation repository is published as a release on GitHub.com. Releases provide a list of changes made to a specific release as well as links to the assets available. Using GitHub releases enables the use of the Azure DevOps GitHub Release Task so that the scripts in das-platform-automation can be consumed within Azure Pipeline deployments.
 
-## 6.2. Release Versioning
+## Release Versioning
 
 To ensure a consistent release versioning policy the following can be used as a reference:
 
@@ -257,7 +257,7 @@ To ensure a consistent release versioning policy the following can be used as a 
 
 [GitVersion](https://gitversion.readthedocs.io/en/latest/) is used to achieve release versioning. Read more about [Version Incrementing](https://gitversion.readthedocs.io/en/latest/more-info/version-increments/).
 
-# 7. Using das-platform-automation in Azure Pipelines
+# Using das-platform-automation in Azure Pipelines
 
 This section provides an overview of the following:
 
@@ -267,7 +267,7 @@ This section provides an overview of the following:
 | Reference a GitHub Release Asset in an Azure PowerShell Task | This section provides a breakdown of how to reference a GitHub release asset within an Azure PowerShell task. |
 | Task Groups Preference | This section provides an overview of task groups and a preference for using them with Azure Pipelines. |
 
-## 7.1. Azure DevOps GitHub Release Task
+## Azure DevOps GitHub Release Task
 
 To use the das-platform-automation repository as a GitHub Release Task follow these steps:
 
@@ -280,7 +280,7 @@ To use the das-platform-automation repository as a GitHub Release Task follow th
 
 You can now use assets in the das-platform-automation releases in Azure Pipelines tasks.
 
-## 7.2. Reference a GitHub Release Asset in an Azure PowerShell Task
+## Reference a GitHub Release Asset in an Azure PowerShell Task
 
 To use one of the PowerShell scripts from a das-platform-automation release artifact use the `Azure PowerShell` task and version `4.* (preview)`. This has support for the Az cmdlets. The script path is comprised of the following:
 
@@ -294,7 +294,7 @@ The following is an example of a valid script path:
 $(System.DefaultWorkingDirectory)/das-platform-automation/Set-AzResourceGroupTags.ps1
 ```
 
-## 7.3. Task Groups Preference
+## Task Groups Preference
 
 A task group encapsulates a sequence of tasks, already defined in a build or a release pipeline, into a single reusable task that can be added to a build or release pipeline.
 
@@ -314,7 +314,7 @@ The following are guidelines for creating a new task group:
 - Use variables for the parameter default values.
 - For any tasks that require a service connection, use a variable, for example `$(ARMSubscription)`. Create new pipeline variables for each service connection name.
 
-# 8. References and Further Reading
+# References and Further Reading
 
 | Reference | URL |
 | -- | -- |
