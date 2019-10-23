@@ -13,7 +13,6 @@ Describe "New-ServiceBusConnectionStrings Unit Tests" -Tags @("Unit") {
     Context "Namespace and Authorisation rules exists, Return Authorisation rules Connection Strings" {
 
 
-
         Mock Get-AzResource -MockWith {
             return @{
                 "Name" = $Config.NamespaceName
