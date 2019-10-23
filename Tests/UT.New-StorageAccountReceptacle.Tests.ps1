@@ -5,7 +5,7 @@ Describe "New-StorageAccountReceptacle Unit Tests" -Tags @("Unit") {
 
     Context "Invalid Receptacle Type is passed as parameter"{
         It "If an Invalid ReceptacleType parameter is passed then an error should be thrown" {
-            { ./New-StorageAccountReceptacle -ResourceGroup $Config.resourceGroupName -StorageAccount $Config.storageAccountName -ReceptacleType blob -ReceptacleName $Config.receptacleName } | Should throw
+            { ./New-StorageAccountReceptacle -ResourceGroup $Config.resourceGroupName -StorageAccount $Config.storageAccountName -ReceptacleType plop -ReceptacleName $Config.receptacleName } | Should throw
         }
     }
         Context "Resource Group does not exist" {
@@ -175,6 +175,58 @@ Describe "New-StorageAccountReceptacle Unit Tests" -Tags @("Unit") {
             Assert-MockCalled -CommandName  'New-AzStorageContext' -Times 1 -Scope It
             Assert-MockCalled -CommandName  'Get-AzStorageTable' -Times 1 -Scope It
             Assert-MockCalled -CommandName 'New-AzStorageTable' -Times 1 -Scope It
+        }
+
+    }
+
+    Context "Resource Group and Storage Account Exists,Receptacle Type is Container and ReceptacleName name does not exists." {
+
+        Mock Get-AzResourceGroup -MockWith {
+            $ResourceGroupExist = [Microsoft.Azure.Management.ResourceManager.Models.ResourceGroup]::new("West Europe", $null, $Config.resourceGroupName)
+            return $ResourceGroupExist
+        }
+
+        Mock Get-AzStorageAccount -MockWith {
+            $StorageAccountExist = [Microsoft.Azure.Management.Storage.Models.StorageAccount]::new("West Europe", $null, $Config.storageAccountName)
+            return $StorageAccountExist
+        }
+
+        Mock Get-AzStorageAccountKey -MockWith {
+            $KeyArr = @()
+            1..2 | ForEach-Object {
+                $KeyArr += [Microsoft.Azure.Management.Storage.Models.StorageAccountKey]::new("Key$_", "Key$_", 1)
+            }
+            return $KeyArr
+        }
+
+        Mock New-AzStorageContext -MockWith  {
+            $storageContext = [Microsoft.WindowsAzure.Commands.Common.Storage.AzureStorageContext]::EmptyContextInstance
+            return $storageContext
+        }
+
+        Mock Get-AzStorageContainer -MockWith {
+            $ErrorId = ' ResourceNotFoundException,Microsoft.WindowsAzure.Commands.Storage.Blob.Cmdlet.Get-AzStorageContainerCommand'
+            $TargetObject = 'ResourceNotFoundException'
+            $ErrorCategory = [System.Management.Automation.ErrorCategory]::OpenError
+            $ErrorMessage = "Get-AzureStorageTable : Can not find table $($Config.tableName)"
+            $Exception = New-Object -TypeName System.InvalidOperationException -ArgumentList $ErrorMessage
+            Write-Error -ErrorId $ErrorId -TargetObject $TargetObject -Category $ErrorCategory -Message $ErrorMessage -Exception $Exception
+
+        }
+
+        Mock  New-AzStorageContainer -MockWith {
+            $value = "Blob End Point: $($Config.storageAccountName)"
+            return $value
+        }
+
+        It "All Stages of the script should be called " {
+            ./New-StorageAccountReceptacle -ResourceGroup $Config.resourceGroupName -StorageAccount $Config.storageAccountName -ReceptacleType blob -ReceptacleName $Config.receptacleName -ContainerPermission $Config.ContainerPermission
+            Assert-MockCalled -CommandName 'Get-AzResourceGroup' -Times 1 -Scope It
+            Assert-MockCalled -CommandName 'Get-AzStorageAccount' -Times 1 -Scope It
+            Assert-MockCalled -CommandName  'Get-AzStorageAccountKey' -Times 1 -Scope It
+            Assert-MockCalled -CommandName  'New-AzStorageContext' -Times 1 -Scope It
+            Assert-MockCalled -CommandName  'Get-AzStorageContainer' -Times 1 -Scope It
+            Assert-MockCalled -CommandName 'New-AzStorageContainer' -Times 1 -Scope It
         }
 
     }

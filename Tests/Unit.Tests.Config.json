@@ -9,6 +9,7 @@
   "statuscakeTestName": "MyStatuscakeTest",
   "statuscakeTestUrl": "https://www.testurl.com/",
   "receptacleName": "AReceptacle",
+  "ContainerPermission": "Blob",
   "NamespaceName": "ANamespace",
   "AuthorizationRuleName": "AnAuthorizationRule",
   "Rights": "Send"

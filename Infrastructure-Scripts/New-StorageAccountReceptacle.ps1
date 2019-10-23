@@ -17,6 +17,9 @@
     .PARAMETER ReceptacleName
     The Name of the table to be create.
 
+    .PARAMETER ContainerPermission
+    Optional Parameter for Access type to storage container.
+
     .EXAMPLE
     .\New-StorageAccountReceptacle.ps1 -ResourceGroup rgname -StorageAccount saname -ReceptacleType Receptacle type -ReceptacleName tablename
 
@@ -32,11 +35,13 @@ Param(
     [ValidateNotNullOrEmpty()]
     [String]$StorageAccount,
     [Parameter(Mandatory = $true)]
-    [ValidateSet("table","queue")]
+    [ValidateSet("table","queue","blob")]
     [String]$ReceptacleType,
     [Parameter(Mandatory = $true)]
     [ValidateNotNullOrEmpty()]
-    [String]$ReceptacleName
+    [String]$ReceptacleName,
+    [ValidateSet("Container", "Blob", "Off")]
+    [String]$ContainerPermission = "Off"
 )
 
 try {
@@ -79,6 +84,20 @@ try {
             }
             catch {
                 throw "Could not create Table $ReceptacleName : $_"
+            }
+        }
+    }
+
+    if ($ReceptacleType -eq "blob") {
+        # --- Create  Storage container .
+        $ContainerExists = Get-AzStorageContainer -Name $ReceptacleName -Context $ctx  -ErrorAction SilentlyContinue
+        if (!$ContainerExists) {
+            try {
+                $result = New-AzStorageContainer -Name $ReceptacleName -Context $ctx -Permission $ContainerPermission
+                Write-Output $result
+            }
+            catch {
+                throw "Could not create blob container $ReceptacleName : $_"
             }
         }
     }
