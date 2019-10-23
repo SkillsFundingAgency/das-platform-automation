@@ -8,5 +8,8 @@
   "serviceOffering": "AS Manage your apprenticeships",
   "statuscakeTestName": "MyStatuscakeTest",
   "statuscakeTestUrl": "https://www.testurl.com/",
-  "receptacleName": "areceptacle"
+  "receptacleName": "areceptacle",
+  "NamespaceName": "ANameSpace",
+  "AuthorizationRuleName": "AnAuthorizationRule",
+  "Rights": "Send"
 }
