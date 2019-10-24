@@ -11,5 +11,12 @@
   "receptacleName": "AReceptacle",
   "NamespaceName": "ANamespace",
   "AuthorizationRuleName": "AnAuthorizationRule",
-  "Rights": "Send"
+  "Rights": "Send",
+  "storageAccountSASToken": "?sv=2019-02-02&sig=EfWIQ%3D&spr=https&se=2019-10-24T11%3A44%3A52Z&srt=sco&ss=bft&sp=rwd",
+  "storageAccountSASTokenGenerateForSQLExternalDatasource": "sv=2019-02-02&sig=EfWIQ%3D&spr=https&se=2019-10-24T11%3A44%3A52Z&srt=sco&ss=bft&sp=rwd",
+  "storageAccountSASTokenService": "blob",
+  "storageAccountSASTokenResourceType": "container",
+  "storageAccountSASTokenPermissions": "rwdlacup",
+  "storageAccountSASTokenExpiryMinutes": "60",
+  "storageAccountSASTokenOutputVariable": "SASToken"
 }
