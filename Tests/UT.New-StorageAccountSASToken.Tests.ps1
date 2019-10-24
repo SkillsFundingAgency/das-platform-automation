@@ -24,15 +24,15 @@ Describe "New-StorageAccountSASToken Unit Tests" -Tags @("Unit") {
         }
     }
 
-    Context "Resource Group and Storage Account Exists, return Storage Account SAS Tokens" {
+    Context "Resource Group and Storage Account exists, return Storage Account SAS tokens" {
 
         Mock Get-AzResourceGroup -MockWith {
-            $ResourceGroupExist = [Microsoft.Azure.Management.ResourceManager.Models.ResourceGroup]::new("West Europe", $null, $Config.resourceGroupName)
+            $ResourceGroupExist = [Microsoft.Azure.Management.ResourceManager.Models.ResourceGroup]::new($Config.location, $null, $Config.resourceGroupName)
             return $ResourceGroupExist
         }
 
         Mock Get-AzStorageAccount -MockWith {
-            $StorageAccountExist = [Microsoft.Azure.Management.Storage.Models.StorageAccount]::new("West Europe", $null, $Config.storageAccountName)
+            $StorageAccountExist = [Microsoft.Azure.Management.Storage.Models.StorageAccount]::new($Config.location, $null, $Config.storageAccountName)
             return $StorageAccountExist
         }
 
@@ -54,7 +54,7 @@ Describe "New-StorageAccountSASToken Unit Tests" -Tags @("Unit") {
             return $SASToken
         }
 
-        It "SAS Token is returned and environment output provided" {
+        It "SAS token is returned and environment output provided" {
 
             $SASTokenOutput = ./New-StorageAccountSASToken -ResourceGroup $Config.resourceGroupName -StorageAccount $Config.storageAccountName -Service $Config.storageAccountSASTokenService -ResourceType $Config.storageAccountSASTokenResourceType -Permissions $Config.storageAccountSASTokenPermissions -ExpiryInMinutes $Config.storageAccountSASTokenExpiryMinutes
             $SASTokenOutput | Should Be "##vso[task.setvariable variable=$($Config.storageAccountSASTokenOutputVariable);issecret=true]$($Config.storageAccountSASToken)"
@@ -65,7 +65,7 @@ Describe "New-StorageAccountSASToken Unit Tests" -Tags @("Unit") {
             Assert-MockCalled -CommandName 'New-AzStorageAccountSASToken' -Times 1 -Scope It
         }
 
-        It "SAS Token is returned with the ? character removed from the start of the token, and environment output provided" {
+        It "SAS token is returned with the ? character removed from the start of the token, and environment output provided" {
 
             $SASTokenOutput = ./New-StorageAccountSASToken -ResourceGroup $Config.resourceGroupName -StorageAccount $Config.storageAccountName -Service $Config.storageAccountSASTokenService -ResourceType $Config.storageAccountSASTokenResourceType -Permissions $Config.storageAccountSASTokenPermissions -ExpiryInMinutes $Config.storageAccountSASTokenExpiryMinutes -GenerateForSQLExternalDatasource
             $SASTokenOutput | Should Be "##vso[task.setvariable variable=$($Config.storageAccountSASTokenOutputVariable);issecret=true]$($Config.storageAccountSASTokenGenerateForSQLExternalDatasource)"

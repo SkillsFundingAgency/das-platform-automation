@@ -4,7 +4,7 @@
 
     .DESCRIPTION
     Create a new Storage Account level ad-hoc SAS token and write to a Azure Pipelines variable. Secured using the secondary account key.
-    Use the -GenerateForSQLExternalDataSource switch to remove the ? from the SAS Token so that is can be used for SQL External Data Sources.
+    Use the -GenerateForSQLExternalDatasource switch to remove the ? character from the SAS token so that is can be used for SQL External Data Sources.
     Account SAS parameters: https://docs.microsoft.com/en-gb/rest/api/storageservices/create-account-sas?redirectedfrom=MSDN
 
     .PARAMETER ResourceGroup
@@ -20,14 +20,15 @@
     Specify one or more of the following; Service, Container, Object.
 
     .PARAMETER Permissions
-    Specifies the signed permissions for the account SAS. Permissions are only valid if they match the specified signed resource type; otherwise they are ignored.
+    Specifies the signed permissions for the account level SAS token. Permissions are only valid if they match the specified signed resource type; otherwise they are ignored.
     Construct a string using the one or more of the following letters r (read), w (write), d (delete), l (list), a (add), c (create), u (update), p (process).
+    For example rwd.
 
     .PARAMETER ExpiryInMinutes
     Specify in minutes how long the SAS token is valid for.
 
     .PARAMETER GenerateForSQLExternalDataSource
-    Use this switch parameter to remove the ? from the start of the SAS token so that it can be used for a SQL External Data Source.
+    Use this switch parameter to remove the ? character from the start of the SAS token so that it can be used for a SQL External Data Source.
     https://docs.microsoft.com/en-us/sql/relational-databases/import-export/examples-of-bulk-access-to-data-in-azure-blob-storage?view=sql-server-ver15
 
     .PARAMETER OutputVariable
@@ -36,17 +37,13 @@
     .EXAMPLE
     .\New-StorageAccountSASToken.ps1 -ResourceGroup rgname -StorageAccount saname -Service blob -ResourceType container -Permissions rwd -ExpiryInMinutes 60
 
-    Create a new SAS token with an expiry of 60 minutes to the specified service and resource type.
+    Create a new SAS token with an expiry of 60 minutes to the specified service and resource type, with read, write and delete permissions.
 
     .EXAMPLE
-    .\New-StorageAccountSASToken.ps1 -ResourceGroup deleteme-rg -StorageAccount testsadm -Service blob -ResourceType container -Permissions rwd -ExpiryInMinutes 60 -GenerateForSQLExternalDataSource
+    .\New-StorageAccountSASToken.ps1 -ResourceGroup rgname -StorageAccount saname -Service blob -ResourceType container -Permissions rwd -ExpiryInMinutes 5 -GenerateForSQLExternalDataSource
 
-    Create a new SAS token with an expiry of 60 minutes to the specified service and resource type. Remove the ? from the start of the SAS token.
-
-    .EXAMPLE
-    .\New-StorageAccountSASToken.ps1 -ResourceGroup deleteme-rg -StorageAccount testsadm -Service blob -ResourceType container -Permissions rwd -ExpiryInMinutes 60 -GenerateForSQLExternalDataSource
-
-    Create a new SAS token with an expiry of 60 minutes to the specified service and resource type. Remove the ? from the start of the SAS token.
+    Create a new SAS token with an expiry of 5 minutes to the specified service and resource type, with read, write and delete permissions.
+    Prepare the SAS token for SQL External Data Source use.
 #>
 
 [CmdletBinding()]
@@ -66,7 +63,7 @@ Param (
     [Parameter(Mandatory = $true)]
     [String]$ExpiryInMinutes,
     [Parameter(Mandatory = $false)]
-    [switch]$GenerateForSQLExternalDatasource,
+    [switch]$GenerateForSQLExternalDataSource,
     [Parameter(Mandatory = $false)]
     [ValidateNotNullOrEmpty()]
     [String]$OutputVariable = "SASToken"
@@ -99,7 +96,7 @@ try {
             $SASToken = $SASToken.Substring(1)
         }
 
-        # ---
+        # --- Output the Azure Pipelines variable and SAS token as a secret value.
         Write-Output ("##vso[task.setvariable variable=$($OutputVariable);issecret=true]$($SASToken)")
     }
 
