@@ -1,12 +1,12 @@
 $Config = Get-Content $PSScriptRoot\..\Tests\Unit.Tests.Config.json -Raw | ConvertFrom-Json
 Set-Location $PSScriptRoot\..\Infrastructure-Scripts\
 
-Describe "Get-AzStorageAccountConnectionString Unit Tests" -Tags @("Unit") {
+Describe "Get-StorageAccountConnectionString Unit Tests" -Tags @("Unit") {
 
     Context "Resource Group does not exist" {
         It "The specified Resource Group was not found in the subscription, throw an error" {
             Mock Get-AzResourceGroup -MockWith { Return $null }
-            { ./Get-AzStorageAccountConnectionString -ResourceGroup $Config.resourceGroupName -StorageAccount $Config.storageAccountName -OutputVariable $Config.outputVariable } | Should throw "Resource Group $($Config.resourceGroupName) does not exist."
+            { ./Get-StorageAccountConnectionString -ResourceGroup $Config.resourceGroupName -StorageAccount $Config.storageAccountName -OutputVariable $Config.outputVariable } | Should throw "Resource Group $($Config.resourceGroupName) does not exist."
             Assert-MockCalled -CommandName 'Get-AzResourceGroup' -Times 1 -Scope It
         }
     }
@@ -18,7 +18,7 @@ Describe "Get-AzStorageAccountConnectionString Unit Tests" -Tags @("Unit") {
                 return $ResourceGroupExist
             }
             Mock Get-AzStorageAccount -MockWith { Return $null }
-            { ./Get-AzStorageAccountConnectionString -ResourceGroup $Config.resourceGroupName -StorageAccount $Config.storageAccountName -OutputVariable $Config.outputVariable } | Should throw "Storage Account $($Config.storageAccountName) does not exist."
+            { ./Get-StorageAccountConnectionString -ResourceGroup $Config.resourceGroupName -StorageAccount $Config.storageAccountName -OutputVariable $Config.outputVariable } | Should throw "Storage Account $($Config.storageAccountName) does not exist."
             Assert-MockCalled -CommandName 'Get-AzResourceGroup' -Times 1 -Scope It
             Assert-MockCalled -CommandName 'Get-AzStorageAccount' -Times 1 -Scope It
         }
