@@ -45,7 +45,7 @@ Describe "Get-StorageAccountConnectionString Unit Tests" -Tags @("Unit") {
         }
 
         It "Primary Storage Account Key is returned and environment output provided" {
-            $ConnectionString = ./Get-AzStorageAccountConnectionString -ResourceGroup $Config.resourceGroupName -StorageAccount $Config.storageAccountName -OutputVariable $Config.outputVariable
+            $ConnectionString = ./Get-StorageAccountConnectionString -ResourceGroup $Config.resourceGroupName -StorageAccount $Config.storageAccountName -OutputVariable $Config.outputVariable
             $ConnectionString | Should Be "##vso[task.setvariable variable=$($Config.outputVariable);issecret=true]DefaultEndpointsProtocol=https;AccountName=$($Config.storageAccountName);AccountKey=key1;EndpointSuffix=core.windows.net"
             Assert-MockCalled -CommandName 'Get-AzResourceGroup' -Times 1 -Scope It
             Assert-MockCalled -CommandName 'Get-AzStorageAccount' -Times 1 -Scope It
@@ -53,7 +53,7 @@ Describe "Get-StorageAccountConnectionString Unit Tests" -Tags @("Unit") {
         }
 
         It "Secondary Storage Account Key is returned and environment output provided" {
-            $ConnectionString = ./Get-AzStorageAccountConnectionString -ResourceGroup $Config.resourceGroupName -StorageAccount $Config.storageAccountName -OutputVariable $Config.outputVariable -UseSecondaryKey
+            $ConnectionString = ./Get-StorageAccountConnectionString -ResourceGroup $Config.resourceGroupName -StorageAccount $Config.storageAccountName -OutputVariable $Config.outputVariable -UseSecondaryKey
             $ConnectionString | Should Be "##vso[task.setvariable variable=$($Config.outputVariable);issecret=true]DefaultEndpointsProtocol=https;AccountName=$($Config.storageAccountName);AccountKey=key2;EndpointSuffix=core.windows.net"
             Assert-MockCalled -CommandName 'Get-AzResourceGroup' -Times 1 -Scope It
             Assert-MockCalled -CommandName 'Get-AzStorageAccount' -Times 1 -Scope It
