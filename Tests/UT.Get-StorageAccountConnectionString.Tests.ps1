@@ -1,12 +1,12 @@
 $Config = Get-Content $PSScriptRoot\..\Tests\Unit.Tests.Config.json -Raw | ConvertFrom-Json
 Set-Location $PSScriptRoot\..\Infrastructure-Scripts\
 
-Describe "Get-AzStorageAccountConnectionString Unit Tests" -Tags @("Unit") {
+Describe "Get-StorageAccountConnectionString Unit Tests" -Tags @("Unit") {
 
     Context "Resource Group does not exist" {
         It "The specified Resource Group was not found in the subscription, throw an error" {
             Mock Get-AzResourceGroup -MockWith { Return $null }
-            { ./Get-AzStorageAccountConnectionString -ResourceGroup $Config.resourceGroupName -StorageAccount $Config.storageAccountName -OutputVariable $Config.outputVariable } | Should throw "Resource Group $($Config.resourceGroupName) does not exist."
+            { ./Get-StorageAccountConnectionString -ResourceGroup $Config.resourceGroupName -StorageAccount $Config.storageAccountName -OutputVariable $Config.outputVariable } | Should throw "Resource Group $($Config.resourceGroupName) does not exist."
             Assert-MockCalled -CommandName 'Get-AzResourceGroup' -Times 1 -Scope It
         }
     }
@@ -18,7 +18,7 @@ Describe "Get-AzStorageAccountConnectionString Unit Tests" -Tags @("Unit") {
                 return $ResourceGroupExist
             }
             Mock Get-AzStorageAccount -MockWith { Return $null }
-            { ./Get-AzStorageAccountConnectionString -ResourceGroup $Config.resourceGroupName -StorageAccount $Config.storageAccountName -OutputVariable $Config.outputVariable } | Should throw "Storage Account $($Config.storageAccountName) does not exist."
+            { ./Get-StorageAccountConnectionString -ResourceGroup $Config.resourceGroupName -StorageAccount $Config.storageAccountName -OutputVariable $Config.outputVariable } | Should throw "Storage Account $($Config.storageAccountName) does not exist."
             Assert-MockCalled -CommandName 'Get-AzResourceGroup' -Times 1 -Scope It
             Assert-MockCalled -CommandName 'Get-AzStorageAccount' -Times 1 -Scope It
         }
@@ -45,7 +45,7 @@ Describe "Get-AzStorageAccountConnectionString Unit Tests" -Tags @("Unit") {
         }
 
         It "Primary Storage Account Key is returned and environment output provided" {
-            $ConnectionString = ./Get-AzStorageAccountConnectionString -ResourceGroup $Config.resourceGroupName -StorageAccount $Config.storageAccountName -OutputVariable $Config.outputVariable
+            $ConnectionString = ./Get-StorageAccountConnectionString -ResourceGroup $Config.resourceGroupName -StorageAccount $Config.storageAccountName -OutputVariable $Config.outputVariable
             $ConnectionString | Should Be "##vso[task.setvariable variable=$($Config.outputVariable);issecret=true]DefaultEndpointsProtocol=https;AccountName=$($Config.storageAccountName);AccountKey=key1;EndpointSuffix=core.windows.net"
             Assert-MockCalled -CommandName 'Get-AzResourceGroup' -Times 1 -Scope It
             Assert-MockCalled -CommandName 'Get-AzStorageAccount' -Times 1 -Scope It
@@ -53,7 +53,7 @@ Describe "Get-AzStorageAccountConnectionString Unit Tests" -Tags @("Unit") {
         }
 
         It "Secondary Storage Account Key is returned and environment output provided" {
-            $ConnectionString = ./Get-AzStorageAccountConnectionString -ResourceGroup $Config.resourceGroupName -StorageAccount $Config.storageAccountName -OutputVariable $Config.outputVariable -UseSecondaryKey
+            $ConnectionString = ./Get-StorageAccountConnectionString -ResourceGroup $Config.resourceGroupName -StorageAccount $Config.storageAccountName -OutputVariable $Config.outputVariable -UseSecondaryKey
             $ConnectionString | Should Be "##vso[task.setvariable variable=$($Config.outputVariable);issecret=true]DefaultEndpointsProtocol=https;AccountName=$($Config.storageAccountName);AccountKey=key2;EndpointSuffix=core.windows.net"
             Assert-MockCalled -CommandName 'Get-AzResourceGroup' -Times 1 -Scope It
             Assert-MockCalled -CommandName 'Get-AzStorageAccount' -Times 1 -Scope It
