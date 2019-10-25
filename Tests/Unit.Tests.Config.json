@@ -18,5 +18,9 @@
   "storageAccountSASTokenResourceType": "container",
   "storageAccountSASTokenPermissions": "rwdlacup",
   "storageAccountSASTokenExpiryMinutes": "60",
-  "storageAccountSASTokenOutputVariable": "SASToken"
+  "storageAccountSASTokenOutputVariable": "SASToken",
+  "CdnProfileName": "aCdnProfile",
+  "CdnEndPointName": "aCdnEndpoint",
+  "purgeContent": "/*",
+  "blankPurge": ""
 }
