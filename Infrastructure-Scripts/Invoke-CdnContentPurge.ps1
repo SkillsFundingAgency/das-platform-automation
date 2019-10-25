@@ -21,7 +21,6 @@
     Root domain purge: Purge the root of the endpoint with "/" in the path
 
     .EXAMPLE
-
     Invoke-CdnContentPurge.ps1 -CDNProfileResourceGroup aResourceGroup -CDNProfileName aCdnProfile -CDNEndPointName aCdnEndpoint -PurgeContent "/*"
 #>
 [CmdletBinding()]
@@ -32,7 +31,7 @@ Param(
     [String]$CDNProfileName,
     [Parameter(Mandatory = $true)]
     [String]$CDNEndPointName,
-    [Parameter(Mandatory = $false)]
+    [Parameter(Mandatory = $true)]
     [String]$PurgeContent = ""
 )
 try {
@@ -42,7 +41,7 @@ try {
     # --- Set CDN EndPoint
     $CDNEndpoint = Get-AzCdnEndpoint -ResourceGroupName $CDNProfileResourceGroup -ProfileName $CDNProfileName -EndpointName $CDNEndpointName
     if (!$CDNEndpoint) {
-        throw "CDN Endpoint Does not exist"
+        throw "CDN Endpoint does not exist"
     }
     # ---> Purging CDN EndPoint
     Unpublish-AzCdnEndpointContent  -ResourceGroupName $CDNProfileResourceGroup -ProfileName $CDNProfileName -EndpointName $CDNEndpointName -PurgeContent $PurgeContent
