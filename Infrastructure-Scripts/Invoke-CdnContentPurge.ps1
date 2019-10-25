@@ -46,12 +46,12 @@ try {
     if ( $PurgeContent -eq "" ) {
         throw "Purge Content blank will not run purge"
     }
-        # --- Set CDN EndPoint
+    # --- Set CDN EndPoint
     $CDNEndpoint = Get-AzCdnEndpoint -ResourceGroupName $CDNProfileResourceGroup -ProfileName $CDNProfileName -EndpointName $CDNEndpointName
-    if (!$CDNEndpoint){
+    if (!$CDNEndpoint) {
         throw "CDN Endpoint Does not exist"
     }
-        # ---> Purging CDN EndPoint
+    # ---> Purging CDN EndPoint
     Unpublish-AzCdnEndpointContent  -ResourceGroupName $CDNProfileResourceGroup -ProfileName $CDNProfileName -EndpointName $CDNEndpointName -PurgeContent $PurgeContent
 }
 catch {
