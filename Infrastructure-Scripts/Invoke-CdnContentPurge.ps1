@@ -32,7 +32,7 @@ Param(
     [Parameter(Mandatory = $true)]
     [String]$CDNEndPointName,
     [Parameter(Mandatory = $true)]
-    [String]$PurgeContent = ""
+    [String]$PurgeContent
 )
 try {
     if ( $PurgeContent -eq "" ) {
