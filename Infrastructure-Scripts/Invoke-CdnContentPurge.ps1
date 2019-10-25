@@ -35,7 +35,7 @@ Param(
     [String]$PurgeContent
 )
 try {
-    if ( $PurgeContent -eq "" ) {
+    if ( $PurgeContent -eq " " ) {
         throw "Purge Content blank will not run purge"
     }
     # --- Set CDN EndPoint

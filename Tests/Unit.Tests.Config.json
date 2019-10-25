@@ -22,5 +22,5 @@
   "CdnProfileName": "aCdnProfile",
   "CdnEndPointName": "aCdnEndpoint",
   "purgeContent": "/*",
-  "blankPurge": ""
+  "blankPurge": " "
 }
