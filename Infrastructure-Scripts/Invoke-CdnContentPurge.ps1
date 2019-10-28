@@ -44,7 +44,7 @@ try {
         throw "CDN Endpoint does not exist"
     }
     # ---> Purging CDN EndPoint
-    Unpublish-AzCdnEndpointContent  -ResourceGroupName $CDNProfileResourceGroup -ProfileName $CDNProfileName -EndpointName $CDNEndpointName -PurgeContent $PurgeContent
+   $CDNEndpoint |  Unpublish-AzCdnEndpointContent -PurgeContent $PurgeContent
 }
 catch {
     throw "$_"
