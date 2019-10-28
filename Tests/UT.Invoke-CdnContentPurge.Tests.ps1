@@ -20,11 +20,7 @@ Describe "Invoke-CdnContentPurge Unit Tests" -Tags @("Unit") {
     Context "Parameters are ok" {
         It "Should call Unpublish-AzCdnEndpointContent" {
             Mock Get-AzCdnEndpoint -MockWith {
-                $cdnEndpointExists = {
-                    return @{
-                        message = "Test Output"
-                    }
-                }
+                $cdnEndpointExists = [Microsoft.Azure.Commands.Cdn.Models.Endpoint.PSEndpoint]::new()
                 return $cdnEndpointExists
             }
             Mock Unpublish-AzCdnEndpointContent -MockWith { Return $null }
