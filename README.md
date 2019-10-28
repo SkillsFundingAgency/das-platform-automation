@@ -35,6 +35,7 @@ PowerShell helper scripts to be used locally and in Azure Pipelines for the Digi
 - [GitHub Releases and Versioning](#github-releases-and-versioning)
     - [GitHub Releases](#github-releases)
     - [Release Versioning](#release-versioning)
+    - [Approving a New Release](#approving-a-new-release)
 - [Using das-platform-automation in Azure Pipelines](#using-das-platform-automation-in-azure-pipelines)
     - [Azure DevOps GitHub Release Task](#azure-devops-github-release-task)
     - [Reference a GitHub Release Asset in an Azure PowerShell Task](#reference-a-github-release-asset-in-an-azure-powershell-task)
@@ -61,6 +62,7 @@ Use the following as a checklist when creating new helper scripts:
 |Should| Adhere to .vscode settings. | Stored in .vscode/settings.json|
 |Should| Use a forward slash ('/') in paths. | This is to ensure compatibility on both Windows and Linux platforms. |
 |Should| Use -ErrorAction per cmdlet. | This is to ensure useful errors are not suppressed globally. |
+|Should| Use PowerShell scripts to output sensitive information such as connection strings. |This is the preference over using the outputs section in a [building block ARM template](https://github.com/SkillsFundingAgency/das-platform-building-blocks).|
 |Should NOT| Use aliases. | This can cause less readable code. |
 |Should NOT | Hard code credentials (especially plain text). | Expose sensitive information. |
 |Should NOT | Use Write-Host. | As explained by [Jeffrey Snover](http://www.jsnover.com/blog/2013/12/07/write-host-considered-harmful/) and [Don Jones](https://www.itprotoday.com/powershell/what-do-not-do-powershell-part-1) |
@@ -108,10 +110,10 @@ The following styles are applied by using Format Document (Shift + Alt + F on Wi
 To troubleshoot EditorConfig and see what is being applied to your file, click `OUTPUT` in Visual Studio Code and in the drop down select `Editorconfig`. This will provide an output of what EditorConfig is applying. The following is an example of a final newline being inserted:
 
 ~~~~
-das-platform-automation/Infrastructure-Scripts/Get-AzStorageAccountConnectionString.ps1: Using EditorConfig core...
-Infrastructure-Scripts/Get-AzStorageAccountConnectionString.ps1: setEndOfLine(LF)
-Infrastructure-Scripts/Get-AzStorageAccountConnectionString.ps1: editor.action.trimTrailingWhitespace
-Infrastructure-Scripts/Get-AzStorageAccountConnectionString.ps1: insertFinalNewline(LF)
+das-platform-automation/Infrastructure-Scripts/Get-StorageAccountConnectionString.ps1: Using EditorConfig core...
+Infrastructure-Scripts/Get-StorageAccountConnectionString.ps1: setEndOfLine(LF)
+Infrastructure-Scripts/Get-StorageAccountConnectionString.ps1: editor.action.trimTrailingWhitespace
+Infrastructure-Scripts/Get-StorageAccountConnectionString.ps1: insertFinalNewline(LF)
 ~~~~
 
 ## Visual Studio Code Workspace Settings
@@ -238,7 +240,7 @@ This section provides an overview of the following:
 
 | Section Header | Description |
 | - | - |
-| GitHub Releases | This section provides an overview of the das-platform-automation repository release and how to use the Azure DevOps GitHub Release Task within a release pipeline. |
+| GitHub Releases | This section provides an overview of the das-platform-automation repository release, how to approve a release to GitHub and how to use the Azure DevOps GitHub Release Task within a release pipeline. |
 | Release Versioning | This section provides an overview of how to ensure a consistent release versioning policy is used, and GitHub releases are appropriately incremented. |
 
 ## GitHub Releases
@@ -256,6 +258,17 @@ To ensure a consistent release versioning policy the following can be used as a 
 | Patch | Non-breaking changes to existing scripts | Automatically incremented for every merge if a major or minor is not defined. |
 
 [GitVersion](https://gitversion.readthedocs.io/en/latest/) is used to achieve release versioning. Read more about [Version Incrementing](https://gitversion.readthedocs.io/en/latest/more-info/version-increments/).
+
+## Approving a New Release
+
+Within the `azure-pipelines.yml` definition there is a `Release` stage with a display name of `Create Release in GitHub`. This stage is used to create a new release within GitHub ensuring the correct build number is used based on the release versioning increment type in the pull request title and include all `*.ps1` files from the Infrastructure-Scripts folder as release assets. When a pull request is merged, the `das-platform-automation` pipeline stage `Release` will go into a pending state. A manual approval is required to create the GitHub release. Follow these steps to manually approve a release:
+
+- Open the `das-platform-automation` pipeline.
+- Click the `Release` stage. *This stage should show as `Job is pending...`.*
+- Click `Review`.
+- Click `Approve`.
+
+A new GitHub release will be created [here](https://github.com/SkillsFundingAgency/das-platform-automation/releases).
 
 # Using das-platform-automation in Azure Pipelines
 
