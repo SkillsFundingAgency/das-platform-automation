@@ -43,7 +43,7 @@ try {
     if (!$CDNEndpoint) {
         throw "CDN Endpoint does not exist"
     }
-    # ---> Purging CDN EndPoint
+    # --- Purging CDN EndPoint
     $CDNEndpoint | Unpublish-AzCdnEndpointContent -PurgeContent $PurgeContent
 }
 catch {
