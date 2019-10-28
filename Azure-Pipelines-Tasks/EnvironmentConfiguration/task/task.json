@@ -1,0 +1,92 @@
+{
+    "id": "7c21ef57-08a3-4dab-a647-1c790f76ad19",
+    "name": "InjectConfiguration",
+    "friendlyName": "Inject Configuration",
+    "description": "Generate, validate and inject custom application configuration in to table storage.",
+    "helpMarkDown": "",
+    "category": "Utility",
+    "author": "Craig Gumbley",
+    "visibility": [
+        "Release"
+    ],
+    "version": {
+        "Major": 1,
+        "Minor": 0,
+        "Patch": 0
+    },
+    "groups": [
+        {
+            "name": "schema",
+            "displayName": "Schema Definitions",
+            "isExpanded": true
+        },
+        {
+            "name": "azurestorage",
+            "displayName": "Azure Storage",
+            "isExpanded": true
+        }
+    ],
+    "inputs": [
+        {
+            "name": "SourcePath",
+            "type": "filePath",
+            "label": "Source Path",
+            "defaultValue": "$(System.DefaultWorkingDirectory)",
+            "required": true,
+            "groupName": "schema",
+            "helpMarkDown": "Path of the directory that contains the schemas."
+        },
+        {
+            "name": "TargetFilename",
+            "type": "string",
+            "label": "Target Filename",
+            "defaultValue": "*.schema.json",
+            "required": true,
+            "groupName": "schema",
+            "helpMarkDown": "Names of the schemas to process. Wildcards are accepted."
+        },
+        {
+            "name": "ServiceConnectionName",
+            "type": "connectedService:AzureRM",
+            "label": "Service Connection",
+            "defaultValue": "",
+            "required": true,
+            "groupName": "azurestorage",
+            "helpMarkDown": "Azure Resource Manager subscription."
+        },
+        {
+            "name": "StorageAccountName",
+            "type": "pickList",
+            "label": "Storage Account",
+            "defaultValue": "",
+            "required": true,
+            "groupName": "azurestorage",
+            "helpMarkDown": "Choose a pre-existing ARM storage account.",
+            "properties": {
+                "EditableOptions": "True"
+            }
+        },
+        {
+            "name": "TableName",
+            "type": "string",
+            "label": "Table Name",
+            "defaultValue": "configuration",
+            "required": true,
+            "groupName": "azurestorage",
+            "helpMarkDown": "Specify a table in the storage account. If the table does not exist, it will get created."
+        }
+    ],
+    "dataSourceBindings": [
+        {
+            "target": "StorageAccountName",
+            "endpointId": "$(ServiceConnectionName)",
+            "dataSourceName": "AzureStorageAccountRM"
+        }
+    ],
+    "instanceNameFormat": "Inject Configuration",
+    "execution": {
+        "PowerShell3": {
+            "target": "Invoke-Task.ps1"
+        }
+    }
+}
