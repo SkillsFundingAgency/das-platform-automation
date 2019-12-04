@@ -32,7 +32,7 @@ param(
     [Parameter(Mandatory = $false)]
     [string]$Location = "West Europe",
     [Parameter(Mandatory = $true)]
-    [ValidateSet("Production", "Pre-Production", "Dev/Test")]
+    [ValidateSet("Production", "Pre-Production", "Dev/Test", "Prod", "Test", "Dev")]
     [string]$Environment,
     [Parameter(Mandatory = $true)]
     [string]$ParentBusiness,
