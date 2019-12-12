@@ -23,13 +23,13 @@ try {
     $Group = Get-AzResourceGroup -ResourceGroupName $ResourceGroupName
     if ($null -ne $Group.Tags) {
         $Resources = Get-AzResource -ResourceGroupName $Group.ResourceGroupName
-        foreach ($R in $Resources) {
+        foreach ($Resource in $Resources) {
             $TagChanges = $false
-            $ResourceTags = (Get-AzResource -ResourceId $R.ResourceId).Tags
+            $ResourceTags = (Get-AzResource -ResourceId $Resource.ResourceId).Tags
             if ($ResourceTags) {
                 foreach ($Key in $Group.Tags.Keys) {
                     if (-not($ResourceTags.ContainsKey($Key))) {
-                        Write-Output "ADD: $($R.Name) - $Key"
+                        Write-Output "ADD: $($Resource.Name) - $Key"
                         $ResourceTags.Add($Key, $Group.Tags[$Key])
                         $TagChanges = $true
                     }
@@ -38,7 +38,7 @@ try {
                             # Key is up-to-date
                         }
                         else {
-                            Write-Output "UPD: $($R.Name) - $Key"
+                            Write-Output "UPD: $($Resource.Name) - $Key"
                             $null = $ResourceTags.Remove($Key)
                             $ResourceTags.Add($Key, $Group.Tags[$Key])
                             $TagChanges = $true
@@ -49,17 +49,17 @@ try {
             }
             else {
                 # All tags missing
-                Write-Output "ADD: $($R.Name) - All tags from RG"
+                Write-Output "ADD: $($Resource.Name) - All tags from RG"
                 $TagsToWrite = $Group.Tags
                 $TagChanges = $true
             }
             if ($TagChanges) {
                 try {
-                    $Result = Set-AzResource -Tag $TagsToWrite -ResourceId $R.ResourceId -Force -ErrorAction Stop
+                    $Result = Set-AzResource -Tag $TagsToWrite -ResourceId $Resource.ResourceId -Force -ErrorAction Stop
                     Write-Output $Result
                 }
                 catch {
-                    Write-Error "$($R.Name) - $($Group.ResourceID) : $_.Exception"
+                    Write-Error "$($Resource.Name) - $($Group.ResourceID) : $_.Exception"
                 }
             }
         }
