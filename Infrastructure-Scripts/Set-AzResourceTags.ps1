@@ -59,7 +59,7 @@ try {
                     Write-Output $Result
                 }
                 catch {
-                     Write-Error "$($R.Name) - $($Group.ResourceID) : $_.Exception"
+                    Write-Error "$($R.Name) - $($Group.ResourceID) : $_.Exception"
                 }
             }
         }
