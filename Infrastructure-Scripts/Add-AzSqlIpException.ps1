@@ -55,7 +55,7 @@ try {
         }
 
         # --- Try to retrieve the firewall rule by name
-        $FirewallRule = Get-AzSqlServerFirewallRule -ServerName $ServerName -ResourceGroupName $ResourceGroupName | Where-Object {$_.FirewallRuleName.ToLower() -eq $Name.ToLower()} 
+        $FirewallRule = Get-AzSqlServerFirewallRule -ServerName $ServerName -ResourceGroupName $ResourceGroupName | Where-Object {$_.FirewallRuleName.ToLower() -eq $Name.ToLower()}
 
         # --- Create or update the new rule
         if (!$FirewallRule) {

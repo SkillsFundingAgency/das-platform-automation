@@ -43,11 +43,11 @@ try {
     $AppServiceResourceConfig = Get-AzWebAppAccessRestrictionConfig -ResourceGroupName $AppServiceResource.ResourceGroupName -Name $ResourceName
 
     Write-Output "Processing app service: $ResourceName and Creating rule $Name"
-    
+
     # --- Workout next priority number
     $StartPriority = 100
     $ExistingPriority = ($AppServiceResourceConfig.MainSiteAccessRestrictions.priority | Where-Object { ($_ -ge $StartPriority) -and $_ -lt [int32]::MaxValue } | Measure-Object -Maximum).Maximum
-        
+
     if (!$ExistingPriority) {
         $NewPriority = $StartPriority
     }
@@ -56,7 +56,7 @@ try {
     }
 
     Write-Output "  -> Rule priority set to $NewPriority"
-    Add-AzWebAppAccessRestrictionRule -ResourceGroupName $AppServiceResource.ResourceGroupName -WebAppName $ResourceName -Name $Name -Priority $NewPriority -Action "Allow" -IpAddress "$IpAddress/32"          
+    Add-AzWebAppAccessRestrictionRule -ResourceGroupName $AppServiceResource.ResourceGroupName -WebAppName $ResourceName -Name $Name -Priority $NewPriority -Action "Allow" -IpAddress "$IpAddress/32"
 }
 catch {
     throw "$_"
