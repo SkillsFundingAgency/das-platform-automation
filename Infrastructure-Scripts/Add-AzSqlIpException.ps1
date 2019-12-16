@@ -33,6 +33,7 @@ Param (
 )
 
 try {
+    $Name = $Name.Replace(' ','')
     $SubscriptionSqlServers = Get-AzResource -Name $ResourceNamePattern -ResourceType "Microsoft.Sql/Servers"
 
     if (!$SubscriptionSqlServers) {

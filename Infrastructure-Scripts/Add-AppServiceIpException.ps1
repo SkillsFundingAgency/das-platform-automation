@@ -34,6 +34,8 @@ Param (
 )
 
 try {
+
+    $Name = $Name.Replace(' ','')
     $AppServiceResource = Get-AzResource -Name $ResourceName -ResourceType "Microsoft.Web/sites"
 
     if (!$AppServiceResource) {
