@@ -24,5 +24,8 @@
   "purgeContent": "/*",
   "blankPurge": " ",
   "resourceName": "AResource",
-  "resourceId": "AresourceID"
+  "resourceId": "AresourceID",
+  "serverName": "das-pester-shared-sql",
+  "ruleName": "ruleName",
+  "ipAddress": "1.2.3.4"
 }
