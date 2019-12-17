@@ -33,7 +33,7 @@ Param (
 )
 
 try {
-    $Name = $Name.Replace(' ','')
+    $Name = $Name.Replace(' ', '')
     $SubscriptionSqlServers = Get-AzResource -Name $ResourceNamePattern -ResourceType "Microsoft.Sql/Servers"
 
     if (!$SubscriptionSqlServers) {
@@ -56,7 +56,7 @@ try {
         }
 
         # --- Try to retrieve the firewall rule by name
-        $FirewallRule = Get-AzSqlServerFirewallRule -ServerName $ServerName -ResourceGroupName $ResourceGroupName | Where-Object {$_.FirewallRuleName.ToLower() -eq $Name.ToLower()}
+        $FirewallRule = Get-AzSqlServerFirewallRule -ServerName $ServerName -ResourceGroupName $ResourceGroupName | Where-Object { $_.FirewallRuleName.ToLower() -eq $Name.ToLower() }
 
         # --- Create or update the new rule
         if (!$FirewallRule) {

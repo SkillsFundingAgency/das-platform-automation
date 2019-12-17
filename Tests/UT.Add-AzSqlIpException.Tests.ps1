@@ -17,7 +17,7 @@ Describe "Add-AzSqlIpException Unit Tests" -Tags @("Unit") {
             Mock Get-AzResource -MockWith {
                 return @{
                     "ResourceGroupName" = $Config.resourceGroupName
-                    "Name" = $Config.serverName
+                    "Name"              = $Config.serverName
                 }
             }
             Mock Get-AzSqlServerFirewallRule -MockWith { return @{
@@ -34,7 +34,7 @@ Describe "Add-AzSqlIpException Unit Tests" -Tags @("Unit") {
 
     Context "Resources exists and firewall exception with given doesn't exist" {
         It "Should add the firewall exceptions to the found resources" {
-            
+
             Mock Get-AzResource -MockWith {
                 return @{
                     "ResourceGroupName" = $Config.resourceGroupName

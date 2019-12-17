@@ -1,7 +1,7 @@
 $Config = Get-Content $PSScriptRoot\..\Tests\Unit.Tests.Config.json -Raw | ConvertFrom-Json
 Set-Location $PSScriptRoot\..\Infrastructure-Scripts\
 
-Describe "Add-AppServiceIpException Unit Tests" -Tags @("Unit") { 
+Describe "Add-AppServiceIpException Unit Tests" -Tags @("Unit") {
 
     Context "Resource does not exist" {
         It "The specified Resource was not found in the subscription, throw an error" {
@@ -16,21 +16,21 @@ Describe "Add-AppServiceIpException Unit Tests" -Tags @("Unit") {
             Mock Get-AzResource -MockWith { return @{
                     "ResourceGroupName" = $Config.resourceGroupName
                     "Name"              = $Config.resourceName
-                    } 
                 }
+            }
             Mock Get-AzWebAppAccessRestrictionConfig -MockWith { throw "Operation returned an invalid status code 'NotFound'" }
             { ./Add-AppServiceIpException -Name $Config.ruleName -IpAddress $Config.ipAddress -ResourceName $Config.resourceName } | Should throw
             Assert-MockCalled -CommandName 'Get-AzResource' -Times 1 -Scope It
             Assert-MockCalled -CommandName 'Get-AzWebAppAccessRestrictionConfig' -Times 1 -Scope It
         }
-    }    
+    }
 
     Context "Resource exists and adds access restriction config" {
         It "The specified Resource Config was updated, should not throw an error" {
             Mock Get-AzResource -MockWith { return @{
                     "ResourceGroupName" = $Config.resourceGroupName
                     "Name"              = $Config.resourceName
-                } 
+                }
             }
             Mock Get-AzWebAppAccessRestrictionConfig -MockWith { return $null }
             Mock Add-AzWebAppAccessRestrictionRule -MockWith { return $null }
