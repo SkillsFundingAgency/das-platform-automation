@@ -3,7 +3,8 @@ Set-Location $PSScriptRoot\..\Infrastructure-Scripts\
 
 Describe "Add-AppServiceIpException Unit Tests" -Tags @("Unit") {
 
-    $env:Release_RequestedFor =  $Config.ruleName
+    $env:RELEASE_REQUESTEDFOR =  $Config.ruleName
+    $env:RELEASE_ENVIRONMENTNAME = ""
 
     Context "Resource does not exist" {
         It "The specified Resource was not found in the subscription, throw an error" {
