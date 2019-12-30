@@ -28,12 +28,12 @@ Param (
 )
 
 try {
-    if ($env:RELEASE_ENVIRONMENTNAME -eq "DEV") {
-        $ReleaseName = $env:RELEASE_RELEASENAME.Replace("Name", "$env:RELEASE_REQUESTEDFOR")
+    if ($env:Release_EnvironmentName -eq "DEV") {
+        $ReleaseName = $env:Release_ReleaseName.Replace("Name", "$env:Release_RequestedFor")
         Write-Output "##vso[release.updatereleasename]$ReleaseName"
     }
 
-    $Name = $env:RELEASE_REQUESTEDFOR.Replace(' ', '')
+    $Name = $env:Release_RequestedFor.Replace(' ', '')
     $AppServiceResource = Get-AzResource -Name $ResourceName -ResourceType "Microsoft.Web/sites"
 
     if (!$AppServiceResource) {
