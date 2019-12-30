@@ -29,7 +29,7 @@ Param (
 
 try {
     $Name = $env:Release_RequestedFor.Replace(' ', '')
-    Write-Output "##vso[build.updatereleasename]Whitelist-$Name-$IpAddress"
+    Write-Output "##vso[release.updatereleasename]Whitelist-$Name-$IpAddress"
     $AppServiceResource = Get-AzResource -Name $ResourceName -ResourceType "Microsoft.Web/sites"
 
     if (!$AppServiceResource) {

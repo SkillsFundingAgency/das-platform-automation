@@ -28,7 +28,7 @@ Param (
 
 try {
     $Name = $env:Release_RequestedFor.Replace(' ', '')
-    Write-Output "##vso[build.updatereleasename]Whitelist-$Name-$IpAddress"
+    Write-Output "##vso[release.updatereleasename]Whitelist-$Name-$IpAddress"
     $SubscriptionSqlServers = Get-AzResource -Name $ResourceNamePattern -ResourceType "Microsoft.Sql/Servers"
 
     if (!$SubscriptionSqlServers) {
