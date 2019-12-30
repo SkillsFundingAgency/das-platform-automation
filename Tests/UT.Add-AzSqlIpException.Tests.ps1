@@ -3,6 +3,8 @@ Set-Location $PSScriptRoot\..\Infrastructure-Scripts\
 
 Describe "Add-AzSqlIpException Unit Tests" -Tags @("Unit") {
 
+    $env:Release_RequestedFor =  $Config.ruleName
+
     Context "Resource does not exist" {
         It "The specified Resource was not found in the subscription, throw an error" {
             Mock Get-AzResource -MockWith { return $null }
