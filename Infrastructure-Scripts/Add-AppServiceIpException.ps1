@@ -33,7 +33,7 @@ try {
         Write-Output "##vso[release.updatereleasename]$ReleaseName"
     }
 
-    $Name = $env:Release_RequestedFor.Replace(' ', '')
+    $Name = $env:RELEASE_REQUESTEDFOR.Replace(' ', '')
     $AppServiceResource = Get-AzResource -Name $ResourceName -ResourceType "Microsoft.Web/sites"
 
     if (!$AppServiceResource) {
