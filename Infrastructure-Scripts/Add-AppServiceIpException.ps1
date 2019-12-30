@@ -28,8 +28,12 @@ Param (
 )
 
 try {
+    if ($env:RELEASE_ENVIRONMENTNAME == "DEV") {
+        $ReleaseName = $env:RELEASE_RELEASENAME.Replace("Name", "$env:RELEASE_REQUESTEDFOR")
+        Write-Output "##vso[release.updatereleasename]$ReleaseName"
+    }
+
     $Name = $env:Release_RequestedFor.Replace(' ', '')
-    Write-Output "##vso[release.updatereleasename]Whitelist-$Name-$IpAddress"
     $AppServiceResource = Get-AzResource -Name $ResourceName -ResourceType "Microsoft.Web/sites"
 
     if (!$AppServiceResource) {
