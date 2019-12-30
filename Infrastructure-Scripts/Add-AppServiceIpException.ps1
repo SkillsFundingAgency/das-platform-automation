@@ -28,8 +28,8 @@ Param (
 )
 
 try {
-    Write-Host "##vso[task.setvariable variable=Name;]$($RELEASE.REQUESTEDFOR)"
-    $Name = $Name.Replace(' ', '')
+    $Name = $env:Release.RequestedFor.Replace(' ', '')
+    Write-Output "##vso[build.updatereleasename]Whitelist-$Name-$IpAddress"
     $AppServiceResource = Get-AzResource -Name $ResourceName -ResourceType "Microsoft.Web/sites"
 
     if (!$AppServiceResource) {
