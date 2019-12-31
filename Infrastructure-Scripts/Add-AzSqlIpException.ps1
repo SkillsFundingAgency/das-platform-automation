@@ -6,9 +6,6 @@
     .DESCRIPTION
     Update the firewall of an Azure SQL Server
 
-    .PARAMETER Name
-    The name of the firewall rule
-
     .PARAMETER IpAddress
     An ip address to associate with the firewall rule
 
@@ -16,14 +13,11 @@
     Substring of the SQL Server to search for
 
     .EXAMPLE
-    Add-AzSqlIpException -Name JoeBlogs -IpAddress 192.168.0.1 -ResourceNamePattern das-*
+    Add-AzSqlIpException -IpAddress 192.168.0.1 -ResourceNamePattern das-*
 
 #>
 [CmdletBinding()]
 Param (
-    [Parameter(Mandatory = $true)]
-    [ValidateNotNull()]
-    [String]$Name,
     [Parameter(Mandatory = $true)]
     [ValidateNotNull()]
     [IPAddress]$IpAddress,
@@ -33,7 +27,7 @@ Param (
 )
 
 try {
-    $Name = $Name.Replace(' ', '')
+    $Name = $env:Release_RequestedFor.Replace(' ', '')
     $SubscriptionSqlServers = Get-AzResource -Name $ResourceNamePattern -ResourceType "Microsoft.Sql/Servers"
 
     if (!$SubscriptionSqlServers) {

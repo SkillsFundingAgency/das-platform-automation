@@ -6,17 +6,17 @@
     .DESCRIPTION
     Update the access restriction rules for an app service
 
-    .PARAMETER Name
-    The name of the access restriction rule
-
     .PARAMETER IpAddress
     An ip address to associate with the access restriction rule
 
     .PARAMETER ResourceName
     The name of the app service
 
+    .PARAMETER UpdateReleaseName
+    Update the release name on the AzureDevops release pipeline
+
     .EXAMPLE
-    Add-AppServiceIpException -Name JoeBlogs -IpAddress 192.168.0.1 -ResourceName das-prd-sms-as
+    Add-AppServiceIpException -IpAddress 192.168.0.1 -ResourceName das-prd-sms-as
 
 #>
 
@@ -24,18 +24,21 @@
 Param (
     [Parameter(Mandatory = $true)]
     [ValidateNotNull()]
-    [String]$Name,
-    [Parameter(Mandatory = $true)]
-    [ValidateNotNull()]
     [IPAddress]$IpAddress,
     [Parameter(Mandatory = $true)]
     [ValidateNotNull()]
-    [String]$ResourceName
+    [String]$ResourceName,
+    [Parameter(Mandatory = $false)]
+    [Switch]$UpdateReleaseName
 )
 
 try {
+    if ($UpdateReleaseName.IsPresent) {
+        $ReleaseName = $env:Release_ReleaseName.Replace("Name", "$env:Release_RequestedFor")
+        Write-Output "##vso[release.updatereleasename]$ReleaseName"
+    }
 
-    $Name = $Name.Replace(' ', '')
+    $Name = $env:Release_RequestedFor.Replace(' ', '')
     $AppServiceResource = Get-AzResource -Name $ResourceName -ResourceType "Microsoft.Web/sites"
 
     if (!$AppServiceResource) {
