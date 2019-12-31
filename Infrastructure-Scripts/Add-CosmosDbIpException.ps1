@@ -52,7 +52,7 @@ try {
             Write-Output "  -> Adding $($IpAddress) to ipRangeFilter ($($CosmosDbProperties.ipRangeFilter))"
             $null = $IPRangeFilterList.Add($IpAddress.IpAddressToString)
             $CosmosDbProperties.ipRangeFilter = $IPRangeFilterList -join ','
-            $null = Set-AzResource -ResourceId $CosmosDbAcc.ResourceId -Properties $CosmosDbProperties -Force
+            $null = Set-AzResource -ResourceId $CosmosDbAcc.ResourceId -Properties $CosmosDbProperties -Force -AsJob
         }
         else {
             Write-Output "  -> $IpAddress exists in the current ipRangeFilter. Not updating"
