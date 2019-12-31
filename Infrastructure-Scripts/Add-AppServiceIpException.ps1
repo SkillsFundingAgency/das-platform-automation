@@ -24,11 +24,13 @@ Param (
     [IPAddress]$IpAddress,
     [Parameter(Mandatory = $true)]
     [ValidateNotNull()]
-    [String]$ResourceName
+    [String]$ResourceName,
+    [Parameter(Mandatory = $false)]
+    [Switch]$UpdateReleaseName
 )
 
 try {
-    if ($env:Release_EnvironmentName -eq "DEV") {
+    if ($UpdateReleaseName.IsPresent) {
         $ReleaseName = $env:Release_ReleaseName.Replace("Name", "$env:Release_RequestedFor")
         Write-Output "##vso[release.updatereleasename]$ReleaseName"
     }
