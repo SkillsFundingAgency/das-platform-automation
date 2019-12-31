@@ -12,6 +12,9 @@
     .PARAMETER ResourceName
     The name of the app service
 
+    .PARAMETER UpdateReleaseName
+    Update the release name on the AzureDevops release pipeline
+
     .EXAMPLE
     Add-AppServiceIpException -IpAddress 192.168.0.1 -ResourceName das-prd-sms-as
 
