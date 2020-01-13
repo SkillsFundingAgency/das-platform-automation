@@ -43,7 +43,7 @@ try {
 
         if ($CosmosDbProperties.ipRangeFilter.length -eq 0) {
             Write-Output "  -> ipRestrictions list is empty for this resource. Skipping."
-            #continue
+            continue
         }
 
         $IPRangeFilterList = [System.Collections.ArrayList]::New($CosmosDbProperties.ipRangeFilter -split ',')
