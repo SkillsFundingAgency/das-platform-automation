@@ -45,9 +45,8 @@ stages:
               testResultsFormat: NUnit
               testResultsFiles: "**/TEST-*.xml"
             condition: succeededOrFailed()
-          - publish: $(System.DefaultWorkingDirectory)
+          - publish: $(System.DefaultWorkingDirectory)/Infrastructure-Scripts
             artifact: Infrastructure-Scripts
-            patterns: '**/*.ps1'
 
       - job: "Linux_PSCore_Build_DAS_Continuous_Integration"
         pool:
@@ -100,4 +99,4 @@ stages:
                   tagSource: "manual"
                   tag: "$(Build.BuildNumber)"
                   addChangeLog: true
-                  assets: "$(System.DefaultWorkingDirectory)/Infrastructure-Scripts/**/*.ps1"
+                  assets: "$(Pipeline.Workspace)/Infrastructure-Scripts/**/*.ps1"
