@@ -45,6 +45,9 @@ stages:
               testResultsFormat: NUnit
               testResultsFiles: "**/TEST-*.xml"
             condition: succeededOrFailed()
+          - publish: $(System.DefaultWorkingDirectory)
+            artifact: Infrastructure-Scripts
+            patterns: '**/*.ps1'
 
       - job: "Linux_PSCore_Build_DAS_Continuous_Integration"
         pool:
@@ -86,6 +89,8 @@ stages:
         runOnce:
           deploy:
             steps:
+              - download: current
+                artifact: Infrastructure-Scripts
               - task: GitHubRelease@0
                 inputs:
                   gitHubConnection: "SFA"
