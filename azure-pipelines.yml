@@ -47,6 +47,7 @@ stages:
             condition: succeededOrFailed()
           - publish: $(System.DefaultWorkingDirectory)/Infrastructure-Scripts
             artifact: Infrastructure-Scripts
+            displayName: "Publish Scripts"
 
       - job: "Linux_PSCore_Build_DAS_Continuous_Integration"
         pool:
