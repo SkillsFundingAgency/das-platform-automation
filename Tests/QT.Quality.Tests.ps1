@@ -3,8 +3,6 @@ $Scripts = @()
 $Scripts += Get-ChildItem -Path $PSScriptRoot/../Infrastructure-Scripts/*.ps1 -File
 $Scripts += Get-ChildItem -Path $PSScriptRoot/../Code-Analysis-Scripts/*.ps1 -File
 
-$Scripts =
-
 Describe "Script documentation tests" -Tags @("Quality") {
 
     foreach ($Script in $Scripts) {
