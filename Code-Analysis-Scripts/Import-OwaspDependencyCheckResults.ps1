@@ -57,9 +57,9 @@ Function Post-LogAnalyticsData($customerId, $sharedKey, $body, $logType) {
     $uri = "https://" + $customerId + ".ods.opinsights.azure.com" + $resource + "?api-version=2016-04-01"
 
     $headers = @{
-        "Authorization" = $signature;
-        "Log-Type"      = $logType;
-        "x-ms-date"     = $rfc1123date;
+        "Authorization"        = $signature;
+        "Log-Type"             = $logType;
+        "x-ms-date"            = $rfc1123date;
         "time-generated-field" = $TimeStampField;
     }
 
