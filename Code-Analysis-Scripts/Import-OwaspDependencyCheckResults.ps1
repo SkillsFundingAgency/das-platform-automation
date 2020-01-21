@@ -8,7 +8,7 @@
     .PARAMETER SharedKey
     The Primary/Secondary key of the Log Analytics workspace.
     .EXAMPLE
-    .\Import-OwaspDependencyCheckResults.ps1 -CustomerId $ProdLogAnalyticsWorkspaceId -SharedKey $ProdLogAnalyticsWorkspaceKey
+    .\Import-OwaspDependencyCheckResults.ps1 -CustomerId $(ProdLogAnalyticsWorkspaceId) -SharedKey $(ProdLogAnalyticsWorkspaceKey)
 #>
 [CmdletBinding()]
 param(
