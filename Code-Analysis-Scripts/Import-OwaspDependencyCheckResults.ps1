@@ -54,7 +54,7 @@ try {
 
 
     # Create the function to create and post the request
-    Function Post-LogAnalyticsData($customerId, $sharedKey, $body, $logType) {
+    Function Send-LogAnalyticsData($customerId, $sharedKey, $body, $logType) {
         $method = "POST"
         $contentType = "application/json"
         $resource = "/api/logs"
@@ -83,7 +83,7 @@ try {
     }
 
     # Submit the data to the API endpoint
-    Post-LogAnalyticsData -customerId $customerId -sharedKey $sharedKey -body ([System.Text.Encoding]::UTF8.GetBytes($json)) -logType $logType
+    Send-LogAnalyticsData -customerId $customerId -sharedKey $sharedKey -body ([System.Text.Encoding]::UTF8.GetBytes($json)) -logType $logType
 }
 catch {
     throw "$_"
