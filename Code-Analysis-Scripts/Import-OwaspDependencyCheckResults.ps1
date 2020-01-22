@@ -37,7 +37,7 @@ try {
     | ConvertTo-Json
 
     # Create the function to create the authorization signature
-    Function Build-Signature ($customerId, $sharedKey, $date, $contentLength, $method, $contentType, $resource) {
+    Function New-Signature ($customerId, $sharedKey, $date, $contentLength, $method, $contentType, $resource) {
         $xHeaders = "x-ms-date:" + $date
         $stringToHash = $method + "`n" + $contentLength + "`n" + $contentType + "`n" + $xHeaders + "`n" + $resource
 
@@ -60,7 +60,7 @@ try {
         $resource = "/api/logs"
         $rfc1123date = [DateTime]::UtcNow.ToString("r")
         $contentLength = $body.Length
-        $signature = Build-Signature `
+        $signature = New-Signature `
             -customerId $customerId `
             -sharedKey $sharedKey `
             -date $rfc1123date `
