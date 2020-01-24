@@ -32,11 +32,11 @@ Param(
     [ValidateNotNullOrEmpty()]
     [String]$StorageAccount,
     [Parameter(Mandatory = $true)]
-    [ValidateSet("table","queue")]
+    [ValidateSet("table", "queue")]
     [String]$ReceptacleType,
     [Parameter(Mandatory = $true)]
     [ValidateNotNullOrEmpty()]
-    [String]$ReceptacleName
+    [String[]]$ReceptacleName
 )
 
 try {
@@ -55,30 +55,32 @@ try {
     $Key = (Get-AzStorageAccountKey -ResourceGroupName $ResourceGroup -Name $StorageAccount)[0].Value
     $ctx = New-AzStorageContext -StorageAccountName $StorageAccount -StorageAccountKey $key
 
-    if ($ReceptacleType -eq "queue") {
-        # --- Create Table Storage Queue .
-        $QueueExists = Get-AzStorageQueue -Name $ReceptacleName -Context $ctx  -ErrorAction SilentlyContinue
-        if (!$QueueExists) {
-            try {
-                $result = New-AzStorageQueue -Name $ReceptacleName -Context $ctx
-                Write-Output $result
+    foreach ($Receptacle in $ReceptacleName) {
+        switch ($ReceptacleType) {
+            "queue" {
+                $QueueExists = Get-AzStorageQueue -Name $Receptacle -Context $ctx  -ErrorAction SilentlyContinue
+                if (!$QueueExists) {
+                    try {
+                        $result = New-AzStorageQueue -Name $Receptacle -Context $ctx
+                        Write-Output $result
+                    }
+                    catch {
+                        throw "Could not create Table $Receptacle : $_"
+                    }
+                }
+                break
             }
-            catch {
-                throw "Could not create Table $ReceptacleName : $_"
-            }
-        }
-    }
-
-    if ($ReceptacleType -eq "table") {
-        # --- Create Table Storage Table .
-        $TableExists = Get-AzStorageTable -Name $ReceptacleName -Context $ctx  -ErrorAction SilentlyContinue
-        if (!$TableExists) {
-            try {
-                $result = New-AzStorageTable -Name $ReceptacleName -Context $ctx
-                Write-Output $result
-            }
-            catch {
-                throw "Could not create Table $ReceptacleName : $_"
+            "table" {
+                $TableExists = Get-AzStorageTable -Name $Receptacle -Context $ctx  -ErrorAction SilentlyContinue
+                if (!$TableExists) {
+                    try {
+                        $result = New-AzStorageTable -Name $Receptacle -Context $ctx
+                        Write-Output $result
+                    }
+                    catch {
+                        throw "Could not create Table $Receptacle : $_"
+                    }
+                }
             }
         }
     }
