@@ -68,7 +68,7 @@ try {
             contentType   = $ContentType
             resource      = $Resource
         }
-        $Signature = Initialize-Signature $SignatureHashArguments
+        $Signature = Initialize-Signature @SignatureHashArguments
         $uri = "https://" + $CustomerId + ".ods.opinsights.azure.com" + $Resource + "?api-version=2016-04-01"
 
         $headers = @{
