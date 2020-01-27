@@ -46,8 +46,8 @@ stages:
               testResultsFiles: "**/TEST-*.xml"
             condition: succeededOrFailed()
           - publish: |
-              $(System.DefaultWorkingDirectory)/Infrastructure-Scripts
-              $(System.DefaultWorkingDirectory)/Code-Analysis-Scripts
+              "$(System.DefaultWorkingDirectory)/Infrastructure-Scripts"
+              "$(System.DefaultWorkingDirectory)/Code-Analysis-Scripts"
             artifact: Scripts
             displayName: "Publish Scripts"
 
