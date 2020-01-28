@@ -45,9 +45,7 @@ stages:
               testResultsFormat: NUnit
               testResultsFiles: "**/TEST-*.xml"
             condition: succeededOrFailed()
-          - publish:
-              $(System.DefaultWorkingDirectory)/Infrastructure-Scripts
-              $(System.DefaultWorkingDirectory)/Code-Analysis-Scripts
+          - publish: $(System.DefaultWorkingDirectory)/Scripts
             artifact: Scripts
             displayName: "Publish Scripts"
 
@@ -102,6 +100,4 @@ stages:
                   tagSource: "manual"
                   tag: "$(Build.BuildNumber)"
                   addChangeLog: true
-                  assets: |
-                    "$(Pipeline.Workspace)/Infrastructure-Scripts/**/*.ps1"
-                    "$(Pipeline.Workspace)/Code-Analysis-Scripts/**/*.ps1"
+                  assets: "$(Pipeline.Workspace)/Scripts/**/*.ps1"

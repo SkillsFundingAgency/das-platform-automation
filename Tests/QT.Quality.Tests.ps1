@@ -1,7 +1,7 @@
 $Scripts = @()
 
-$Scripts += Get-ChildItem -Path $PSScriptRoot/../Infrastructure-Scripts/*.ps1 -File
-$Scripts += Get-ChildItem -Path $PSScriptRoot/../Code-Analysis-Scripts/*.ps1 -File
+$Scripts += Get-ChildItem -Path $PSScriptRoot/../Scripts/Infrastructure/*.ps1 -File
+$Scripts += Get-ChildItem -Path $PSScriptRoot/../Scripts/Code-Analysis/*.ps1 -File
 
 Describe "Script documentation tests" -Tags @("Quality") {
 

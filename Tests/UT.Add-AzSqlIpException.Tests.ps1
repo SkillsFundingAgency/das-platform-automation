@@ -1,5 +1,5 @@
 $Config = Get-Content $PSScriptRoot\..\Tests\Unit.Tests.Config.json -Raw | ConvertFrom-Json
-Set-Location $PSScriptRoot\..\Infrastructure-Scripts\
+Set-Location $PSScriptRoot\..\Scripts\Infrastructure\
 
 Describe "Add-AzSqlIpException Unit Tests" -Tags @("Unit") {
 

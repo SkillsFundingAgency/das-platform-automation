@@ -1,4 +1,4 @@
-Set-Location $PSScriptRoot\..\Infrastructure-Scripts\
+Set-Location $PSScriptRoot\..\Scripts\Infrastructure\
 
 Describe "Set-ArmTemplateOutputVariables.ps1 Unit Tests" -Tags @("Unit") {
 
