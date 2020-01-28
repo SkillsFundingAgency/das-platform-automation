@@ -15,7 +15,12 @@ Describe "Import-OwaspDependencyCheckResults Unit Tests" -Tags @("Unit") {
         Mock Import-Csv {
             [pscustomobject]@{ Project = 'OWASP Dependency Check' }
         }
-        { ./Import-OwaspDependencyCheckResults @TestParams } | Should throw "No such host is known"
+        if ($PSVersionTable.Platform -eq "Unix") {
+            { ./Import-OwaspDependencyCheckResults @TestParams } | Should throw "No such device or address"
+        }
+        elseif ($PSVersionTable.Platform -like "Win") {
+            { ./Import-OwaspDependencyCheckResults @TestParams } | Should throw "No such host is known"
+        }
     }
 
     It "Should fail with invalid Base-64 string for SharedKey" {
