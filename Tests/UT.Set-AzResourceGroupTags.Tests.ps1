@@ -16,7 +16,7 @@ Describe "Set-AzResourceGroupTags.ps1 Unit Tests" -Tags @("Unit") {
                     }
                 }
             }
-            $Result = ./Set-AzResourceGroupTags -ResourceGroupName $Config.resourceGroupName -Tags @{"Environment" = $Config.environment; "Parent Business" = $Config.parentBusinessTag; "Service Offering" = $Config.serviceOffering}
+            $Result = ./Set-AzResourceGroupTags -ResourceGroupName $Config.resourceGroupName -Tags "{'Environment':'$($Config.environment)','Parent Business':'$($Config.parentBusinessTag)','Service Offering':'$($Config.serviceOffering)'}"
             $Result.Tags.Count | Should Be 3
             Assert-MockCalled -CommandName 'Get-AzResourceGroup' -Times 1 -Scope It
             Assert-MockCalled -CommandName 'New-AzResourceGroup' -Times 1 -Scope It
@@ -35,7 +35,7 @@ Describe "Set-AzResourceGroupTags.ps1 Unit Tests" -Tags @("Unit") {
                     "ResourceGroupName" = $Config.resourceGroupName
                 }
             }
-            { ./Set-AzResourceGroupTags -ResourceGroupName $Config.resourceGroupName -Tags @{"Environment" = $Config.environment; "Parent Business" = $Config.parentBusinessTag; "Service Offering" = $Config.serviceOffering} } | Should Not Throw
+            { ./Set-AzResourceGroupTags -ResourceGroupName $Config.resourceGroupName -Tags "{'Environment':'$($Config.environment)','Parent Business':'$($Config.parentBusinessTag)','Service Offering':'$($Config.serviceOffering)'}" } | Should Not Throw
             Assert-MockCalled -CommandName 'Get-AzResourceGroup' -Times 1 -Scope It
             Assert-MockCalled -CommandName 'Set-AzResourceGroup' -Times 1 -Scope It
         }

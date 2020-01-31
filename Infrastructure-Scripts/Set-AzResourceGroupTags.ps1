@@ -26,17 +26,20 @@ param(
     [Parameter(Mandatory = $false)]
     [string]$Location = "West Europe",
     [Parameter(Mandatory = $true)]
-    [hashtable]$Tags
+    [string]$Tags
 )
 
 try {
+
+    $TagsHashTable = @{ }
+    (ConvertFrom-Json $Tags).PSObject.Properties | ForEach-Object { $TagsHashTable[$_.Name] = $_.Value }
 
     Write-Verbose -Message "Attempting to retrieve existing resource group $ResourceGroupName"
     $ResourceGroup = Get-AzResourceGroup -Name $ResourceGroupName -ErrorAction SilentlyContinue
 
     if (!$ResourceGroup) {
         Write-Verbose -Message "Resource group $ResourceGroupName doesn't exist, creating resource group"
-        New-AzResourceGroup -Name $ResourceGroupName -Location $Location -Tag $Tags
+        New-AzResourceGroup -Name $ResourceGroupName -Location $Location -Tag $TagsHashTable
     }
 
     else {
@@ -46,22 +49,22 @@ try {
         if ($ResourceGroup.Tags) {
             # --- Check existing tags and update if necessary
             $UpdatedTags = $ResourceGroup.Tags
-            foreach ($Key in $Tags.Keys) {
+            foreach ($Key in $TagsHashTable.Keys) {
                 Write-Verbose "Current value of Resource Group Tag $Key is $($ResourceGroup.Tags[$Key])"
 
-                if ($($ResourceGroup.Tags[$Key]) -eq $($Tags[$Key])) {
-                    Write-Verbose -Message "Current value of tag ($($ResourceGroup.Tags[$Key])) matches parameter ($($Tags[$Key]))"
+                if ($($ResourceGroup.Tags[$Key]) -eq $($TagsHashTable[$Key])) {
+                    Write-Verbose -Message "Current value of tag ($($ResourceGroup.Tags[$Key])) matches parameter ($($TagsHashTable[$Key]))"
                 }
 
                 elseif ($null -eq $($ResourceGroup.Tags[$Key])) {
-                    Write-Verbose -Message ("Tag value is not set, adding tag {0} with value {1}" -f $Key, $Tags[$Key])
-                    $UpdatedTags[$Key] = $Tags[$Key]
+                    Write-Verbose -Message ("Tag value is not set, adding tag {0} with value {1}" -f $Key, $TagsHashTable[$Key])
+                    $UpdatedTags[$Key] = $TagsHashTable[$Key]
                     $UpdateTags = $true
                 }
 
                 else {
-                    Write-Verbose -Message ("Tag value is incorrect, setting tag {0} with value {1}" -f $Key, $Tags[$Key])
-                    $UpdatedTags[$Key] = $Tags[$Key]
+                    Write-Verbose -Message ("Tag value is incorrect, setting tag {0} with value {1}" -f $Key, $TagsHashTable[$Key])
+                    $UpdatedTags[$Key] = $TagsHashTable[$Key]
                     $UpdateTags = $true
                 }
 
@@ -71,7 +74,7 @@ try {
 
         else {
             # --- No tags to check, just update with the passed in tags
-            $UpdatedTags = $Tags
+            $UpdatedTags = $TagsHashTable
             $UpdateTags = $true
         }
 
