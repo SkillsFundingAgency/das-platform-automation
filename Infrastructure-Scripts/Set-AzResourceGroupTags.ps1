@@ -32,7 +32,7 @@ param(
 try {
 
     $TagsHashTable = @{ }
-    $TagsHashTable = ($Tags | ConvertFrom-Json -AsHashtable)
+    (ConvertFrom-Json $Tags).PSObject.Properties | ForEach-Object { $TagsHashTable[$_.Name] = $_.Value }
 
     Write-Verbose -Message "Attempting to retrieve existing resource group $ResourceGroupName"
     $ResourceGroup = Get-AzResourceGroup -Name $ResourceGroupName -ErrorAction SilentlyContinue
