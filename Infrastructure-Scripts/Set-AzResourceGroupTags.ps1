@@ -39,7 +39,7 @@ try {
 
     if (!$ResourceGroup) {
         Write-Verbose -Message "Resource group $ResourceGroupName doesn't exist, creating resource group"
-        New-AzResourceGroup -Name $ResourceGroupName -Location $Location -Tag $Tags
+        New-AzResourceGroup -Name $ResourceGroupName -Location $Location -Tag $TagsHashTable
     }
 
     else {
