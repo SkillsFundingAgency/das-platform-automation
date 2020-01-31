@@ -12,17 +12,11 @@
     .PARAMETER Location
     [Optional]Location of the Resource Group, defaults to West Europe.
 
-    .PARAMETER Environment
-    Name of the environment, select from a valid ESFA environment name tag: Production, Pre-Production or Dev/Test.
-
-    .PARAMETER ParentBusiness
-    Name of the business to which the resources belong, e.g. Apprenticeships, Apprenticeships (PP).
-
-    .PARAMETER ServiceOffering
-    Name of the service offering to which the resources belong, e.g. AS Commitments, AS Commitments (PP).
+    .PARAMETER Tags
+    A hashtable of the tags to be assigned to the resource group
 
     .EXAMPLE
-    Set-ResourceGroupTags -ResourceGroupName "das-at-foobar-rg" -Environment "Dev/Test" -ParentBusiness "Apprenticeships" -ServiceOffering "AS Commitments"
+    Set-ResourceGroupTags -ResourceGroupName "das-at-foobar-rg" -Tags @{"Environment" = "Dev/Test";"Parent Business" = "Apprenticeships";"Service Offering" = "AS Commitments"}
 #>
 
 [CmdletBinding()]
@@ -32,21 +26,10 @@ param(
     [Parameter(Mandatory = $false)]
     [string]$Location = "West Europe",
     [Parameter(Mandatory = $true)]
-    [ValidateSet("Production", "Pre-Production", "Dev/Test", "Prod", "Test", "Dev")]
-    [string]$Environment,
-    [Parameter(Mandatory = $true)]
-    [string]$ParentBusiness,
-    [Parameter(Mandatory = $true)]
-    [string]$ServiceOffering
+    [hashtable]$Tags
 )
 
 try {
-
-    $Tags = @{
-        Environment        = $Environment
-        'Parent Business'  = $ParentBusiness
-        'Service Offering' = $ServiceOffering
-    }
 
     Write-Verbose -Message "Attempting to retrieve existing resource group $ResourceGroupName"
     $ResourceGroup = Get-AzResourceGroup -Name $ResourceGroupName -ErrorAction SilentlyContinue
