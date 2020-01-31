@@ -16,7 +16,7 @@
     A hashtable of the tags to be assigned to the resource group
 
     .EXAMPLE
-    Set-ResourceGroupTags -ResourceGroupName "das-at-foobar-rg" -Tags @{"Parent Business" = "Apprenticeships";"Service Offering" = "AS Commitments"}
+    Set-ResourceGroupTags -ResourceGroupName "das-at-foobar-rg" -Tags @{"Environment" = "Dev/Test";"Parent Business" = "Apprenticeships";"Service Offering" = "AS Commitments"}
 #>
 
 [CmdletBinding()]
