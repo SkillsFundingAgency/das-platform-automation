@@ -1,23 +1,23 @@
 <#
 
     .SYNOPSIS
-    Disables or Enables Or Triggers associated with a Data Factory
+    Disables or enables triggers associated with a Data Factory.
 
     .DESCRIPTION
-    Disables or Enables Or Triggers associated with a Data Factory Allowing for Safe Release
+    Disables or enables triggers associated with a Data Factory allowing for safe release.
 
     .PARAMETER DataFactoryName
-    The Name of the Data Factory to run the command against
+    The name of the Data Factory to run the script against.
 
     .PARAMETER ResourceGroupName
-    The Name of the Resource Group hosting the Data Factory.
+    The name of the Resource Group hosting the Data Factory.
 
     .PARAMETER TriggerState
-    The State in which to set the triggers either enable or disabled
+    The state in which to set the triggers, either enable or disable.
 
     .EXAMPLE
-    Set-AzDataFactoryTriggerStae -DataFactoryName aDataFactory -ResourceGroupName aResourceGroup -TriggerState disable
-    Set-AzDataFactoryTriggerStae -DataFactoryName aDataFactory -ResourceGroupName aResourceGroup -TriggerState enable
+    Set-AzDataFactoryTriggerState -DataFactoryName aDataFactory -ResourceGroupName aResourceGroup -TriggerState disable
+    Set-AzDataFactoryTriggerState -DataFactoryName aDataFactory -ResourceGroupName aResourceGroup -TriggerState enable
 
 #>
 Param (
