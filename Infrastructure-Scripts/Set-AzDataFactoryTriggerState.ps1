@@ -27,7 +27,7 @@ Param (
     [Parameter(Mandatory = $true)]
     [ValidateNotNull()]
     [String]$ResourceGroupName,
-    [Parameter(Mandatory = $false)]
+    [Parameter(Mandatory = $true)]
     [ValidateSet("enable", "disable")]
     [String]$TriggerState
 )
@@ -45,7 +45,7 @@ try {
 
     $Triggers = Get-AzDataFactoryV2Trigger -DataFactoryName $DataFactoryName -ResourceGroupName  $ResourceGroupName
     if (!$Triggers) {
-        Write-Output -Message "No Triggers Associated with Datafactory $DataFactoryName"
+        Write-Output  "No Triggers Associated with Datafactory $DataFactoryName"
     }
     else {
 
