@@ -1,7 +1,7 @@
 $Config = Get-Content $PSScriptRoot\..\Tests\Unit.Tests.Config.json -Raw | ConvertFrom-Json
 Set-Location $PSScriptRoot\..\Infrastructure-Scripts\
 
-Describe "Set-AzResourceGroupTags.ps1 Unit Tests" -Tags @("Unit") {
+Describe "Set-AzDataFactoryTriggerState.ps1 Unit Tests" -Tags @("Unit") {
 
     Context "Resource Group does not exist" {
         It "The specified Resource Group was not found in the subscription, throw an error" {
@@ -27,11 +27,11 @@ Describe "Set-AzResourceGroupTags.ps1 Unit Tests" -Tags @("Unit") {
 
     Context "Resource Group exists and DataFactory exists but no Triggers Associated with the DataFactory" {
 
-        It "Should Throw Errors if no Triggers associated with the DataFactory" {
+        It "Should Output Warning but not throw error if No Triggers associated with Data Factory" {
             Mock Get-AzResourceGroup -MockWith { Return $Config.ResourceGroupName }
             Mock Get-AzDataFactoryV2 -MockWith { Return $Config.DataFactoryName }
             Mock Get-AzDataFactoryV2Trigger -MockWith { Return $null }
-            { ./Set-AzDataFactoryTriggerState -DataFactoryName $Config.DataFactoryName -ResourceGroupName $Config.ResourceGroupName -TriggerState Disable } | Should throw "No Triggers Associated with $($Config.DataFactoryName)"
+            { ./Set-AzDataFactoryTriggerState -DataFactoryName $Config.DataFactoryName -ResourceGroupName $Config.ResourceGroupName -TriggerState Disable } | Should Not throw
             Assert-MockCalled -CommandName 'Get-AzResourceGroup' -Times 1 -Scope It
             Assert-MockCalled -CommandName 'Get-AzDataFactoryV2' -Times 1 -Scope It
             Assert-MockCalled -CommandName 'Get-AzDataFactoryV2Trigger' -Times 1 -Scope It

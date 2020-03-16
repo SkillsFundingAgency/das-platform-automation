@@ -45,21 +45,23 @@ try {
 
     $Triggers = Get-AzDataFactoryV2Trigger -DataFactoryName $DataFactoryName -ResourceGroupName  $ResourceGroupName
     if (!$Triggers) {
-        throw "No Triggers Associated with $DataFactoryName"
+        Write-Output -Message "No Triggers Associated with Datafactory $DataFactoryName"
     }
+    else {
 
-    switch ($TriggerState) {
-        "enable" {
-            foreach ($Trigger in $Triggers) {
-                Start-AzDataFactoryV2Trigger -ResourceGroupName $ResourceGroupName -DataFactoryName $DataFactoryName -Name $Trigger.name -Force
+        switch ($TriggerState) {
+            "enable" {
+                foreach ($Trigger in $Triggers) {
+                    Start-AzDataFactoryV2Trigger -ResourceGroupName $ResourceGroupName -DataFactoryName $DataFactoryName -Name $Trigger.name -Force
+                }
+                break
             }
-            break
-        }
-        "disable" {
-            foreach ($Trigger in $Triggers) {
-                Stop-AzDataFactoryV2Trigger -ResourceGroupName $ResourceGroupName -DataFactoryName $DataFactoryName -Name $Trigger.name -Force
+            "disable" {
+                foreach ($Trigger in $Triggers) {
+                    Stop-AzDataFactoryV2Trigger -ResourceGroupName $ResourceGroupName -DataFactoryName $DataFactoryName -Name $Trigger.name -Force
+                }
+                break
             }
-            break
         }
     }
 }
