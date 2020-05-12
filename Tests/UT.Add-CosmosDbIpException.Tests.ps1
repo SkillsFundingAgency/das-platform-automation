@@ -46,6 +46,7 @@ Describe "Add-CosmosDbIpException Unit Tests" -Tags @("Unit") {
             Mock Update-AzCosmosDBAccount -MockWith { return $null }
             { ./Add-CosmosDbIpException -IpAddress $Config.ipAddress -ResourceNamePattern $Config.resourceName } | Should Not throw
             Assert-MockCalled -CommandName 'Get-AzResource' -Times 1 -Scope It
+            Assert-MockCalled -CommandName 'Get-AzCosmosDBAccount' -Times 1 -Scope It
         }
     }
 }
