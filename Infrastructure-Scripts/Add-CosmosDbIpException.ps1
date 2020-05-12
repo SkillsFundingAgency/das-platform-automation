@@ -51,7 +51,6 @@ try {
         if ($IPRangeFilterList -notcontains $IpAddress) {
             Write-Output "  -> Adding $($IpAddress) to ipRules ($($CosmosDbProperties.IpRangeFilter ))"
             $null = $IPRangeFilterList.Add($IpAddress.IpAddressToString)
-            #$CosmosDbProperties.IpRangeFilter = $IPRangeFilterList -join ','
             $null = Update-AzCosmosDBAccount -ResourceId $CosmosDbAcc.ResourceId -IpRangeFilter $IPRangeFilterList -AsJob
         }
         else {
