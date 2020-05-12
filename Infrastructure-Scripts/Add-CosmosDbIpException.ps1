@@ -28,7 +28,7 @@ Param (
 
 try {
     $SubscriptionCosmosDbAccs = Get-AzResource -Name $ResourceNamePattern -ResourceType "Microsoft.DocumentDb/databaseAccounts"
-    
+
     if (!$SubscriptionCosmosDbAccs) {
         throw "Could not find a resource matching $ResourceNamePattern in the subscription"
     }
