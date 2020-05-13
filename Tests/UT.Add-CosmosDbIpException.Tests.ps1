@@ -35,9 +35,18 @@ Describe "Add-CosmosDbIpException Unit Tests" -Tags @("Unit") {
                     }
                 }
             }
-            Mock Set-AzResource -MockWith { return $null }
+            Mock Get-AzCosmosDBAccount -MockWith {
+                return @{
+                    "ResourceId" = $Config.resourceId
+                    "Properties" = @{
+                        "ipRangeFilter" = ""
+                    }
+                }
+            }
+            Mock Update-AzCosmosDBAccount -MockWith { return $null }
             { ./Add-CosmosDbIpException -IpAddress $Config.ipAddress -ResourceNamePattern $Config.resourceName } | Should Not throw
-            Assert-MockCalled -CommandName 'Get-AzResource' -Times 2 -Scope It
+            Assert-MockCalled -CommandName 'Get-AzResource' -Times 1 -Scope It
+            Assert-MockCalled -CommandName 'Get-AzCosmosDBAccount' -Times 1 -Scope It
         }
     }
 }

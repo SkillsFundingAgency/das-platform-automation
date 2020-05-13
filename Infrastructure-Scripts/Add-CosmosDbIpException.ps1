@@ -39,20 +39,19 @@ try {
 
         # --- Create or update firewall rules on the Cosmos Db Account
         Write-Output "Processing Cosmos DB Account $ServerName using -AsJob"
-        $CosmosDbProperties = (Get-AzResource -ResourceId $CosmosDbAcc.ResourceId).Properties
+        $CosmosDbProperties = Get-AzCosmosDBAccount -ResourceId $CosmosDbAcc.ResourceId
 
-        if ($CosmosDbProperties.ipRules.length -eq 0) {
+        if ($CosmosDbProperties.IpRangeFilter.length -eq 0) {
             Write-Output "  -> ipRestrictions list is empty for this resource. Skipping."
             continue
         }
 
-        $IPRulesFilterList = [System.Collections.ArrayList]::New($CosmosDbProperties.ipRules -split ',')
+        $IPRangeFilterList = [System.Collections.ArrayList]::New($CosmosDbProperties.IpRangeFilter -split ',')
 
-        if ($IPRulesFilterList -notcontains $IpAddress) {
-            Write-Output "  -> Adding $($IpAddress) to ipRules ($($CosmosDbProperties.ipRules))"
-            $null = $IPRulesFilterList.Add($IpAddress.IpAddressToString)
-            $CosmosDbProperties.ipRules = $IPRulesFilterList -join ','
-            $null = Set-AzResource -ResourceId $CosmosDbAcc.ResourceId -Properties $CosmosDbProperties -Force -AsJob
+        if ($IPRangeFilterList -notcontains $IpAddress) {
+            Write-Output "  -> Adding $($IpAddress) to ipRules ($($CosmosDbProperties.IpRangeFilter ))"
+            $null = $IPRangeFilterList.Add($IpAddress.IpAddressToString)
+            $null = Update-AzCosmosDBAccount -ResourceId $CosmosDbAcc.ResourceId -IpRangeFilter $IPRangeFilterList -AsJob
         }
         else {
             Write-Output "  -> $IpAddress exists in the current ipRules. Not updating"
