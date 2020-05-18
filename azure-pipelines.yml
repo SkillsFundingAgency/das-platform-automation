@@ -53,6 +53,7 @@ stages:
         pool:
           name: "DAS - Continuous Integration"
           demands:
+            - agent.OS -equals Linux
             - npm
             - node.js
         workspace:
