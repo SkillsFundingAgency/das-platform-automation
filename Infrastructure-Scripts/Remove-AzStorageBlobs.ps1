@@ -44,35 +44,39 @@ param(
     [Parameter(Mandatory = $false)]
     [bool]$DryRun = $true
 )
+
+# Creating the Storage Context and setting up to be able to list the Blobs in the Container
 try {
-  If($DryRun){
-    Write-Warning "Processing DryRun..."
-  }
 
-  $StorageContext = New-AzStorageContext -StorageAccountName $StorageAccount -SasToken $SASToken
-  $AzStorageContainer = Get-AzStorageContainer -Container $StorageContainer -Context $StorageContext
-  if (!$AzStorageContainer) {
-    throw "Storage container not found"
-  }
+    If ($DryRun) {
+        Write-Warning "Processing DryRun..."
+    }
 
-  Foreach ($File in (Get-AzStorageBlob -Container $StorageContainer -Context $StorageContext | Where-Object { [string]::IsNullOrEmpty($FilesOlderThan) -or $_.LastModified -lt ((Get-Date).AddDays($FilesOlderThan)) })) {
-      if ([string]::IsNullOrEmpty($FilesToIgnore) -or (!($FilesToIgnore.Replace(" ","") -split(',') | Where-Object {$File.Name -like $_}))) {
-        Write-Output "Deleting -> $($File.Name)"
-        if (!$DryRun) {
-          try {
-            Remove-AzStorageBlob -Blob $File.Name -Container $StorageContainer -Context $StorageContext -ErrorAction Continue -WhatIf
-          }
-          catch {
-            "Unable to delete $($File.Name), details below"
-            $_
-          }
+    $StorageContext = New-AzStorageContext -StorageAccountName $StorageAccount -SasToken $SASToken
+    $AzStorageContainer = Get-AzStorageContainer -Container $StorageContainer -Context $StorageContext
+    if (!$AzStorageContainer) {
+        throw "Storage container not found"
+    }
+
+    Foreach ($File in (Get-AzStorageBlob -Container $StorageContainer -Context $StorageContext | Where-Object { [string]::IsNullOrEmpty($FilesOlderThan) -or $_.LastModified -lt ((Get-Date).AddDays($FilesOlderThan)) })) {
+        if ([string]::IsNullOrEmpty($FilesToIgnore) -or (!($FilesToIgnore.Replace(" ", "") -split (',') | Where-Object { $File.Name -like $_ }))) {
+            Write-Output "Deleting -> $($File.Name)"
+            if (!$DryRun) {
+                try {
+                    #$AzStorageContainer | Get-AzStorageBlob -Blob $($File.Name) | Remove-AzStorageBlob -ErrorAction Continue -WhatIf
+                    Remove-AzStorageBlob -Blob $File.Name -Container $StorageContainer -Context $StorageContext -ErrorAction Continue -WhatIf
+                }
+                catch {
+                    "Unable to delete $($File.Name), details below"
+                    $_
+                }
+            }
         }
-      }
-      else {
-        Write-Output "Skipping -> $($File.Name)"
-      }
+        else {
+            Write-Output "Skipping -> $($File.Name)"
+        }
   }
 }
 catch {
-  throw "$_"
+    throw "$_"
 }

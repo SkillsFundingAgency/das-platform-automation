@@ -2,6 +2,7 @@
   "location": "West Europe",
   "resourceGroupName": "das-test-pester-rg",
   "storageAccountName": "dastestpestersa",
+  "storageContainerName": "pester",
   "outputVariable": "StorageConnectionString",
   "environment": "Dev/Test",
   "parentBusinessTag": "Apprenticeships",
@@ -19,6 +20,16 @@
   "storageAccountSASTokenPermissions": "rwdlacup",
   "storageAccountSASTokenExpiryMinutes": "60",
   "storageAccountSASTokenOutputVariable": "SASToken",
+  "storageAccountBlobFiles" :[
+    {
+      "Name": "PesterTest.txt",
+      "BlobType": "BlockBlob",
+      "Length": 4,
+      "ContentType": "text/plain",
+      "LastModified": "",
+      "IsDeleted": "False"
+    }
+  ],
   "CdnProfileName": "aCdnProfile",
   "CdnEndPointName": "aCdnEndpoint",
   "purgeContent": "/*",
