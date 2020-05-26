@@ -9,10 +9,10 @@ Describe "Remove-AzStorageBlobs Unit Tests" -Tags @("Unit") {
                 $StorageContext = [Microsoft.WindowsAzure.Commands.Common.Storage.AzureStorageContext]::EmptyContextInstance
                 return $StorageContext
             }
-            Mock Get-AzStorageContainer -MockWith { return $null }
-            { ./Remove-AzStorageBlobs -StorageAccount $Config.storageAccountName -SASToken $Config.storageAccountSASToken -StorageContainer $Config.storageContainerName } | Should Throw "Storage container not found"
+            Mock Get-AzStorageBlob -MockWith { return $null }
+            { ./Remove-AzStorageBlobs -StorageAccount $Config.storageAccountName -SASToken $Config.storageAccountSASToken -StorageContainer $Config.storageContainerName } | Should Throw "Could not find Storage Container: $($Config.storageContainerName)"
             Assert-MockCalled -CommandName 'New-AzStorageContext' -Times 1 -Scope It
-            Assert-MockCalled -CommandName 'Get-AzStorageContainer' -Times 1 -Scope It
+            Assert-MockCalled -CommandName "Get-AzStorageBlob" -Times 1 -Scope It
         }
     }
 
@@ -22,7 +22,6 @@ Describe "Remove-AzStorageBlobs Unit Tests" -Tags @("Unit") {
                 $StorageContext = [Microsoft.WindowsAzure.Commands.Common.Storage.AzureStorageContext]::EmptyContextInstance
                 return $StorageContext
             }
-            Mock Get-AzStorageContainer -MockWith { return "PesterContainer" }
             Mock Get-AzStorageBlob -MockWith {
                 return @(
                     [pscustomobject]@{
@@ -46,7 +45,6 @@ Describe "Remove-AzStorageBlobs Unit Tests" -Tags @("Unit") {
             Mock Remove-AzStorageBlob -MockWith { return $null }
             { ./Remove-AzStorageBlobs -StorageAccount $Config.storageAccountName -SASToken $Config.storageAccountSASToken -StorageContainer $Config.storageContainerName } | Should Not throw
             Assert-MockCalled -CommandName 'New-AzStorageContext' -Times 1 -Scope It
-            Assert-MockCalled -CommandName 'Get-AzStorageContainer' -Times 1 -Scope It
             Assert-MockCalled -CommandName 'Remove-AzStorageBlob' -Times 0 -Scope It -Exactly
         }
         It "All files should be deleted as no filters passed in" {
@@ -54,7 +52,6 @@ Describe "Remove-AzStorageBlobs Unit Tests" -Tags @("Unit") {
                 $StorageContext = [Microsoft.WindowsAzure.Commands.Common.Storage.AzureStorageContext]::EmptyContextInstance
                 return $StorageContext
             }
-            Mock Get-AzStorageContainer -MockWith { return "PesterContainer" }
             Mock Get-AzStorageBlob -MockWith {
                 return @(
                     [pscustomobject]@{
@@ -78,7 +75,6 @@ Describe "Remove-AzStorageBlobs Unit Tests" -Tags @("Unit") {
             Mock Remove-AzStorageBlob -MockWith { return $null }
             { ./Remove-AzStorageBlobs -StorageAccount $Config.storageAccountName -SASToken $Config.storageAccountSASToken -StorageContainer $Config.storageContainerName -DryRun $false } | Should Not throw
             Assert-MockCalled -CommandName 'New-AzStorageContext' -Times 1 -Scope It
-            Assert-MockCalled -CommandName 'Get-AzStorageContainer' -Times 1 -Scope It
             Assert-MockCalled -CommandName 'Remove-AzStorageBlob' -Times 2 -Scope It -Exactly
         }
         It "Only the txt file should be deleted as .fmt ignored" {
@@ -86,7 +82,6 @@ Describe "Remove-AzStorageBlobs Unit Tests" -Tags @("Unit") {
                 $StorageContext = [Microsoft.WindowsAzure.Commands.Common.Storage.AzureStorageContext]::EmptyContextInstance
                 return $StorageContext
             }
-            Mock Get-AzStorageContainer -MockWith { return "PesterContainer" }
             Mock Get-AzStorageBlob -MockWith {
                 return @(
                     [pscustomobject]@{
@@ -110,7 +105,6 @@ Describe "Remove-AzStorageBlobs Unit Tests" -Tags @("Unit") {
             Mock Remove-AzStorageBlob -MockWith { return $null }
             { ./Remove-AzStorageBlobs -StorageAccount $Config.storageAccountName -SASToken $Config.storageAccountSASToken -StorageContainer $Config.storageContainerName -DryRun $False -FilesToIgnore "*.fmt"} | Should Not throw
             Assert-MockCalled -CommandName 'New-AzStorageContext' -Times 1 -Scope It
-            Assert-MockCalled -CommandName 'Get-AzStorageContainer' -Times 1 -Scope It
             Assert-MockCalled -CommandName 'Remove-AzStorageBlob' -Times 1 -Scope It -Exactly
         }
         It "Only the txt file should be ignored as both .csv and .fmt ignored" {
@@ -118,7 +112,6 @@ Describe "Remove-AzStorageBlobs Unit Tests" -Tags @("Unit") {
                 $StorageContext = [Microsoft.WindowsAzure.Commands.Common.Storage.AzureStorageContext]::EmptyContextInstance
                 return $StorageContext
             }
-            Mock Get-AzStorageContainer -MockWith { return "PesterContainer" }
             Mock Get-AzStorageBlob -MockWith {
                 return @(
                     [pscustomobject]@{
@@ -150,7 +143,6 @@ Describe "Remove-AzStorageBlobs Unit Tests" -Tags @("Unit") {
             Mock Remove-AzStorageBlob -MockWith { return $null }
             { ./Remove-AzStorageBlobs -StorageAccount $Config.storageAccountName -SASToken $Config.storageAccountSASToken -StorageContainer $Config.storageContainerName -DryRun $False -FilesToIgnore "*.csv, *.fmt" } | Should Not throw
             Assert-MockCalled -CommandName 'New-AzStorageContext' -Times 1 -Scope It
-            Assert-MockCalled -CommandName 'Get-AzStorageContainer' -Times 1 -Scope It
             Assert-MockCalled -CommandName 'Remove-AzStorageBlob' -Times 1 -Scope It -Exactly
         }
         It "Only the files older than 7 days should be deleted" {
@@ -158,7 +150,6 @@ Describe "Remove-AzStorageBlobs Unit Tests" -Tags @("Unit") {
                 $StorageContext = [Microsoft.WindowsAzure.Commands.Common.Storage.AzureStorageContext]::EmptyContextInstance
                 return $StorageContext
             }
-            Mock Get-AzStorageContainer -MockWith { return "PesterContainer" }
             Mock Get-AzStorageBlob -MockWith {
                 return @(
                     [pscustomobject]@{
@@ -190,7 +181,6 @@ Describe "Remove-AzStorageBlobs Unit Tests" -Tags @("Unit") {
             Mock Remove-AzStorageBlob -MockWith { return $null }
             { ./Remove-AzStorageBlobs -StorageAccount $Config.storageAccountName -SASToken $Config.storageAccountSASToken -StorageContainer $Config.storageContainerName -DryRun $False -FilesOlderThan -7 } | Should Not throw
             Assert-MockCalled -CommandName 'New-AzStorageContext' -Times 1 -Scope It
-            Assert-MockCalled -CommandName 'Get-AzStorageContainer' -Times 1 -Scope It
             Assert-MockCalled -CommandName 'Remove-AzStorageBlob' -Times 2 -Scope It -Exactly
         }
 
@@ -199,7 +189,6 @@ Describe "Remove-AzStorageBlobs Unit Tests" -Tags @("Unit") {
                 $StorageContext = [Microsoft.WindowsAzure.Commands.Common.Storage.AzureStorageContext]::EmptyContextInstance
                 return $StorageContext
             }
-            Mock Get-AzStorageContainer -MockWith { return "PesterContainer" }
             Mock Get-AzStorageBlob -MockWith {
                 return @(
                     [pscustomobject]@{
@@ -231,7 +220,6 @@ Describe "Remove-AzStorageBlobs Unit Tests" -Tags @("Unit") {
             Mock Remove-AzStorageBlob -MockWith { return $null }
             { ./Remove-AzStorageBlobs -StorageAccount $Config.storageAccountName -SASToken $Config.storageAccountSASToken -StorageContainer $Config.storageContainerName -DryRun $False -FilesOlderThan -7 -FilesToIgnore "*.csv" } | Should Not throw
             Assert-MockCalled -CommandName 'New-AzStorageContext' -Times 1 -Scope It
-            Assert-MockCalled -CommandName 'Get-AzStorageContainer' -Times 1 -Scope It
             Assert-MockCalled -CommandName 'Remove-AzStorageBlob' -Times 1 -Scope It -Exactly
         }
     }

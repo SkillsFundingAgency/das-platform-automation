@@ -33,6 +33,7 @@ The variable $(StorageContainer) will be similar to "tpr", or "alerts"
 The variable $(FilesOlderThan) will specify blobs older then 'x' days will be deleted
 #>
 
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSReviewUnusedParameter", "", Justification = "Known bug - https://github.com/PowerShell/PSScriptAnalyzer/issues/1472")]
 [CmdletBinding()]
 param(
     [Parameter(Mandatory = $true)]
@@ -53,23 +54,22 @@ param(
 
 # Creating the Storage Context and setting up to be able to list the Blobs in the Container
 try {
-
     If ($DryRun) {
         Write-Warning "Processing DryRun..."
     }
 
     $StorageContext = New-AzStorageContext -StorageAccountName $StorageAccount -SasToken $SASToken
-    $AzStorageContainer = Get-AzStorageContainer -Container $StorageContainer -Context $StorageContext
-    if (!$AzStorageContainer) {
-        throw "Storage container not found"
+    $StorageBlob = Get-AzStorageBlob -Container $StorageContainer -Context $StorageContext
+
+    if (!$StorageBlob) {
+        throw("Could not find Storage Container: $StorageContainer")
     }
 
-    Foreach ($File in (Get-AzStorageBlob -Container $StorageContainer -Context $StorageContext | Where-Object { [string]::IsNullOrEmpty($FilesOlderThan) -or $_.LastModified -lt ((Get-Date).AddDays($FilesOlderThan)) })) {
+    Foreach ($File in ($StorageBlob | Where-Object { [string]::IsNullOrEmpty($FilesOlderThan) -or $_.LastModified -lt ((Get-Date).AddDays($FilesOlderThan)) })) {
         if ([string]::IsNullOrEmpty($FilesToIgnore) -or (!($FilesToIgnore.Replace(" ", "") -split (',') | Where-Object { $File.Name -like $_ }))) {
             Write-Output "Deleting -> $($File.Name)"
             if (!$DryRun) {
                 try {
-                    #$AzStorageContainer | Get-AzStorageBlob -Blob $($File.Name) | Remove-AzStorageBlob -ErrorAction Continue -WhatIf
                     Remove-AzStorageBlob -Blob $File.Name -Container $StorageContainer -Context $StorageContext -ErrorAction Continue -WhatIf
                 }
                 catch {
@@ -84,5 +84,5 @@ try {
     }
 }
 catch {
-    throw "$_"
+    throw $_
 }
