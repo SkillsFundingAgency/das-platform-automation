@@ -8,18 +8,24 @@ This script will remove all files from the specified container. It will be able 
 .PARAMETER StorageAccount
 This is the name of the storage account which will contain the storage container
 
-.PARAMETER StorageAccountKey
-This is the access key from the storage account
+.PARAMETER SASToken
+This is the SAS Token for the storage account
 
 .PARAMETER StorageContainer
 This is the name of blob container where the files reside
 
+.PARAMETER FilesToIgnore
+This specifies the file to ignore. Accepts comma delimited and wildcards e.g *.csv
+
 .PARAMETER FilesOlderThan
 This specifies blob files older than 'x' that you'd like to remove from the container
 
+.PARAMETER DryRun
+This defaults to True so file deletion will only occur if passed in as false
+
 .EXAMPLE
 How to use within Azure DevOps Pipelines
-Remove-AzStorageBlobs -StorageAccount $(StorageAccount) -StorageAccountKey $(StorageAccountKey) -StorageContainer $(StorageContainer) -FilesOlderThan $(FilesOlderThan)
+Remove-AzStorageBlobs -StorageAccount $(StorageAccount) -StorageAccountKey $(StorageAccountKey) -StorageContainer $(StorageContainer) -FilesOlderThan $(FilesOlderThan) -DryRun $false
 
 The variable $(StorageAccount) will be similar to "dasprdtprstr","daspptprstr", or "dasdevgrafstr"
 The variable $(StorageAccountKey) will be similar to [string of characters  equating to the Access Key of the Stroage Account]
