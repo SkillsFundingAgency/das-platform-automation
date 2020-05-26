@@ -8,7 +8,7 @@ Describe "Remove-AzStorageBlobs Unit Tests" -Tags @("Unit") {
             Mock New-AzStorageContext -MockWith {
                 $StorageContext = [Microsoft.WindowsAzure.Commands.Common.Storage.AzureStorageContext]::EmptyContextInstance
                 return $StorageContext
-            }   
+            }
             Mock Get-AzStorageContainer -MockWith { return $null }
             { ./Remove-AzStorageBlobs -StorageAccount $Config.storageAccountName -SASToken $Config.storageAccountSASToken -StorageContainer $Config.storageContainerName } | Should Throw "Storage container not found"
             Assert-MockCalled -CommandName 'New-AzStorageContext' -Times 1 -Scope It
@@ -21,7 +21,7 @@ Describe "Remove-AzStorageBlobs Unit Tests" -Tags @("Unit") {
             Mock New-AzStorageContext -MockWith {
                 $StorageContext = [Microsoft.WindowsAzure.Commands.Common.Storage.AzureStorageContext]::EmptyContextInstance
                 return $StorageContext
-            }   
+            }
             Mock Get-AzStorageContainer -MockWith { return "PesterContainer" }
             Mock Get-AzStorageBlob -MockWith {
                 return @(
@@ -53,7 +53,7 @@ Describe "Remove-AzStorageBlobs Unit Tests" -Tags @("Unit") {
             Mock New-AzStorageContext -MockWith {
                 $StorageContext = [Microsoft.WindowsAzure.Commands.Common.Storage.AzureStorageContext]::EmptyContextInstance
                 return $StorageContext
-            }   
+            }
             Mock Get-AzStorageContainer -MockWith { return "PesterContainer" }
             Mock Get-AzStorageBlob -MockWith {
                 return @(
@@ -85,7 +85,7 @@ Describe "Remove-AzStorageBlobs Unit Tests" -Tags @("Unit") {
             Mock New-AzStorageContext -MockWith {
                 $StorageContext = [Microsoft.WindowsAzure.Commands.Common.Storage.AzureStorageContext]::EmptyContextInstance
                 return $StorageContext
-            }   
+            }
             Mock Get-AzStorageContainer -MockWith { return "PesterContainer" }
             Mock Get-AzStorageBlob -MockWith {
                 return @(
@@ -117,7 +117,7 @@ Describe "Remove-AzStorageBlobs Unit Tests" -Tags @("Unit") {
             Mock New-AzStorageContext -MockWith {
                 $StorageContext = [Microsoft.WindowsAzure.Commands.Common.Storage.AzureStorageContext]::EmptyContextInstance
                 return $StorageContext
-            }   
+            }
             Mock Get-AzStorageContainer -MockWith { return "PesterContainer" }
             Mock Get-AzStorageBlob -MockWith {
                 return @(
@@ -157,7 +157,7 @@ Describe "Remove-AzStorageBlobs Unit Tests" -Tags @("Unit") {
             Mock New-AzStorageContext -MockWith {
                 $StorageContext = [Microsoft.WindowsAzure.Commands.Common.Storage.AzureStorageContext]::EmptyContextInstance
                 return $StorageContext
-            }   
+            }
             Mock Get-AzStorageContainer -MockWith { return "PesterContainer" }
             Mock Get-AzStorageBlob -MockWith {
                 return @(
@@ -198,7 +198,7 @@ Describe "Remove-AzStorageBlobs Unit Tests" -Tags @("Unit") {
             Mock New-AzStorageContext -MockWith {
                 $StorageContext = [Microsoft.WindowsAzure.Commands.Common.Storage.AzureStorageContext]::EmptyContextInstance
                 return $StorageContext
-            }   
+            }
             Mock Get-AzStorageContainer -MockWith { return "PesterContainer" }
             Mock Get-AzStorageBlob -MockWith {
                 return @(

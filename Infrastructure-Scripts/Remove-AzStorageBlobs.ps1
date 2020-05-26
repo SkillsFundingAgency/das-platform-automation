@@ -81,7 +81,7 @@ try {
         else {
             Write-Output "Skipping -> $($File.Name)"
         }
-  }
+    }
 }
 catch {
     throw "$_"
