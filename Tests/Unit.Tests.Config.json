@@ -2,6 +2,7 @@
   "location": "West Europe",
   "resourceGroupName": "das-test-pester-rg",
   "storageAccountName": "dastestpestersa",
+  "storageContainerName": "pester",
   "outputVariable": "StorageConnectionString",
   "environment": "Dev/Test",
   "parentBusinessTag": "Apprenticeships",
