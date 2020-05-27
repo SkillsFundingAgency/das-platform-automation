@@ -18,19 +18,20 @@ This is the name of blob container where the files reside
 This specifies the file to ignore. Accepts comma delimited and wildcards e.g *.csv
 
 .PARAMETER FilesOlderThan
-This specifies blob files older than 'x' that you'd like to remove from the container
+This specifies blob files older than 'x' days that you'd like to remove from the container
 
 .PARAMETER DryRun
 This defaults to True so file deletion will only occur if passed in as false
 
 .EXAMPLE
 How to use within Azure DevOps Pipelines
-Remove-AzStorageBlobs -StorageAccount $(StorageAccount) -StorageAccountKey $(StorageAccountKey) -StorageContainer $(StorageContainer) -FilesOlderThan $(FilesOlderThan) -DryRun $false
+Remove-AzStorageBlobs -StorageAccount $(StorageAccount) -StorageAccountKey $(StorageAccountKey) -StorageContainer $(StorageContainer) -FilesOlderThan $(FilesOlderThan) -FilesToIgnore $(FilesToIgnore) -DryRun $false
 
 The variable $(StorageAccount) will be similar to "dasprdtprstr","daspptprstr", or "dasdevgrafstr"
 The variable $(StorageAccountKey) will be similar to [string of characters  equating to the Access Key of the Stroage Account]
 The variable $(StorageContainer) will be similar to "tpr", or "alerts"
 The variable $(FilesOlderThan) will specify blobs older then 'x' days will be deleted
+The variable $(FileToIgnore) will specify which files to delete. Accepts full file names or wildcarded format. Will accept a comma delimted string if required i.e "*.csv, *.txt"
 #>
 
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSReviewUnusedParameter", "", Justification = "Known bug - https://github.com/PowerShell/PSScriptAnalyzer/issues/1472")]
@@ -70,7 +71,7 @@ try {
             Write-Output "Deleting -> $($File.Name)"
             if (!$DryRun) {
                 try {
-                    Remove-AzStorageBlob -Blob $File.Name -Container $StorageContainer -Context $StorageContext -ErrorAction Continue -WhatIf
+                    Remove-AzStorageBlob -Blob $File.Name -Container $StorageContainer -Context $StorageContext -ErrorAction Continue
                 }
                 catch {
                     "Unable to delete $($File.Name), details below"

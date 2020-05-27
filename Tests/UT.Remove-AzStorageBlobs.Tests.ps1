@@ -107,6 +107,36 @@ Describe "Remove-AzStorageBlobs Unit Tests" -Tags @("Unit") {
             Assert-MockCalled -CommandName 'New-AzStorageContext' -Times 1 -Scope It
             Assert-MockCalled -CommandName 'Remove-AzStorageBlob' -Times 1 -Scope It -Exactly
         }
+        It "Only the txt file should be deleted as full filename ignored" {
+            Mock New-AzStorageContext -MockWith {
+                $StorageContext = [Microsoft.WindowsAzure.Commands.Common.Storage.AzureStorageContext]::EmptyContextInstance
+                return $StorageContext
+            }
+            Mock Get-AzStorageBlob -MockWith {
+                return @(
+                    [pscustomobject]@{
+                        Name         = 'PesterTest.txt'
+                        BlobType     = 'BlockBlob'
+                        Length       = 4
+                        ContentType  = "text/plain"
+                        LastModified = (Get-Date).AddDays(-2.5)
+                        IsDeleted    = $False
+                    },
+                    [pscustomobject]@{
+                        Name         = 'DoNotDelete.csv'
+                        BlobType     = 'BlockBlob'
+                        Length       = 4
+                        ContentType  = "application/octet-stream"
+                        LastModified = (Get-Date).AddDays(-65)
+                        IsDeleted    = $False
+                    }
+                )
+            }
+            Mock Remove-AzStorageBlob -MockWith { return $null }
+            { ./Remove-AzStorageBlobs -StorageAccount $Config.storageAccountName -SASToken $Config.storageAccountSASToken -StorageContainer $Config.storageContainerName -DryRun $False -FilesToIgnore "DoNotDelete.csv" } | Should Not throw
+            Assert-MockCalled -CommandName 'New-AzStorageContext' -Times 1 -Scope It
+            Assert-MockCalled -CommandName 'Remove-AzStorageBlob' -Times 1 -Scope It -Exactly
+        }
         It "Only the txt file should be ignored as both .csv and .fmt ignored" {
             Mock New-AzStorageContext -MockWith {
                 $StorageContext = [Microsoft.WindowsAzure.Commands.Common.Storage.AzureStorageContext]::EmptyContextInstance
