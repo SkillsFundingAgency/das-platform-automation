@@ -15,16 +15,16 @@ This is the SAS Token for the storage account
 This is the name of blob container where the files reside
 
 .PARAMETER FilesToIgnore
-This specifies the file to ignore. Accepts comma delimited, full file names and wildcards e.g *.csv,*.txt, FileThatShouldNotBeDeleted.pdf
+This specifies the file to ignore. Accepts comma delimited, full file names and wildcards e.g "*.csv, *.fmt, DoNotDelete.txt"
 
-.PARAMETER FilesOlderThan
+.PARAMETER DaysFilesOlderThan
 This specifies blob files older than 'x' days that you'd like to remove from the container
 
 .PARAMETER DryRun
 This defaults to True so file deletion will only occur if passed in as false
 
 .EXAMPLE
-Remove-AzStorageBlobs -StorageAccount dasdevgrafstr -SASToken $(SASToken) -StorageContainer alerts -FilesOlderThan 7 -FilesToIgnore "*.csv, *.fmt, DoNotDelete.txt" -DryRun $false
+Remove-AzStorageBlobs -StorageAccount dasdevgrafstr -SASToken $(SASToken) -StorageContainer alerts -DaysFilesOlderThan 7 -FilesToIgnore "*.csv, *.fmt, DoNotDelete.txt" -DryRun $false
 #>
 
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSReviewUnusedParameter", "", Justification = "Known bug - https://github.com/PowerShell/PSScriptAnalyzer/issues/1472")]
@@ -38,7 +38,7 @@ param(
     [string]$StorageContainer,
     [Parameter(Mandatory = $false)]
     [ValidateNotNull()]
-    [string]$FilesOlderThan,
+    [string]$DaysFilesOlderThan,
     [Parameter(Mandatory = $false)]
     [ValidateNotNull()]
     [string]$FilesToIgnore,
@@ -59,7 +59,7 @@ try {
         throw("Could not find Storage Container: $StorageContainer")
     }
 
-    Foreach ($File in ($StorageBlob | Where-Object { [string]::IsNullOrEmpty($FilesOlderThan) -or $_.LastModified -lt ((Get-Date).AddDays(([int]$FilesOlderThan*-1))) })) {
+    Foreach ($File in ($StorageBlob | Where-Object { [string]::IsNullOrEmpty($DaysFilesOlderThan) -or $_.LastModified -lt ((Get-Date).AddDays(([int]$DaysFilesOlderThan*-1))) })) {
         if ([string]::IsNullOrEmpty($FilesToIgnore) -or (!($FilesToIgnore.Replace(" ", "") -split (',') | Where-Object { $File.Name -like $_ }))) {
             Write-Output "Deleting -> $($File.Name)"
             if (!$DryRun) {
