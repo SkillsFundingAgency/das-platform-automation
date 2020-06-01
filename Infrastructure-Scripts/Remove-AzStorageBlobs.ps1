@@ -64,11 +64,11 @@ try {
             Write-Output "Deleting -> $($File.Name)"
             if (!$DryRun) {
                 try {
-                    Remove-AzStorageBlob -Blob $File.Name -Container $StorageContainer -Context $StorageContext -ErrorAction Continue
+                    Remove-AzStorageBlob -Blob $File.Name -Container $StorageContainer -Context $StorageContext -ErrorAction Continue -WhatIf
                 }
                 catch {
-                    "Unable to delete $($File.Name), details below"
-                    $_
+                    Write-Error "Unable to delete $($File.Name), details below"
+                    Write-Error $_
                 }
             }
         }
