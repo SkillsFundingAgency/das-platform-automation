@@ -59,7 +59,7 @@ try {
         throw("Could not find Storage Container: $StorageContainer")
     }
 
-    Foreach ($File in ($StorageBlob | Where-Object { [string]::IsNullOrEmpty($FilesOlderThan) -or $_.LastModified -lt ((Get-Date).AddDays($FilesOlderThan)) })) {
+    Foreach ($File in ($StorageBlob | Where-Object { [string]::IsNullOrEmpty($FilesOlderThan) -or $_.LastModified -lt ((Get-Date).AddDays(([int]$FilesOlderThan*-1))) })) {
         if ([string]::IsNullOrEmpty($FilesToIgnore) -or (!($FilesToIgnore.Replace(" ", "") -split (',') | Where-Object { $File.Name -like $_ }))) {
             Write-Output "Deleting -> $($File.Name)"
             if (!$DryRun) {
