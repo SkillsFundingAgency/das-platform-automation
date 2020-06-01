@@ -248,7 +248,7 @@ Describe "Remove-AzStorageBlobs Unit Tests" -Tags @("Unit") {
                 )
             }
             Mock Remove-AzStorageBlob -MockWith { return $null }
-            { ./Remove-AzStorageBlobs -StorageAccount $Config.storageAccountName -SASToken $Config.storageAccountSASToken -StorageContainer $Config.storageContainerName -DryRun $False -FilesOlderThan -7 -FilesToIgnore "*.csv" } | Should Not throw
+            { ./Remove-AzStorageBlobs -StorageAccount $Config.storageAccountName -SASToken $Config.storageAccountSASToken -StorageContainer $Config.storageContainerName -DryRun $False -FilesOlderThan 7 -FilesToIgnore "*.csv" } | Should Not throw
             Assert-MockCalled -CommandName 'New-AzStorageContext' -Times 1 -Scope It
             Assert-MockCalled -CommandName 'Remove-AzStorageBlob' -Times 1 -Scope It -Exactly
         }
