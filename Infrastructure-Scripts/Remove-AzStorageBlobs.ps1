@@ -15,7 +15,7 @@ This is the SAS Token for the storage account
 This is the name of blob container where the files reside
 
 .PARAMETER FilesToIgnore
-This specifies the file to ignore. Accepts comma delimited and wildcards e.g *.csv
+This specifies the file to ignore. Accepts comma delimited, full file names and wildcards e.g *.csv,*.txt, FileThatShouldNotBeDeleted.pdf
 
 .PARAMETER FilesOlderThan
 This specifies blob files older than 'x' days that you'd like to remove from the container
@@ -24,14 +24,7 @@ This specifies blob files older than 'x' days that you'd like to remove from the
 This defaults to True so file deletion will only occur if passed in as false
 
 .EXAMPLE
-How to use within Azure DevOps Pipelines
-Remove-AzStorageBlobs -StorageAccount $(StorageAccount) -StorageAccountKey $(StorageAccountKey) -StorageContainer $(StorageContainer) -FilesOlderThan $(FilesOlderThan) -FilesToIgnore $(FilesToIgnore) -DryRun $false
-
-The variable $(StorageAccount) will be similar to "dasprdtprstr","daspptprstr", or "dasdevgrafstr"
-The variable $(StorageAccountKey) will be similar to [string of characters  equating to the Access Key of the Stroage Account]
-The variable $(StorageContainer) will be similar to "tpr", or "alerts"
-The variable $(FilesOlderThan) will specify blobs older then 'x' days will be deleted
-The variable $(FileToIgnore) will specify which files to delete. Accepts full file names or wildcarded format. Will accept a comma delimted string if required i.e "*.csv, *.txt"
+Remove-AzStorageBlobs -StorageAccount dasprdtprstr -SASToken $(SASToken) -StorageContainer tpr -FilesOlderThan 7 -FilesToIgnore *.csv -DryRun $false
 #>
 
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSReviewUnusedParameter", "", Justification = "Known bug - https://github.com/PowerShell/PSScriptAnalyzer/issues/1472")]
@@ -66,7 +59,7 @@ try {
         throw("Could not find Storage Container: $StorageContainer")
     }
 
-    Foreach ($File in ($StorageBlob | Where-Object { [string]::IsNullOrEmpty($FilesOlderThan) -or $_.LastModified -lt ((Get-Date).AddDays($FilesOlderThan)) })) {
+    Foreach ($File in ($StorageBlob | Where-Object { [string]::IsNullOrEmpty($FilesOlderThan) -or $_.LastModified -lt ((Get-Date).AddDays($FilesOlderThan*(-1))) })) {
         if ([string]::IsNullOrEmpty($FilesToIgnore) -or (!($FilesToIgnore.Replace(" ", "") -split (',') | Where-Object { $File.Name -like $_ }))) {
             Write-Output "Deleting -> $($File.Name)"
             if (!$DryRun) {
