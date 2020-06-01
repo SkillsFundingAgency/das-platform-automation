@@ -24,7 +24,7 @@ This specifies blob files older than 'x' days that you'd like to remove from the
 This defaults to True so file deletion will only occur if passed in as false
 
 .EXAMPLE
-Remove-AzStorageBlobs -StorageAccount dasprdtprstr -SASToken $(SASToken) -StorageContainer tpr -FilesOlderThan 7 -FilesToIgnore *.csv -DryRun $false
+Remove-AzStorageBlobs -StorageAccount dasdevgrafstr -SASToken $(SASToken) -StorageContainer alerts -FilesOlderThan 7 -FilesToIgnore "*.csv, *.fmt, DoNotDelete.txt" -DryRun $false
 #>
 
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSReviewUnusedParameter", "", Justification = "Known bug - https://github.com/PowerShell/PSScriptAnalyzer/issues/1472")]
