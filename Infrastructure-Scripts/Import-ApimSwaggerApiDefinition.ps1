@@ -52,16 +52,6 @@ function Get-AllSwaggerFilePaths ($SwaggerHtml) {
     $Paths
 }
 
-function Remove-DeletedApiVersions ($Context, $ApiName) {
-    $ExistingApis = Get-AzApiManagementApi -Context $Context | Where-Object ApiId -Match "^$ApiName-.*"
-    foreach ($ExistingApi in $ExistingApis) {
-        if (!$ApisSeen.Contains($ExistingApi.ApiId)) {
-            Write-Host ("Deleting " + $ExistingApi.ApiId)
-            Remove-AzApiManagementApi -Context $Context -ApiId $ExistingApi.ApiId
-        }
-    }
-}
-
 $PolicyString = "<policies><inbound><base/><authentication-managed-identity resource=`"$ApplicationIdentifierUri`"/></inbound><backend><base/></backend><outbound><base/></outbound><on-error><base/></on-error></policies>"
 
 Write-Verbose "Building APIM context for $ApimResourceGroup\$InstanceName"
@@ -77,7 +67,6 @@ foreach ($SwaggerPath in $SwaggerPaths) {
     $SwaggerPath -match 'v\d' | Out-Null
     $Version = $matches[0]
     $ApiId = "$ApiName-" + $Version.ToUpper()
-    $ApisSeen += $ApiId
 
     # Get Version Set for given ApiName or create one if it does not exist
     $VersionSet = Get-AzApiManagementApiVersionSet -Context $context | Where-Object { $_.DisplayName -eq "$ApiName" }
@@ -91,8 +80,6 @@ foreach ($SwaggerPath in $SwaggerPaths) {
     # Import API to APIM with swagger json file
     Import-AzApiManagementApi -Context $Context -SpecificationFormat OpenApi -ServiceUrl $ServiceUrl -SpecificationUrl $SwaggerSpecificationUrl -Path $ApiPath -ApiId $ApiId -ApiVersion $Version -ApiVersionSetId $VersionSetId -ErrorAction Stop -Verbose:$VerbosePreference
 }
+
 # Set API Level policies
 Set-AzApiManagementPolicy -Context $Context -ApiId $ApiId -Policy $PolicyString
-
-# Remove any
-Remove-DeletedApiVersions -Context $Context -ApiName $ApiName -multiVersion $apiContainsMultipleVersions
