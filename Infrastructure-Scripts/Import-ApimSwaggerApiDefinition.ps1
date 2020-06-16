@@ -36,7 +36,9 @@ Param(
     [Parameter(Mandatory = $true)]
     [String]$ApiPath,
     [Parameter(Mandatory = $true)]
-    [String]$ApiBaseUrl
+    [String]$ApiBaseUrl,
+    [Parameter(Mandatory = $true)]
+    [String]$ApplicationIdentifierUri
 )
 
 
@@ -59,7 +61,7 @@ $Context = New-AzApiManagementContext -ResourceGroupName $ApimResourceGroup -Ser
 
 # Get all version paths
 $SwaggerHtml = Read-SwaggerHtml -ApiBaseUrl $ApiBaseUrl
-$SwaggerPaths = Get-AllSwaggerFilePaths -swaggerHtml $swaggerHtml
+$SwaggerPaths = Get-AllSwaggerFilePaths -swaggerHtml $SwaggerHtml
 
 #Loop through each version
 foreach ($SwaggerPath in $SwaggerPaths) {
@@ -69,9 +71,9 @@ foreach ($SwaggerPath in $SwaggerPaths) {
     $ApiId = "$ApiName-" + $Version.ToUpper()
 
     # Get Version Set for given ApiName or create one if it does not exist
-    $VersionSet = Get-AzApiManagementApiVersionSet -Context $context | Where-Object { $_.DisplayName -eq "$ApiName" }
+    $VersionSet = Get-AzApiManagementApiVersionSet -Context $Context | Where-Object { $_.DisplayName -eq "$ApiName" }
     if ($null -eq $VersionSet) {
-        $VersionSetId = (New-AzApiManagementApiVersionSet -Context $context -Name "$apiName" -Scheme "Header" -HeaderName "X-version" -Description $apiName).Id
+        $VersionSetId = (New-AzApiManagementApiVersionSet -Context $Context -Name "$ApiName" -Scheme "Header" -HeaderName "X-version" -Description $ApiName).Id
     }
     else {
         $versionSetId = $VersionSet.Id
