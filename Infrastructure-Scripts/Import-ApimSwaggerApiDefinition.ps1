@@ -81,7 +81,7 @@ foreach ($SwaggerPath in $SwaggerPaths) {
 
     # Import API to APIM with swagger json file
     Import-AzApiManagementApi -Context $Context -SpecificationFormat OpenApi -ServiceUrl $ServiceUrl -SpecificationUrl $SwaggerSpecificationUrl -Path $ApiPath -ApiId $ApiId -ApiVersion $Version -ApiVersionSetId $VersionSetId -ErrorAction Stop -Verbose:$VerbosePreference
-}
 
-# Set API Level policies
-Set-AzApiManagementPolicy -Context $Context -ApiId $ApiId -Policy $PolicyString
+    # Set API Level policies
+    Set-AzApiManagementPolicy -Context $Context -ApiId $ApiId -Policy $PolicyString
+}
