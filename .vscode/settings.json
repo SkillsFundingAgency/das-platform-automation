@@ -11,5 +11,6 @@
   "powershell.codeFormatting.preset": "Custom",
   "powershell.codeFormatting.alignPropertyValuePairs": true,
   "powershell.codeFormatting.whitespaceAroundPipe": true,
-  "files.eol": "\n"
+  "files.eol": "\n",
+  "powershell.codeFormatting.addWhitespaceAroundPipe": true
 }

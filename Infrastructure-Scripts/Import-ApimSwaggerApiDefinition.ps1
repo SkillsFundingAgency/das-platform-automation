@@ -73,14 +73,14 @@ foreach ($SwaggerPath in $SwaggerPaths) {
     # Get Version Set for given ApiName or create one if it does not exist
     $VersionSet = Get-AzApiManagementApiVersionSet -Context $Context | Where-Object { $_.DisplayName -eq "$ApiName" }
     if ($null -eq $VersionSet) {
-        $VersionSetId = (New-AzApiManagementApiVersionSet -Context $Context -Name "$ApiName" -Scheme "Header" -HeaderName "X-version" -Description $ApiName).Id
+        $VersionSetId = (New-AzApiManagementApiVersionSet -Context $Context -Name "$ApiName" -Scheme "Header" -HeaderName "X-Version" -Description $ApiName).Id
     }
     else {
         $versionSetId = $VersionSet.Id
     }
 
     # Import API to APIM with swagger json file
-    Import-AzApiManagementApi -Context $Context -SpecificationFormat OpenApi -ServiceUrl $ServiceUrl -SpecificationUrl $SwaggerSpecificationUrl -Path $ApiPath -ApiId $ApiId -ApiVersion $Version -ApiVersionSetId $VersionSetId -ErrorAction Stop -Verbose:$VerbosePreference
+    Import-AzApiManagementApi -Context $Context -SpecificationFormat OpenApi -ServiceUrl $ApiBaseUrl -SpecificationUrl $SwaggerSpecificationUrl -Path $ApiPath -ApiId $ApiId -ApiVersion $Version -ApiVersionSetId $VersionSetId -ErrorAction Stop -Verbose:$VerbosePreference
 
     # Set API Level policies
     Set-AzApiManagementPolicy -Context $Context -ApiId $ApiId -Policy $PolicyString
