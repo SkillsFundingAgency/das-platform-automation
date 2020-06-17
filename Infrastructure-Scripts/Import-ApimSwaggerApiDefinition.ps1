@@ -16,7 +16,7 @@
     .PARAMETER ApplicationIdentifierUri
     The Application Identifier URI of the API app registration
     .EXAMPLE
-    Import-ApimSwaggerApiDefinition -ApimResourceGroup das-at-foobar-rg -InstanceName das-at-foobar-apim -ApiName foobar-api -ApiBaseUrl "https://das-at-foobar-as.azurewebsites.net/" -ApiPath "foo-bar" -ApplicationIdentifierUri "https://citizenazuresfabisgov.onmicrosoft.com/das-at-foobar-as-ar"
+    Import-ApimSwaggerApiDefinition -ApimResourceGroup das-at-foobar-rg -InstanceName das-at-foobar-apim -ApiName foobar-api -ApiBaseUrl "https://at-foobar-api.apprenticeships.education.gov.uk" -ApiPath "foo-bar" -ApplicationIdentifierUri "https://citizenazuresfabisgov.onmicrosoft.com/das-at-foobar-as-ar"
 #>
 
 [CmdletBinding()]
