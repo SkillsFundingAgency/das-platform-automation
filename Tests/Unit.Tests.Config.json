@@ -29,5 +29,11 @@
   "serverName": "das-pester-shared-sql",
   "ruleName": "ruleName",
   "ipAddress": "1.2.3.4",
-  "DataFactoryName": "aDataFactory"
+  "DataFactoryName": "aDataFactory",
+  "instanceName": "InstanceName",
+  "apiName": "ApiName",
+  "apiBaseUrl": "base-url.apprenticeships.education.gov.uk",
+  "apiPath": "api-path",
+  "applicationIdentifierUri": "ApplicationIdentifierUri",
+  "productId": "ProductId"
 }
