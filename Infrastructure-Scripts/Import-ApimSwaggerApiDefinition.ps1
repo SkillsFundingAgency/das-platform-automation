@@ -15,8 +15,10 @@
     The full path to the swagger defintion
     .PARAMETER ApplicationIdentifierUri
     The Application Identifier URI of the API app registration
+    .PARAMETER ProductId
+    The Id of the Product that the API will be assigned to
     .EXAMPLE
-    Import-ApimSwaggerApiDefinition -ApimResourceGroup das-at-foobar-rg -InstanceName das-at-foobar-apim -ApiName foobar-api -ApiBaseUrl "https://at-foobar-api.apprenticeships.education.gov.uk" -ApiPath "foo-bar" -ApplicationIdentifierUri "https://citizenazuresfabisgov.onmicrosoft.com/das-at-foobar-as-ar"
+    Import-ApimSwaggerApiDefinition -ApimResourceGroup das-at-foobar-rg -InstanceName das-at-foobar-apim -ApiName foobar-api -ApiBaseUrl "https://at-foobar-api.apprenticeships.education.gov.uk" -ApiPath "foo-bar" -ApplicationIdentifierUri "https://citizenazuresfabisgov.onmicrosoft.com/das-at-foobar-as-ar" -ProductId ProductId
 #>
 
 [CmdletBinding()]
@@ -39,7 +41,13 @@ Param(
 
 
 function Read-SwaggerHtml ($ApiBaseUrl) {
-    Invoke-WebRequest "$ApiBaseUrl/index.html"
+    try {
+        Invoke-WebRequest "$ApiBaseUrl/index.html"
+    }
+    catch {
+        throw "Could not find swagger page at: $ApiBaseUrl/index.html"
+    }
+
 }
 
 function Get-AllSwaggerFilePaths ($SwaggerHtml) {
@@ -51,6 +59,12 @@ function Get-AllSwaggerFilePaths ($SwaggerHtml) {
 }
 
 $PolicyString = "<policies><inbound><base/><authentication-managed-identity resource=`"$ApplicationIdentifierUri`"/></inbound><backend><base/></backend><outbound><base/></outbound><on-error><base/></on-error></policies>"
+
+# Check if the APIM Instance exists
+$ApimInstanceExists = Get-AzApiManagement -ResourceGroupName $ApimResourceGroup -Name $InstanceName
+if (!$ApimInstanceExists) {
+    throw "APIM Instance: $InstanceName does not exist in resource group: $ApimResourceGroup"
+}
 
 Write-Verbose "Building APIM context for $ApimResourceGroup\$InstanceName"
 $Context = New-AzApiManagementContext -ResourceGroupName $ApimResourceGroup -ServiceName $InstanceName
