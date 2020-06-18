@@ -52,8 +52,9 @@ function Read-SwaggerHtml ($ApiBaseUrl) {
 
 function Get-AllSwaggerFilePaths ($SwaggerHtml) {
     $Paths = @()
-    Select-String '/swagger/v\d/swagger.json' -input $SwaggerHtml -AllMatches | ForEach-Object {
-        $Paths = $_.matches -split ' '
+    $MatchedStrings = Select-String '/swagger/v\d/swagger.json' -input $SwaggerHtml -AllMatches
+    foreach ($MatchedString in $MatchedStrings){
+        $Paths = $MatchedString.matches -split ' '
     }
     $Paths
 }
