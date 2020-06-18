@@ -23,6 +23,8 @@ Describe "Import-ApimSwaggerApiDefinition Unit Tests" -Tags @("Unit") {
 
     Context "APIM Instance exists and found swagger pages - Importing API" {
         It "The specified Resource was not found in the subscription, throw an error" {
+            function Read-SwaggerHtml () {}
+            function Get-AllSwaggerFilePaths () {}
             Mock Get-AzApiManagement -MockWith { Return "Context" }
             Mock Read-SwaggerHtml -MockWith { Return $null }
             Mock Get-AllSwaggerFilePaths -MockWith { Return @("/swagger/v1/swagger.json", "/swagger/v2/swagger.json") }
@@ -44,7 +46,6 @@ Describe "Import-ApimSwaggerApiDefinition Unit Tests" -Tags @("Unit") {
             Assert-MockCalled -CommandName 'Add-AzApiManagementApiToProduct' -Times 1 -Scope It
             Assert-MockCalled -CommandName 'Set-AzApiManagementPolicy' -Times 1 -Scope It
         }
-
 
     }
 
