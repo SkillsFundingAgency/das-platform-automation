@@ -18,7 +18,7 @@
     .PARAMETER ProductId
     The Id of the Product that the API will be assigned to
     .EXAMPLE
-    Import-ApimSwaggerApiDefinition -ApimResourceGroup das-at-foobar-rg -InstanceName das-at-foobar-apim -ApiName foobar-api -ApiBaseUrl "https://at-foobar-api.apprenticeships.education.gov.uk" -ApiPath "foo-bar" -ApplicationIdentifierUri "https://citizenazuresfabisgov.onmicrosoft.com/das-at-foobar-as-ar" -ProductId ProductId
+    Import-ApimSwaggerApiDefinition -ApimResourceGroup das-at-foobar-rg -InstanceName das-at-foobar-apim -ApiName foobar-api -ApiBaseUrl "https://at-foobar-api.apprenticeships.education.gov.uk" -ApiPath "foo-bar" -ApplicationIdentifierUri "https://tenant.com/das-at-foobar-as-ar" -ProductId ProductId
 #>
 
 [CmdletBinding()]
@@ -29,8 +29,8 @@ Param(
     [String]$InstanceName,
     [Parameter(Mandatory = $true)]
     [String]$ApiName,
-    [Parameter(Mandatory = $true)]
-    [String]$ApiPath,
+    [Parameter(Mandatory = $false)]
+    [String]$ApiPath = "",
     [Parameter(Mandatory = $true)]
     [String]$ApiBaseUrl,
     [Parameter(Mandatory = $true)]
