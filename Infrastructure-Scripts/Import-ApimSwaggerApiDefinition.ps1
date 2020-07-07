@@ -4,9 +4,11 @@
     .DESCRIPTION
     Update an APIM API with a swagger definition with multiple versions
     .PARAMETER ApimResourceGroup
-    The name of the resource group that contains the APIM instnace
+    The name of the resource group that contains the APIM instance
     .PARAMETER InstanceName
     The name of the APIM instance
+    .PARAMETER AppServiceResourceGroup
+    The name of the resource group that contains the App Service
     .PARAMETER ApiName
     The name of the API to update
     .PARAMETER ApiPath
@@ -18,7 +20,7 @@
     .PARAMETER ProductId
     The Id of the Product that the API will be assigned to
     .EXAMPLE
-    Import-ApimSwaggerApiDefinition -ApimResourceGroup das-at-foobar-rg -InstanceName das-at-foobar-apim -ApiName foobar-api -ApiBaseUrl "https://at-foobar-api.apprenticeships.education.gov.uk" -ApiPath "foo-bar" -ApplicationIdentifierUri "https://citizenazuresfabisgov.onmicrosoft.com/das-at-foobar-as-ar" -ProductId ProductId
+    Import-ApimSwaggerApiDefinition -ApimResourceGroup das-at-foobar-rg -InstanceName das-at-foobar-apim -AppServiceResourceGroup das-at-foobar-rg -ApiName foobar-api -ApiBaseUrl "https://at-foobar-api.apprenticeships.education.gov.uk" -ApiPath "foo-bar" -ApplicationIdentifierUri "https://<tenant>.onmicrosoft.com/das-at-foobar-as-ar" -ProductId ProductId
 #>
 
 [CmdletBinding()]
@@ -27,6 +29,8 @@ Param(
     [String]$ApimResourceGroup,
     [Parameter(Mandatory = $true)]
     [String]$InstanceName,
+    [Parameter(Mandatory = $true)]
+    [String]$AppServiceResourceGroup,
     [Parameter(Mandatory = $true)]
     [String]$ApiName,
     [Parameter(Mandatory = $true)]
@@ -59,6 +63,22 @@ function Get-AllSwaggerFilePaths ($SwaggerHtml) {
     $Paths
 }
 
+function Get-AppServiceName ($ApiBaseUrl){
+    $CustomHostname = $ApiBaseUrl -replace ".*https://"
+    $AppServiceName = (Resolve-DnsName -Name $CustomHostname)[0].NameHost.split('.')[0]
+    $AppServiceName
+}
+
+function Add-AppServiceWhitelist ($AppServiceResourceGroup, $AppServiceName) {
+    $IpRestrictions = Get-AzWebAppAccessRestrictionConfig -ResourceGroupName $AppServiceResourceGroup -Name $AppServiceName
+    $MyIp = (Invoke-RestMethod ifconfig.me/ip -UseBasicParsing)
+    if ($IpRestrictions.MainSiteAccessRestrictions.RuleName -notcontains "Allow all" -and ($IpRestrictions.MainSiteAccessRestrictions | Where-Object { $_.Action -eq "Allow" }).IpAddress -notcontains "$MyIp/32") {
+        Write-Output "Whitelisting $MyIp"
+        $Priority = ($IpRestrictions.MainSiteAccessRestrictions | Where-Object { $_.Action -eq "Allow" }).Priority[-1] + 1
+        $null = Add-AzWebAppAccessRestrictionRule -ResourceGroupName $AppServiceResourceGroup -WebAppName $AppServiceName -Name "DeployServer" -IpAddress "$MyIp/32" -Priority $Priority -Action Allow
+    }
+}
+
 $PolicyString = "<policies><inbound><base/><authentication-managed-identity resource=`"$ApplicationIdentifierUri`"/></inbound><backend><base/></backend><outbound><base/></outbound><on-error><base/></on-error></policies>"
 
 # Check if the APIM Instance exists
@@ -69,6 +89,12 @@ if (!$ApimInstanceExists) {
 
 Write-Verbose "Building APIM context for $ApimResourceGroup\$InstanceName"
 $Context = New-AzApiManagementContext -ResourceGroupName $ApimResourceGroup -ServiceName $InstanceName
+
+# Get App Service name
+$AppServiceName = Get-AppServiceName -ApiBaseUrl $ApiBaseUrl
+
+# Temporarily whitelist the deployment server
+Add-AppServiceWhitelist -AppServiceResourceGroup $AppServiceResourceGroup -AppServiceName $AppServiceName
 
 # Get all version paths
 $SwaggerHtml = Read-SwaggerHtml -ApiBaseUrl $ApiBaseUrl
@@ -99,3 +125,7 @@ foreach ($SwaggerPath in $SwaggerPaths) {
     # Set API Level policies
     Set-AzApiManagementPolicy -Context $Context -ApiId $ApiId -Policy $PolicyString
 }
+
+# Remove the temporary whitelist of the deployment server
+Write-Output "Removing whitelisted IP"
+Remove-AzWebAppAccessRestrictionRule -ResourceGroupName $AppServiceResourceGroup -WebAppName $AppServiceName -Name "DeployServer"
