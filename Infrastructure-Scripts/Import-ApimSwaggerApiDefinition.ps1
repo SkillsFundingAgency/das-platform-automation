@@ -5,10 +5,10 @@
     Update an APIM API with a swagger definition with multiple versions
     .PARAMETER ApimResourceGroup
     The name of the resource group that contains the APIM instance
-    .PARAMETER AppServiceResourceGroup
-    The name of the resource group that contains the App Service
     .PARAMETER InstanceName
     The name of the APIM instance
+    .PARAMETER AppServiceResourceGroup
+    The name of the resource group that contains the App Service
     .PARAMETER ApiName
     The name of the API to update
     .PARAMETER ApiPath
@@ -20,17 +20,17 @@
     .PARAMETER ProductId
     The Id of the Product that the API will be assigned to
     .EXAMPLE
-    Import-ApimSwaggerApiDefinition -ApimResourceGroup das-at-foobar-rg -InstanceName das-at-foobar-apim -ApiName foobar-api -ApiBaseUrl "https://at-foobar-api.apprenticeships.education.gov.uk" -ApiPath "foo-bar" -ApplicationIdentifierUri "https://<tenant>.onmicrosoft.com/das-at-foobar-as-ar" -ProductId ProductId
+    Import-ApimSwaggerApiDefinition -ApimResourceGroup das-at-foobar-rg -InstanceName das-at-foobar-apim -AppServiceResourceGroup das-at-foobar-rg -ApiName foobar-api -ApiBaseUrl "https://at-foobar-api.apprenticeships.education.gov.uk" -ApiPath "foo-bar" -ApplicationIdentifierUri "https://<tenant>.onmicrosoft.com/das-at-foobar-as-ar" -ProductId ProductId
 #>
 
 [CmdletBinding()]
 Param(
     [Parameter(Mandatory = $true)]
-    [String]$ApimResourceGroup,
-    [Parameter(Mandatory = $true)]
-    [String]$AppServiceResourceGroup,
+    [String]$ApimResourceGroup],
     [Parameter(Mandatory = $true)]
     [String]$InstanceName,
+    [Parameter(Mandatory = $true)]
+    [String]$AppServiceResourceGroup,
     [Parameter(Mandatory = $true)]
     [String]$ApiName,
     [Parameter(Mandatory = $true)]
