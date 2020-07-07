@@ -26,7 +26,7 @@
 [CmdletBinding()]
 Param(
     [Parameter(Mandatory = $true)]
-    [String]$ApimResourceGroup],
+    [String]$ApimResourceGroup,
     [Parameter(Mandatory = $true)]
     [String]$InstanceName,
     [Parameter(Mandatory = $true)]
@@ -63,6 +63,22 @@ function Get-AllSwaggerFilePaths ($SwaggerHtml) {
     $Paths
 }
 
+function Get-AppServiceName ($ApiBaseUrl){
+    $CustomHostname = $ApiBaseUrl -replace ".*https://"
+    $AppServiceName = (Resolve-DnsName -Name $CustomHostname)[0].NameHost.split('.')[0]
+    $AppServiceName
+}
+
+function Set-AppServiceWhitelist ($AppServiceResourceGroup, $AppServiceName) {
+    $IpRestrictions = Get-AzWebAppAccessRestrictionConfig -ResourceGroupName $AppServiceResourceGroup -Name $AppServiceName
+    $MyIp = (Invoke-RestMethod ifconfig.me/ip -UseBasicParsing)
+    if ($IpRestrictions.MainSiteAccessRestrictions.RuleName -notcontains "Allow all" -and ($IpRestrictions.MainSiteAccessRestrictions | Where-Object { $_.Action -eq "Allow" }).IpAddress -notcontains "$MyIp/32") {
+        Write-Output "Whitelisting $MyIp"
+        $Priority = ($IpRestrictions.MainSiteAccessRestrictions | where { $_.Action -eq "Allow" }).Priority[-1] + 1
+        $null = Add-AzWebAppAccessRestrictionRule -ResourceGroupName $AppServiceResourceGroup -WebAppName $AppServiceName -Name "DeployServer" -IpAddress "$MyIp/32" -Priority $Priority -Action Allow
+    }
+}
+
 $PolicyString = "<policies><inbound><base/><authentication-managed-identity resource=`"$ApplicationIdentifierUri`"/></inbound><backend><base/></backend><outbound><base/></outbound><on-error><base/></on-error></policies>"
 
 # Check if the APIM Instance exists
@@ -75,17 +91,10 @@ Write-Verbose "Building APIM context for $ApimResourceGroup\$InstanceName"
 $Context = New-AzApiManagementContext -ResourceGroupName $ApimResourceGroup -ServiceName $InstanceName
 
 # Get App Service name
-$CustomHostname = $ApiBaseUrl -replace ".*https://"
-$AppServiceName = (Resolve-DnsName -Name $CustomHostname)[0].NameHost.split('.')[0]
+$AppServiceName = Get-AppServiceName -ApiBaseUrl $ApiBaseUrl
 
 # Temporariliy whitelist the deployment server
-$IpRestrictions = Get-AzWebAppAccessRestrictionConfig -ResourceGroupName $AppServiceResourceGroup -Name $AppServiceName
-$MyIp = (Invoke-RestMethod ifconfig.me/ip -UseBasicParsing)
-if ($IpRestrictions.MainSiteAccessRestrictions.RuleName -notcontains "Allow all" -and ($IpRestrictions.MainSiteAccessRestrictions | Where-Object { $_.Action -eq "Allow" }).IpAddress -notcontains "$MyIp/32") {
-    Write-Output "Whitelisting $MyIp"
-    $Priority = ($IpRestrictions.MainSiteAccessRestrictions | where { $_.Action -eq "Allow" }).Priority[-1] + 1
-    $null = Add-AzWebAppAccessRestrictionRule -ResourceGroupName $AppServiceResourceGroup -WebAppName $AppServiceName -Name "DeployServer" -IpAddress "$MyIp/32" -Priority $Priority -Action Allow
-}
+Set-AppServiceWhitelist -AppServiceResourceGroup $AppServiceResourceGroup -AppServiceName $AppServiceName
 
 # Get all version paths
 $SwaggerHtml = Read-SwaggerHtml -ApiBaseUrl $ApiBaseUrl
@@ -119,4 +128,4 @@ foreach ($SwaggerPath in $SwaggerPaths) {
 
 # Remove the temporary whitelist of the deployment server
 Write-Output "Removing whitelisted IP"
-Remove-AzWebAppAccessRestrictionRule -ResourceGroupName $ResourceGroupName -WebAppName $AppServiceName -Name "DeployServer"
+Remove-AzWebAppAccessRestrictionRule -ResourceGroupName $AppServiceResourceGroup -WebAppName $AppServiceName -Name "DeployServer"
