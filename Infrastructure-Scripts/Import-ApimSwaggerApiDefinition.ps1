@@ -93,7 +93,7 @@ $Context = New-AzApiManagementContext -ResourceGroupName $ApimResourceGroup -Ser
 # Get App Service name
 $AppServiceName = Get-AppServiceName -ApiBaseUrl $ApiBaseUrl
 
-# Temporariliy whitelist the deployment server
+# Temporarily whitelist the deployment server
 Add-AppServiceWhitelist -AppServiceResourceGroup $AppServiceResourceGroup -AppServiceName $AppServiceName
 
 # Get all version paths
