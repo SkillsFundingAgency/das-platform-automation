@@ -46,7 +46,7 @@ Param(
 function Read-SwaggerHtml ($ApiBaseUrl) {
     $WebRequestRetries = 3
     for ($i = 0; $i -lt $WebRequestRetries; ++$i) {
-        while ($SwaggerHtml -eq $null) {
+        while (!$SwaggerHtml) {
             Write-Host "Read-SwaggerHtml Attempt: $($i+1)"
             try {
                 $SwaggerHtml = Invoke-WebRequest "$ApiBaseUrl/index.html"
