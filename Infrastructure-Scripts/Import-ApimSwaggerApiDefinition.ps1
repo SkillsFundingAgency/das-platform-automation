@@ -43,15 +43,26 @@ Param(
     [String]$ProductId
 )
 
-
 function Read-SwaggerHtml ($ApiBaseUrl) {
-    try {
-        Invoke-WebRequest "$ApiBaseUrl/index.html"
+    $WebRequestRetries = 3
+    for ($i = 0; $i -lt $WebRequestRetries; ++$i) {
+        while ($SwaggerHtml -eq $null) {
+            Write-Host "Read-SwaggerHtml Attempt: $($i+1)"
+            try {
+                $SwaggerHtml = Invoke-WebRequest "$ApiBaseUrl/index.html"
+            }
+            catch {
+                if ($_.Exception.Message -eq "Response status code does not indicate success: 403 (Ip Forbidden)."  -and ($i+1) -ne $WebRequestRetries) {
+                    Start-Sleep -Seconds 5
+                    continue
+                }
+                else {
+                    throw "Could not find swagger page at: $ApiBaseUrl/index.html. Error: $_"
+                }
+            }
+        }
     }
-    catch {
-        throw "Could not find swagger page at: $ApiBaseUrl/index.html"
-    }
-
+    $SwaggerHtml
 }
 
 function Get-AllSwaggerFilePaths ($SwaggerHtml) {
@@ -73,7 +84,7 @@ function Add-AppServiceWhitelist ($AppServiceResourceGroup, $AppServiceName) {
     $IpRestrictions = Get-AzWebAppAccessRestrictionConfig -ResourceGroupName $AppServiceResourceGroup -Name $AppServiceName
     $MyIp = (Invoke-RestMethod ifconfig.me/ip -UseBasicParsing)
     if ($IpRestrictions.MainSiteAccessRestrictions.RuleName -notcontains "Allow all" -and ($IpRestrictions.MainSiteAccessRestrictions | Where-Object { $_.Action -eq "Allow" }).IpAddress -notcontains "$MyIp/32") {
-        Write-Output "Whitelisting $MyIp"
+        Write-Host "Whitelisting $MyIp"
         $Priority = ($IpRestrictions.MainSiteAccessRestrictions | Where-Object { $_.Action -eq "Allow" }).Priority[-1] + 1
         $null = Add-AzWebAppAccessRestrictionRule -ResourceGroupName $AppServiceResourceGroup -WebAppName $AppServiceName -Name "DeployServer" -IpAddress "$MyIp/32" -Priority $Priority -Action Allow
         Start-Sleep -Seconds 5
@@ -128,5 +139,5 @@ foreach ($SwaggerPath in $SwaggerPaths) {
 }
 
 # Remove the temporary whitelist of the deployment server
-Write-Output "Removing whitelisted IP"
+Write-Host "Removing whitelisted IP"
 Remove-AzWebAppAccessRestrictionRule -ResourceGroupName $AppServiceResourceGroup -WebAppName $AppServiceName -Name "DeployServer"
