@@ -87,7 +87,6 @@ function Add-AppServiceWhitelist ($AppServiceResourceGroup, $AppServiceName) {
         Write-Host "Whitelisting $MyIp"
         $Priority = ($IpRestrictions.MainSiteAccessRestrictions | Where-Object { $_.Action -eq "Allow" }).Priority[-1] + 1
         $null = Add-AzWebAppAccessRestrictionRule -ResourceGroupName $AppServiceResourceGroup -WebAppName $AppServiceName -Name "DeployServer" -IpAddress "$MyIp/32" -Priority $Priority -Action Allow
-        Start-Sleep -Seconds 5
     }
 }
 
