@@ -63,8 +63,8 @@ function Get-AllSwaggerFilePaths ($SwaggerHtml) {
     $Paths
 }
 
-function Get-AppServiceName ($ApiBaseUrl){
-    $AppServices = Get-AzWebapp -ResourceGroupName das-test-apimendp-rg
+function Get-AppServiceName ($ApiBaseUrl, $AppServiceResourceGroup){
+    $AppServices = Get-AzWebapp -ResourceGroupName $AppServiceResourceGroup
     $AppServiceName = ($AppServices | Where-Object $ApiBaseUrl -like $_.hostnames | Select-Object Name).Name
     $AppServiceName
 }
@@ -92,7 +92,7 @@ Write-Verbose "Building APIM context for $ApimResourceGroup\$InstanceName"
 $Context = New-AzApiManagementContext -ResourceGroupName $ApimResourceGroup -ServiceName $InstanceName
 
 # Get App Service name
-$AppServiceName = Get-AppServiceName -ApiBaseUrl $ApiBaseUrl
+$AppServiceName = Get-AppServiceName -ApiBaseUrl $ApiBaseUrl -AppServiceResourceGroup $AppServiceResourceGroup
 
 # Temporarily whitelist the deployment server
 Add-AppServiceWhitelist -AppServiceResourceGroup $AppServiceResourceGroup -AppServiceName $AppServiceName
