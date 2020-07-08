@@ -64,8 +64,8 @@ function Get-AllSwaggerFilePaths ($SwaggerHtml) {
 }
 
 function Get-AppServiceName ($ApiBaseUrl){
-    $CustomHostname = $ApiBaseUrl -replace ".*https://"
-    $AppServiceName = (Resolve-DnsName -Name $CustomHostname)[0].NameHost.split('.')[0]
+    $AppServices = Get-AzWebapp -ResourceGroupName das-test-apimendp-rg
+    $AppServiceName = ($AppServices | Where-Object $ApiBaseUrl -like $_.hostnames | Select-Object Name).Name
     $AppServiceName
 }
 
@@ -76,6 +76,7 @@ function Add-AppServiceWhitelist ($AppServiceResourceGroup, $AppServiceName) {
         Write-Output "Whitelisting $MyIp"
         $Priority = ($IpRestrictions.MainSiteAccessRestrictions | Where-Object { $_.Action -eq "Allow" }).Priority[-1] + 1
         $null = Add-AzWebAppAccessRestrictionRule -ResourceGroupName $AppServiceResourceGroup -WebAppName $AppServiceName -Name "DeployServer" -IpAddress "$MyIp/32" -Priority $Priority -Action Allow
+        Start-Sleep -Seconds 5
     }
 }
 
