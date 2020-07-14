@@ -76,7 +76,8 @@ function Get-AllSwaggerFilePaths ($SwaggerHtml) {
 
 function Get-AppServiceName ($ApiBaseUrl, $AppServiceResourceGroup){
     $AppServices = Get-AzWebapp -ResourceGroupName $AppServiceResourceGroup
-    $AppServiceName = ($AppServices | Where-Object $ApiBaseUrl -like $_.hostnames | Select-Object Name).Name
+    $Hostname = $ApiBaseUrl -replace "https://",""
+    $AppServiceName = ($AppServices | Where-Object { $_.hostnames -like $Hostname }).Name
     $AppServiceName
 }
 
