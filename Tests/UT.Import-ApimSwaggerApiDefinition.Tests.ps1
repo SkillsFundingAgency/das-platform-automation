@@ -7,7 +7,7 @@ Describe "Import-ApimSwaggerApiDefinition Unit Tests" -Tags @("Unit") {
 
         It "The specified APIM Instance was not found in the resource group, throw an error" {
             Mock Get-AzApiManagement -MockWith { Return $null }
-            { ./Import-ApimSwaggerApiDefinition -ApimResourceGroup $Config.resourceGroupName -InstanceName $Config.instanceName -AppServiceResourceGroup $Config.resourceGroupName -ApiName $Config.apiName -ApiBaseUrl $Config.apiBaseUrl -ApiPath $Config.apiPath -ApplicationIdentifierUri $Config.applicationIdentifierUri -ProductId $Config.productId } | Should throw "APIM Instance: $($Config.instanceName) does not exist in resource group: $($Config.resourceGroupName)"
+            { ./Import-ApimSwaggerApiDefinition -ApimResourceGroup $Config.resourceGroupName -InstanceName $Config.instanceName -AppServiceResourceGroup $Config.resourceGroupName -ApiVersionSetName $Config.apiVersionSetName -ApiBaseUrl $Config.apiBaseUrl -ApiPath $Config.apiPath -ApplicationIdentifierUri $Config.applicationIdentifierUri -ProductId $Config.productId } | Should throw "APIM Instance: $($Config.instanceName) does not exist in resource group: $($Config.resourceGroupName)"
             Assert-MockCalled -CommandName 'Get-AzApiManagement' -Times 1 -Scope It
         }
 
@@ -20,7 +20,7 @@ Describe "Import-ApimSwaggerApiDefinition Unit Tests" -Tags @("Unit") {
             Mock Get-AzApiManagement -MockWith { Return "Context" }
             Mock Get-AppServiceName -MockWith { Return "app-service-name" }
             Mock Add-AppServiceWhitelist -MockWith { Return $null }
-            { ./Import-ApimSwaggerApiDefinition -ApimResourceGroup $Config.resourceGroupName -InstanceName $Config.instanceName -AppServiceResourceGroup $Config.resourceGroupName -ApiName $Config.apiName -ApiBaseUrl $Config.apiBaseUrl -ApiPath $Config.apiPath -ApplicationIdentifierUri $Config.applicationIdentifierUri -ProductId $Config.productId} | Should throw "Could not find swagger page at: $($Config.apiBaseUrl)/index.html"
+            { ./Import-ApimSwaggerApiDefinition -ApimResourceGroup $Config.resourceGroupName -InstanceName $Config.instanceName -AppServiceResourceGroup $Config.resourceGroupName -ApiVersionSetName $Config.apiVersionSetName -ApiBaseUrl $Config.apiBaseUrl -ApiPath $Config.apiPath -ApplicationIdentifierUri $Config.applicationIdentifierUri -ProductId $Config.productId} | Should throw "Could not find swagger page at: $($Config.apiBaseUrl)/index.html"
             Assert-MockCalled -CommandName 'Get-AzApiManagement' -Times 1 -Scope It
         }
     }
@@ -29,27 +29,31 @@ Describe "Import-ApimSwaggerApiDefinition Unit Tests" -Tags @("Unit") {
         It "The specified Resource was not found in the subscription, throw an error" {
             function Get-AppServiceName () {}
             function Add-AppServiceWhitelist () {}
-            function Read-SwaggerHtml () {}
+            function Read-IndexHtml () {}
             function Get-AllSwaggerFilePaths () {}
+            function Get-ApiTitle () {}
             Mock Get-AzApiManagement -MockWith { Return "Context" }
             Mock Get-AppServiceName -MockWith { Return "app-service-name" }
             Mock Add-AppServiceWhitelist -MockWith { Return $null }
-            Mock Read-SwaggerHtml -MockWith { Return $null }
+            Mock Read-IndexHtml -MockWith { Return $null }
             Mock Get-AllSwaggerFilePaths -MockWith { Return @("/swagger/v1/swagger.json", "/swagger/v2/swagger.json") }
+            Mock Get-ApiTitle -MockWith {Return $null}
             Mock Get-AzApiManagementApiVersionSet -MockWith {
                 return @{
                     "Id"          = $Config.resourceId
-                    "DisplayName" = $Config.apiName
+                    "DisplayName" = $Config.apiVersionSetName
                 }
             }
             Mock Import-AzApiManagementApi -MockWith { Return $null }
             Mock Add-AzApiManagementApiToProduct -MockWith { Return $null }
             Mock Set-AzApiManagementPolicy -MockWith { Return $null }
             Mock Remove-AzWebAppAccessRestrictionRule -MockWith { Return $null }
-            { ./Import-ApimSwaggerApiDefinition -ApimResourceGroup $Config.resourceGroupName -InstanceName $Config.instanceName -AppServiceResourceGroup $Config.resourceGroupName -ApiName $Config.apiName -ApiBaseUrl $Config.apiBaseUrl -ApiPath $Config.apiPath -ApplicationIdentifierUri $Config.applicationIdentifierUri -ProductId $Config.productId } | Should not throw
+            { ./Import-ApimSwaggerApiDefinition -ApimResourceGroup $Config.resourceGroupName -InstanceName $Config.instanceName -AppServiceResourceGroup $Config.resourceGroupName -ApiVersionSetName $Config.apiVersionSetName -ApiBaseUrl $Config.apiBaseUrl -ApiPath $Config.apiPath -ApplicationIdentifierUri $Config.applicationIdentifierUri -ProductId $Config.productId } | Should not throw
             Assert-MockCalled -CommandName 'Get-AzApiManagement' -Times 1 -Scope It
-            Assert-MockCalled -CommandName 'Read-SwaggerHtml' -Times 1 -Scope It
+            Assert-MockCalled -CommandName 'Get-AzApiManagement' -Times 1 -Scope It
+            Assert-MockCalled -CommandName 'Read-IndexHtml' -Times 1 -Scope It
             Assert-MockCalled -CommandName 'Get-AllSwaggerFilePaths' -Times 1 -Scope It
+            Assert-MockCalled -CommandName 'Get-ApiTitle' -Times 1 -Scope It
             Assert-MockCalled -CommandName 'Get-AzApiManagementApiVersionSet' -Times 1 -Scope It
             Assert-MockCalled -CommandName 'Import-AzApiManagementApi' -Times 1 -Scope It
             Assert-MockCalled -CommandName 'Add-AzApiManagementApiToProduct' -Times 1 -Scope It

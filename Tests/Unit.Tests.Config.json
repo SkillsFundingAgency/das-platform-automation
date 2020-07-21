@@ -31,7 +31,7 @@
   "ipAddress": "1.2.3.4",
   "DataFactoryName": "aDataFactory",
   "instanceName": "InstanceName",
-  "apiName": "ApiName",
+  "apiVersionSetName": "ApiVersionSetName",
   "apiBaseUrl": "base-url.apprenticeships.education.gov.uk",
   "apiPath": "api-path",
   "applicationIdentifierUri": "ApplicationIdentifierUri",
