@@ -9,8 +9,8 @@
     The name of the APIM instance
     .PARAMETER AppServiceResourceGroup
     The name of the resource group that contains the App Service
-    .PARAMETER ApiName
-    The name of the API to update
+    .PARAMETER ApiVersionSetName
+    The name of the API version set to update
     .PARAMETER ApiPath
     The URL suffix that APIM will apply to the API URL.
     .PARAMETER ApiBaseUrl
@@ -20,7 +20,7 @@
     .PARAMETER ProductId
     The Id of the Product that the API will be assigned to
     .EXAMPLE
-    Import-ApimSwaggerApiDefinition -ApimResourceGroup das-at-foobar-rg -InstanceName das-at-foobar-apim -AppServiceResourceGroup das-at-foobar-rg -ApiName foobar-api -ApiBaseUrl "https://at-foobar-api.apprenticeships.education.gov.uk" -ApiPath "foo-bar" -ApplicationIdentifierUri "https://<tenant>.onmicrosoft.com/das-at-foobar-as-ar" -ProductId ProductId
+    Import-ApimSwaggerApiDefinition -ApimResourceGroup das-at-foobar-rg -InstanceName das-at-foobar-apim -AppServiceResourceGroup das-at-foobar-rg -ApiVersionSetName foobar-api -ApiBaseUrl "https://at-foobar-api.apprenticeships.education.gov.uk" -ApiPath "foo-bar" -ApplicationIdentifierUri "https://<tenant>.onmicrosoft.com/das-at-foobar-as-ar" -ProductId ProductId
 #>
 
 [CmdletBinding()]
@@ -32,7 +32,7 @@ Param(
     [Parameter(Mandatory = $true)]
     [String]$AppServiceResourceGroup,
     [Parameter(Mandatory = $true)]
-    [String]$ApiName,
+    [String]$ApiVersionSetName,
     [Parameter(Mandatory = $true)]
     [String]$ApiPath,
     [Parameter(Mandatory = $true)]
@@ -43,13 +43,13 @@ Param(
     [String]$ProductId
 )
 
-function Read-SwaggerHtml ($ApiBaseUrl) {
+function Read-IndexHtml ($ApiBaseUrl) {
     $WebRequestRetries = 3
     for ($i = 0; $i -lt $WebRequestRetries; ++$i) {
-        while (!$SwaggerHtml) {
-            Write-Verbose "Read-SwaggerHtml Attempt: $($i+1)"
+        while (!$IndexHtml) {
+            Write-Verbose "Read-IndexHtml Attempt: $($i+1)"
             try {
-                $SwaggerHtml = Invoke-WebRequest "$ApiBaseUrl/index.html"
+                $IndexHtml = Invoke-WebRequest "$ApiBaseUrl/index.html"
             }
             catch {
                 if ($_.Exception.Message -eq "Response status code does not indicate success: 403 (Ip Forbidden)."  -and ($i+1) -ne $WebRequestRetries) {
@@ -62,21 +62,26 @@ function Read-SwaggerHtml ($ApiBaseUrl) {
             }
         }
     }
-    $SwaggerHtml
+    $IndexHtml
 }
 
-function Get-AllSwaggerFilePaths ($SwaggerHtml) {
+function Get-AllSwaggerFilePaths ($IndexHtml) {
     $Paths = @()
-    $MatchedStrings = Select-String '/swagger/v\d/swagger.json' -input $SwaggerHtml -AllMatches
+    $MatchedStrings = Select-String '/swagger/v\d/swagger.json' -input $IndexHtml -AllMatches
     foreach ($MatchedString in $MatchedStrings){
         $Paths = $MatchedString.matches -split ' '
     }
     $Paths
 }
 
+function Get-ApiTitle ($SwaggerSpecificationUrl) {
+    $ApiTitle = ((Invoke-WebRequest $SwaggerSpecificationUrl).Content | ConvertFrom-Json).info.title
+    $ApiTitle
+}
+
 function Get-AppServiceName ($ApiBaseUrl, $AppServiceResourceGroup){
     $AppServices = Get-AzWebapp -ResourceGroupName $AppServiceResourceGroup
-    $Hostname = $ApiBaseUrl -replace "https://",""
+    $Hostname = ($ApiBaseUrl -replace "https://","").TrimEnd('/')
     $AppServiceName = ($AppServices | Where-Object { $_.hostnames -like $Hostname }).Name
     $AppServiceName
 }
@@ -105,19 +110,20 @@ $AppServiceName = Get-AppServiceName -ApiBaseUrl $ApiBaseUrl -AppServiceResource
 
 Add-AppServiceWhitelist -AppServiceResourceGroup $AppServiceResourceGroup -AppServiceName $AppServiceName
 
-$SwaggerHtml = Read-SwaggerHtml -ApiBaseUrl $ApiBaseUrl
-$SwaggerPaths = Get-AllSwaggerFilePaths -swaggerHtml $SwaggerHtml
+$IndexHtml = Read-IndexHtml -ApiBaseUrl $ApiBaseUrl
+$SwaggerPaths = Get-AllSwaggerFilePaths -IndexHtml $IndexHtml
 
 Write-Verbose "Loop through each versioned Swagger definition and import to APIM"
 foreach ($SwaggerPath in $SwaggerPaths) {
     $SwaggerSpecificationUrl = $ApiBaseUrl + $SwaggerPath
     $SwaggerPath -match '\d' | Out-Null
     $Version = $matches[0]
-    $ApiId = "$ApiName-v" + $Version.ToUpper()
+    $ApiTitle = Get-ApiTitle $SwaggerSpecificationUrl
+    $ApiId = "$ApiTitle-v" + $Version.ToUpper()
 
-    $VersionSet = Get-AzApiManagementApiVersionSet -Context $Context | Where-Object { $_.DisplayName -eq "$ApiName" }
+    $VersionSet = Get-AzApiManagementApiVersionSet -Context $Context | Where-Object { $_.DisplayName -eq "$ApiVersionSetName" }
     if ($null -eq $VersionSet) {
-        $VersionSetId = (New-AzApiManagementApiVersionSet -Context $Context -Name "$ApiName" -Scheme "Header" -HeaderName "X-Version" -Description $ApiName).Id
+        $VersionSetId = (New-AzApiManagementApiVersionSet -Context $Context -Name "$ApiVersionSetName" -Scheme "Header" -HeaderName "X-Version" -Description $ApiVersionSetName).Id
     }
     else {
         $versionSetId = $VersionSet.Id
