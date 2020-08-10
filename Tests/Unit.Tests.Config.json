@@ -35,5 +35,11 @@
   "apiBaseUrl": "base-url.apprenticeships.education.gov.uk",
   "apiPath": "api-path",
   "applicationIdentifierUri": "ApplicationIdentifierUri",
-  "productId": "ProductId"
+  "productId": "ProductId",
+  "string": "string",
+  "integer": 2,
+  "Boolean": "true",
+  "Object": "{'1':'a','2':'b'}",
+  "Array": "['a','b','c']",
+  "ObjectArray": "[{'1':'a','2':'b'},{'3':'c','4':'d'}]"
 }
