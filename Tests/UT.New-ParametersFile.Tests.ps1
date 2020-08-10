@@ -39,7 +39,7 @@ Describe "New-ParametersFile Unit Tests" {
         It "Should create a valid json file that can be deserialized" {
             Remove-Item -Path $MockParametersFilePath -ErrorAction "SilentlyContinue"
             ./New-ParametersFile -TemplateFilePath $MockTemplateFilePath -ParametersFilePath $MockParametersFilePath
-             {Get-Content -Path $MockParametersFilePath -Raw | ConvertFrom-Json } | Should Not Throw
+            { Get-Content -Path $MockParametersFilePath -Raw | ConvertFrom-Json } | Should Not Throw
         }
 
         It "Should return the same parmeters as the arm template" {
