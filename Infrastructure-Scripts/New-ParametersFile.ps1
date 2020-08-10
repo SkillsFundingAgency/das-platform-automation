@@ -39,7 +39,7 @@ try {
 
         if (!$ParameterValue) {
             Write-Verbose -Message "Environment variable for $ParameterName was not found, attempting default value"
-            $ParameterValue = $TemplateParameters.$ParameterName.defaultValue
+            $ParameterValue = $ParameterObject.Value.defaultValue
 
             if ($ParameterValue) {
                 Write-Verbose -Message "Using default value for $ParameterName"
