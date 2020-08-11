@@ -162,5 +162,5 @@ Describe "New-ParametersFile Unit Tests" {
         Clear-MockEnvironment
     }
 
-    #Remove-Item -Path $MockParametersFilePath -ErrorAction "SilentlyContinue"
+    Remove-Item -Path $MockParametersFilePath -ErrorAction "SilentlyContinue"
 }
