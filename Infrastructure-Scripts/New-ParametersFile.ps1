@@ -105,6 +105,7 @@ try {
     }
 
     $null = Set-Content -Path $ParametersFilePath -Value ([Regex]::Unescape(($ParametersFile | ConvertTo-Json -Depth 10))) -Force
+    Write-Output "Parameter file content saved to $ParametersFilePath"
 
 }
 catch {

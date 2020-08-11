@@ -50,22 +50,20 @@ Describe "New-ParametersFile Unit Tests" {
             $TemplateFileParameterNames | Should -Be $ParametersFileParameterNames
         }
 
-        It "Should return the expected values in the parameters file" {
+        It "Should return values in the parameters file" {
             Remove-Item -Path $MockParametersFilePath -ErrorAction "SilentlyContinue"
             ./New-ParametersFile -TemplateFilePath $MockTemplateFilePath -ParametersFilePath $MockParametersFilePath
             $TemplateFileParameters = (Get-Content -Path $MockTemplateFilePath -Raw | ConvertFrom-Json).Parameters.PSObject.Properties | Sort-Object
             $ParametersFileParameters = (Get-Content -Path $MockParametersFilePath -Raw | ConvertFrom-Json).Parameters.PSObject.Properties | Sort-Object
 
             foreach ($Parameter in $TemplateFileParameters) {
-                $EnvironmentValue = (Get-Item -Path "env:$($Parameter.Name)" -ErrorAction SilentlyContinue).Value
-                if (!$EnvironmentValue) {
-                    #Use default value
-                    $EnvironmentValue = $Parameter.Value.defaultValue
-                }
                 $ParameterValue = ($ParametersFileParameters | Where-Object { $_.Name -eq $Parameter.Name }).Value.Value
+                if (!$ParameterValue -and $Parameter.Value.Type -eq "array") {
+                    $ParameterValue = @()
+                }
+                $ParameterValue | Should Not be NullOrEmpty
             }
 
-            $EnvironmentValue | Should Be $ParameterValue
         }
 
         Clear-MockEnvironment
@@ -164,5 +162,5 @@ Describe "New-ParametersFile Unit Tests" {
         Clear-MockEnvironment
     }
 
-    Remove-Item -Path $MockParametersFilePath -ErrorAction "SilentlyContinue"
+    #Remove-Item -Path $MockParametersFilePath -ErrorAction "SilentlyContinue"
 }
