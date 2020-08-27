@@ -39,10 +39,13 @@ try {
 
         if (!$ParameterValue) {
             Write-Verbose -Message "Environment variable for $ParameterName was not found, attempting default value"
-            $ParameterValue = $ParameterObject.Value.defaultValue
-
-            if ($ParameterValue) {
+            if ($null -eq $ParameterObject.Value.defaultValue) {
+                Write-Verbose -Message "Default value for $ParameterName was not found. Process will terminate"
+                throw "Could not find environment variable or default value for template parameter $ParameterName"
+            }
+            else {
                 Write-Verbose -Message "Using default value for $ParameterName"
+                $ParameterValue = $ParameterObject.Value.defaultValue
 
                 if ($ParameterType -eq "object") {
                     $ParameterValue = $ParameterValue | ConvertTo-Json -Depth 10
@@ -51,12 +54,6 @@ try {
         }
         else {
             Write-Verbose -Message "Using environment variable value for $ParameterName"
-        }
-
-        # --- Throw if pipeline variable does not exist and if the type is not a secure string and array
-        if (!$ParameterValue -and ($ParameterType -ne "securestring") -and ($ParameterType -ne "array")) {
-            Write-Verbose -Message "Default value for $ParameterName was not found. Process will terminate"
-            throw "Could not find environment variable or default value for template parameter $ParameterName"
         }
 
         switch ($ParameterType) {
