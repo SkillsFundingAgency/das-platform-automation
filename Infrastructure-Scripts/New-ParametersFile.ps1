@@ -46,16 +46,13 @@ try {
             else {
                 Write-Verbose -Message "Using default value for $ParameterName"
                 $ParameterValue = $ParameterObject.Value.defaultValue
-
-                if ($ParameterType -eq "object") {
-                    $ParameterValue = $ParameterValue | ConvertTo-Json -Depth 10
-                }
             }
         }
         else {
             Write-Verbose -Message "Using environment variable value for $ParameterName"
         }
 
+        Write-Verbose "Processing parameter $ParameterName as type $ParameterType"
         switch ($ParameterType) {
             'array' {
                 # If Default value is an empty array
