@@ -44,13 +44,13 @@ Param(
 )
 
 function Invoke-RetryWebRequest ($ApiUrl) {
-    $SuccessfulResponse = $null
+    $Response = $null
     $AttemptCounter = 1
-    while (!$SuccessfulResponse) {
+    while (!$Response) {
         Write-Verbose "Web request attempt: $($AttemptCounter)"
         try {
             Write-Verbose "Invoking web request to $($ApiUrl)"
-            $SuccessfulResponse = Invoke-WebRequest "$($ApiUrl)"
+            $Response = Invoke-WebRequest "$($ApiUrl)"
         }
         catch {
             if ($AttemptCounter -le 10) {
@@ -63,7 +63,7 @@ function Invoke-RetryWebRequest ($ApiUrl) {
             }
         }
     }
-    $SuccessfulResponse
+    $Response
 }
 
 function Get-AllSwaggerFilePaths ($IndexHtml) {
