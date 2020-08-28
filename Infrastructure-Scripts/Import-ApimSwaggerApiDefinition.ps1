@@ -43,45 +43,44 @@ Param(
     [String]$ProductId
 )
 
-function Read-IndexHtml ($ApiBaseUrl) {
-    $WebRequestRetries = 3
-    for ($i = 0; $i -lt $WebRequestRetries; ++$i) {
-        while (!$IndexHtml) {
-            Write-Verbose "Read-IndexHtml Attempt: $($i+1)"
-            try {
-                $IndexHtml = Invoke-WebRequest "$ApiBaseUrl/index.html"
+function Invoke-RetryWebRequest ($ApiUrl) {
+    $AttemptCounter = 1
+    while (!$IndexHtml) {
+        Write-Verbose "Web request attempt: $($AttemptCounter)"
+        try {
+            Write-Verbose "Invoking web request to $($ApiUrl)"
+            $IndexHtml = Invoke-WebRequest "$($ApiUrl)"
+        }
+        catch {
+            if ($AttemptCounter -le 10) {
+                Write-Verbose "Whitelist not in effect, retrying"
+                Start-Sleep -Seconds 5
+                $AttemptCounter++
             }
-            catch {
-                if ($_.Exception.Message -eq "Response status code does not indicate success: 403 (Ip Forbidden)."  -and ($i+1) -ne $WebRequestRetries) {
-                    Start-Sleep -Seconds 5
-                    continue
-                }
-                else {
-                    throw "Could not find swagger page at: $ApiBaseUrl/index.html. Error: $_"
-                }
+            else {
+                throw "Could not find page at: $($ApiUrl) Error: $_"
             }
         }
     }
-    $IndexHtml
 }
 
 function Get-AllSwaggerFilePaths ($IndexHtml) {
     $Paths = @()
     $MatchedStrings = Select-String '/swagger/v\d/swagger.json' -input $IndexHtml -AllMatches
-    foreach ($MatchedString in $MatchedStrings){
+    foreach ($MatchedString in $MatchedStrings) {
         $Paths = $MatchedString.matches -split ' '
     }
     $Paths
 }
 
 function Get-ApiTitle ($SwaggerSpecificationUrl) {
-    $ApiTitle = ((Invoke-WebRequest $SwaggerSpecificationUrl).Content | ConvertFrom-Json).info.title
+    $ApiTitle = ((Invoke-RetryWebRequest $SwaggerSpecificationUrl).Content | ConvertFrom-Json).info.title
     $ApiTitle
 }
 
-function Get-AppServiceName ($ApiBaseUrl, $AppServiceResourceGroup){
-    $AppServices = Get-AzWebapp -ResourceGroupName $AppServiceResourceGroup
-    $Hostname = ($ApiBaseUrl -replace "https://","").TrimEnd('/')
+function Get-AppServiceName ($ApiBaseUrl, $AppServiceResourceGroup) {
+    $AppServices = Get-AzWebApp -ResourceGroupName $AppServiceResourceGroup
+    $Hostname = ($ApiBaseUrl -replace "https://", "").TrimEnd('/')
     $AppServiceName = ($AppServices | Where-Object { $_.hostnames -like $Hostname }).Name
     $AppServiceName
 }
@@ -110,7 +109,7 @@ $AppServiceName = Get-AppServiceName -ApiBaseUrl $ApiBaseUrl -AppServiceResource
 
 Add-AppServiceWhitelist -AppServiceResourceGroup $AppServiceResourceGroup -AppServiceName $AppServiceName
 
-$IndexHtml = Read-IndexHtml -ApiBaseUrl $ApiBaseUrl
+$IndexHtml = Invoke-RetryWebRequest "$($ApiBaseUrl)/index.html"
 $SwaggerPaths = Get-AllSwaggerFilePaths -IndexHtml $IndexHtml
 
 Write-Verbose "Loop through each versioned Swagger definition and import to APIM"
