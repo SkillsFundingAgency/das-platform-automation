@@ -44,12 +44,13 @@ Param(
 )
 
 function Invoke-RetryWebRequest ($ApiUrl) {
+    $SuccessfulResponse = $null
     $AttemptCounter = 1
-    while (!$IndexHtml) {
+    while (!$SuccessfulResponse) {
         Write-Verbose "Web request attempt: $($AttemptCounter)"
         try {
             Write-Verbose "Invoking web request to $($ApiUrl)"
-            $IndexHtml = Invoke-WebRequest "$($ApiUrl)"
+            $SuccessfulResponse = Invoke-WebRequest "$($ApiUrl)"
         }
         catch {
             if ($AttemptCounter -le 10) {
@@ -62,13 +63,14 @@ function Invoke-RetryWebRequest ($ApiUrl) {
             }
         }
     }
+    $SuccessfulResponse
 }
 
 function Get-AllSwaggerFilePaths ($IndexHtml) {
     $Paths = @()
     $MatchedStrings = Select-String '/swagger/v\d/swagger.json' -input $IndexHtml -AllMatches
     foreach ($MatchedString in $MatchedStrings) {
-        $Paths = $MatchedString.matches -split ' '
+        $Paths += $MatchedString.matches -split ' '
     }
     $Paths
 }
