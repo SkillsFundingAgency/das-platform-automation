@@ -52,7 +52,7 @@ function Invoke-RetryWebRequest ($ApiUrl) {
             $IndexHtml = Invoke-WebRequest "$($ApiUrl)"
         }
         catch {
-            if ($AttemptCounter -le 3) {
+            if ($AttemptCounter -le 10) {
                 Write-Verbose "Whitelist not in effect, retrying"
                 Start-Sleep -Seconds 5
                 $AttemptCounter++

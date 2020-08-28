@@ -20,6 +20,7 @@ Describe "Import-ApimSwaggerApiDefinition Unit Tests" -Tags @("Unit") {
             Mock Get-AzApiManagement -MockWith { Return "Context" }
             Mock Get-AppServiceName -MockWith { Return "app-service-name" }
             Mock Add-AppServiceWhitelist -MockWith { Return $null }
+            Mock Start-Sleep -MockWith { Return $null }
             { ./Import-ApimSwaggerApiDefinition -ApimResourceGroup $Config.resourceGroupName -InstanceName $Config.instanceName -AppServiceResourceGroup $Config.resourceGroupName -ApiVersionSetName $Config.apiVersionSetName -ApiBaseUrl $Config.apiBaseUrl -ApiPath $Config.apiPath -ApplicationIdentifierUri $Config.applicationIdentifierUri -ProductId $Config.productId } | Should throw "Could not find page at: $($Config.apiBaseUrl)/index.html"
             Assert-MockCalled -CommandName 'Get-AzApiManagement' -Times 1 -Scope It
         }
@@ -36,6 +37,7 @@ Describe "Import-ApimSwaggerApiDefinition Unit Tests" -Tags @("Unit") {
             Mock Get-AppServiceName -MockWith { Return "app-service-name" }
             Mock Add-AppServiceWhitelist -MockWith { Return $null }
             Mock Invoke-RetryWebRequest -MockWith { Return $null }
+            Mock Start-Sleep -MockWith { Return $null }
             Mock Get-AllSwaggerFilePaths -MockWith { Return @("/swagger/v1/swagger.json", "/swagger/v2/swagger.json") }
             Mock Get-ApiTitle -MockWith { Return $null }
             Mock Get-AzApiManagementApiVersionSet -MockWith {
