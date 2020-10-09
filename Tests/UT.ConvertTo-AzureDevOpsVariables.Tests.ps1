@@ -7,7 +7,7 @@ Describe "ConvertTo-AzureDevOpsVariables unit tests" -Tag "Unit" {
         It "Should return a string correctly" {
             $Expected = @('Creating Azure DevOps variable foo', '##vso[task.setvariable variable=foo]bar')
 
-            $Output = .\ConvertTo-AzureDevOpsVariables -ARMOutput $Config.ArmOutput
+            $Output = ./ConvertTo-AzureDevOpsVariables -ARMOutput $Config.ArmOutput
             $Output | Should be $Expected
         }
     }
@@ -17,7 +17,7 @@ Describe "ConvertTo-AzureDevOpsVariables unit tests" -Tag "Unit" {
             $Expected = @('Creating Azure DevOps variable foo',
                 '##vso[task.setvariable variable=foo;issecret=true]bar')
 
-            $Output = .\ConvertTo-AzureDevOpsVariables -ARMOutput $Config.ArmOutputSecure
+            $Output = ./ConvertTo-AzureDevOpsVariables -ARMOutput $Config.ArmOutputSecure
             $Output | Should be $Expected
         }
     }
@@ -28,7 +28,7 @@ Describe "ConvertTo-AzureDevOpsVariables unit tests" -Tag "Unit" {
             $Expected = @('Creating Azure DevOps variable fu from foo',
                 '##vso[task.setvariable variable=fu]bar')
 
-            $Output = .\ConvertTo-AzureDevOpsVariables -ARMOutput $Config.ArmOutput -rename @{foo = "fu" }
+            $Output = ./ConvertTo-AzureDevOpsVariables -ARMOutput $Config.ArmOutput -rename @{foo = "fu" }
             $Output | Should be $Expected
         }
     }
