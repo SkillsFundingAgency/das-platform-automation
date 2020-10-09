@@ -12,10 +12,11 @@ If using the Azure Deployment task in an Azure Pipeline, you can set the output 
 .PARAMETER Rename
 [Optional] Allows you to create a AzureDevOps variable with a different name to the output name.
 Takes a dictionary where the key is the name of the ARM template output and the value is the desired name of the AzureDevOps variable.
+This variable must be wrapped in single quotes when passing to this parameter in an Azure DevOps task.
 
 .EXAMPLE
-ConvertTo-AzureDevOpsVariables.ps1 -ARMOutput $(ARMOutputs)
-where ARMOutputs is the deploymentOutputs value from the Azure Deployment task.
+ConvertTo-AzureDevOpsVariables.ps1 -ARMOutput $(ARMOutput)
+where ARMOutputs is the deploymentOutputs value from the Azure Deployment task. Note that $(ARMOutput) is wrapped in single quotes.
 
 #>
 [CmdletBinding()]
