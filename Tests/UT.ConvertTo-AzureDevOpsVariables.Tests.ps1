@@ -8,6 +8,7 @@ Describe "ConvertTo-AzureDevOpsVariables unit tests" -Tag "Unit" {
             $Expected = @('Creating Azure DevOps variable foo', '##vso[task.setvariable variable=foo]bar')
 
             $Output = ./ConvertTo-AzureDevOpsVariables -ARMOutput $Config.ArmOutput
+            Write-Host $Output
             $Output | Should be $Expected
         }
     }
