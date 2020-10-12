@@ -41,5 +41,7 @@
   "Boolean": "true",
   "Object": "{'1':'a','2':'b'}",
   "Array": "['a','b','c']",
-  "ObjectArray": "[{'1':'a','2':'b'},{'3':'c','4':'d'}]"
+  "ObjectArray": "[{'1':'a','2':'b'},{'3':'c','4':'d'}]",
+  "ArmOutput": "{'foo':{'type':'String','value':'bar'}}",
+  "ArmOutputSecure": "{'foo':{'type':'SecureString','value':'bar'}}"
 }
