@@ -15,7 +15,7 @@ Takes a dictionary where the key is the name of the ARM template output and the 
 This variable must be wrapped in single quotes when passing to this parameter in an Azure DevOps task.
 
 .EXAMPLE
-ConvertTo-AzureDevOpsVariables.ps1 -ARMOutput $(ARMOutput)
+ConvertTo-AzureDevOpsVariables.ps1 -ARMOutput '$(ARMOutput)'
 where ARMOutputs is the deploymentOutputs value from the Azure Deployment task. Note that $(ARMOutput) is wrapped in single quotes.
 
 #>
@@ -36,7 +36,7 @@ catch {
     throw "Unable to convert ARMOutput to JSON.  Add System.Debug switch to view ARMOutput."
 }
 
-# The outputs with be of type NoteProperty, get a list of all of them
+# The outputs will be of type NoteProperty, get a list of all of them
 foreach ($OutputName in ($JsonVars | Get-Member -MemberType NoteProperty).name) {
     # Get the type and value for each output
     $OutputTypeValue = $JsonVars | Select-Object -ExpandProperty $OutputName
