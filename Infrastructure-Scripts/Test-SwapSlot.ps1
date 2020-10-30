@@ -1,7 +1,7 @@
 [CmdletBinding()]
 param(
     [Parameter(Mandatory=$true)]
-    [string]$WhatsMyIpServiceUrl = "ifconfig.me/ip",
+    [string]$WhatsMyIpServiceUrl,
     [Parameter(Mandatory=$false)]
     [string]$AppServiceName = "$env:APIAppServiceName",
     [Parameter(Mandatory=$false)]
@@ -32,39 +32,24 @@ $RetryCounter = 1
 Write-Verbose "Checking $TestUri for startup errors"
 while ($RetryCounter -lt 4) {
     Write-Verbose "Attempt $RetryCounter"
-    ## ! this is a lot of looping
-        # loop 4 times to restart slot
-        # loop 5 times with new jobs
-        # loop 10 times to poll URI (with a 6 minute timeout per request)
-        # at least 50 loops and up to 200!
-    ## ! cannot mock functins inside Start-ThreadJob, makes testing difficult
-    ## why is Start-ThreadJob used?
-    ## why is the timeout so high?
-    ## why are we retrying so many times?
-        $null = 1..5 | ForEach-Object { Start-ThreadJob -ScriptBlock {#>
-            $503Retries = 10
-            for ($i = 0; $i -lt $503Retries; ++$i) {
-                try {
-                    $null = Invoke-WebRequest -Uri $using:TestUri -UseBasicParsing -TimeoutSec 360
-                }
-                catch {
-                    if ($_.Exception.Response.StatusCode.Value__ -eq 503 -and $i + 1 -ne $503Retries) {
-                        Start-Sleep -Seconds (2+$i)
-                        continue
-                    }
-                    Write-Error $_
-                    break
-                }
+    $503Retries = 10
+    for ($i = 0; $i -lt $503Retries; ++$i) {
+        try {
+            $null = Invoke-WebRequest -Uri $TestUri -UseBasicParsing -TimeoutSec 360
+        }
+        catch {
+            if ($_.Exception.Response.StatusCode.Value__ -eq 503 -and $i + 1 -ne $503Retries) {
+                Start-Sleep -Seconds (2+$i)
+                continue
             }
+            Write-Error $_
+            break
         }
     }
-    $null = Get-Job | Wait-Job
-    $ErrorResponses = Get-Job | Receive-Job | Where-Object { $_.ErrorDetails.Message -like "*An error occurred while starting the application.*" `
+    $ErrorResponses = $Errors | Where-Object { $_.ErrorDetails.Message -like "*An error occurred while starting the application.*" `
             -or $_.ErrorDetails.Message -like "*ANCM In-Process Start Failure*" `
             -or $_.Exception.Response.StatusCode.Value__ -ge 500 }
-    ## ! this logic assumes that any other error is ok, how is it known that all other errors mean the site is up?
     if ($ErrorResponses) {
-        Get-Job | Remove-Job
         Write-Warning "Staging slot is dead, restarting"
         @($ErrorResponses.Exception.Response.StatusCode.Value__) -join ","
         $null = Restart-AzWebAppSlot -ResourceGroupName $ResourceGroupName -Name $AppServiceName -Slot $SlotName
@@ -72,7 +57,10 @@ while ($RetryCounter -lt 4) {
         $RetryCounter++
     }
     else {
-        Write-Warning "Staging slot looks alright, continuing"
+        Write-Warning "No app start up errors found, staging slot looks alright, continuing"
+        if ($Errors) {
+            Write-Debug "Following errors were ignored`n$Errors"
+        }
         Write-Output "##vso[task.setvariable variable=CompleteSwap]true"
         break
     }
