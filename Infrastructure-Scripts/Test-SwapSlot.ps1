@@ -32,7 +32,16 @@ $RetryCounter = 1
 Write-Verbose "Checking $TestUri for startup errors"
 while ($RetryCounter -lt 4) {
     Write-Verbose "Attempt $RetryCounter"
-    $null = 1..5 | ForEach-Object { Start-ThreadJob -ScriptBlock {
+    ## ! this is a lot of looping
+        # loop 4 times to restart slot
+        # loop 5 times with new jobs
+        # loop 10 times to poll URI (with a 6 minute timeout per request)
+        # at least 50 loops and up to 200!
+    ## ! cannot mock functins inside Start-ThreadJob, makes testing difficult
+    ## why is Start-ThreadJob used?
+    ## why is the timeout so high?
+    ## why are we retrying so many times?
+        $null = 1..5 | ForEach-Object { Start-ThreadJob -ScriptBlock {#>
             $503Retries = 10
             for ($i = 0; $i -lt $503Retries; ++$i) {
                 try {
@@ -53,6 +62,7 @@ while ($RetryCounter -lt 4) {
     $ErrorResponses = Get-Job | Receive-Job | Where-Object { $_.ErrorDetails.Message -like "*An error occurred while starting the application.*" `
             -or $_.ErrorDetails.Message -like "*ANCM In-Process Start Failure*" `
             -or $_.Exception.Response.StatusCode.Value__ -ge 500 }
+    ## ! this logic assumes that any other error is ok, how is it known that all other errors mean the site is up?
     if ($ErrorResponses) {
         Get-Job | Remove-Job
         Write-Warning "Staging slot is dead, restarting"
