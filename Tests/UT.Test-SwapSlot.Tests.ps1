@@ -100,7 +100,6 @@ Describe "Test-SwapSlot Unit Tests" -Tags @("Unit") {
         }
         Mock Write-Output 
         It "Writes CompleteSwap true to Azure DevOps variable" {
-            
             ./Test-SwapSlot.ps1 @Params -Verbose
             Assert-MockCalled Get-AzWebAppAccessRestrictionConfig -Exactly 1 -Scope It
             Assert-MockCalled Add-AzWebAppAccessRestrictionRule -Exactly 0 -Scope It
@@ -108,5 +107,4 @@ Describe "Test-SwapSlot Unit Tests" -Tags @("Unit") {
             Assert-MockCalled -Exactly 1 -Scope It -ParameterFilter { $InputObject -eq "##vso[task.setvariable variable=CompleteSwap]true" }
         }
     }
-
 }
