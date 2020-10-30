@@ -1,4 +1,4 @@
-<#
+﻿<#
     .SYNOPSIS
     Polls the staging slot URL to test whether the app service has successfully started.
 
