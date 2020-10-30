@@ -1,3 +1,26 @@
+<#
+    .SYNOPSIS
+    Polls the staging slot URL to test whether the app service has successfully started.
+
+    .DESCRIPTION
+    Polls the staging slot URL to test whether the app service has successfully started.
+
+    .PARAMETER WhatsMyIpServiceUrl
+    The URL of the service used to obtain the public IP address of the agent running this script.  
+    Services that can be used include https://ifconfig.me/ip, https://ipapi.co/ip/ and https://api.ipify.org/
+
+    .PARAMETER AppServiceName
+    (optional) The name of the app service to be tested, defaults to the environment variable APIAppServiceName
+
+    .PARAMETER ResourceGroupName
+    (optional) The name of the app service's resource group, defaults to the environment variable DeploymentResourceGroup
+
+    .PARAMETER SlotName
+    (optional) The name of the slot, defaults to staging
+
+    .EXAMPLE
+    ./Test-SlotSwap -WhatsMyIpServiceUrl "https://ifconfig.me/ip"
+#>
 [CmdletBinding()]
 param(
     [Parameter(Mandatory=$true)]
