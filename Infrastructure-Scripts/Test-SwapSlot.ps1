@@ -6,7 +6,7 @@
     Polls the staging slot URL to test whether the app service has successfully started.
 
     .PARAMETER WhatsMyIpServiceUrl
-    The URL of the service used to obtain the public IP address of the agent running this script.  
+    The URL of the service used to obtain the public IP address of the agent running this script.
     Services that can be used include https://ifconfig.me/ip, https://ipapi.co/ip/ and https://api.ipify.org/
 
     .PARAMETER AppServiceName
