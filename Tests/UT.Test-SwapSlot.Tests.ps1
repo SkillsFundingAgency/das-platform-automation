@@ -98,7 +98,7 @@ Describe "Test-SwapSlot Unit Tests" -Tags @("Unit") {
                 ScmSiteUseMainSiteRestrictionConfig = $False
             }
         }
-        Mock Write-Output 
+        Mock Write-Output
         It "Writes CompleteSwap true to Azure DevOps variable" {
             ./Test-SwapSlot.ps1 @Params -Verbose
             Assert-MockCalled Get-AzWebAppAccessRestrictionConfig -Exactly 1 -Scope It
