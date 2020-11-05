@@ -61,7 +61,7 @@ Describe "New-ParametersFile Unit Tests" {
                 if (!$ParameterValue -and $Parameter.Value.Type -eq "array") {
                     $ParameterValue = @()
                 }
-                $ParameterValue | Should Not be NullOrEmpty
+                $ParameterValue | Should -Not -BeNullOrEmpty
             }
 
         }
