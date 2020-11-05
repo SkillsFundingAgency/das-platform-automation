@@ -59,9 +59,19 @@ Describe "New-ParametersFile Unit Tests" {
             foreach ($Parameter in $TemplateFileParameters) {
                 $ParameterValue = ($ParametersFileParameters | Where-Object { $_.Name -eq $Parameter.Name }).Value.Value
                 if (!$ParameterValue -and $Parameter.Value.Type -eq "array") {
-                    $ParameterValue = @()
+                    $ParameterValue.Length | Should -Be 0
                 }
-                $ParameterValue | Should -Not -BeNullOrEmpty
+                elseif ($ParameterValue.ToString() -eq "" -and $Parameter.Value.Type -eq "object") {
+                    $ParameterValue | Should -BeOfType System.Management.Automation.PSCustomObject
+                }
+                elseif (!$ParameterValue -and $Parameter.Value.Type -eq "string") {
+                    $ParameterValue | Should -BeNullOrEmpty
+                    $ParameterValue | Should -BeOfType System.String
+                }
+                else {
+                    $ParameterValue | Should -Not -BeNullOrEmpty
+                }
+                
             }
 
         }
@@ -162,5 +172,5 @@ Describe "New-ParametersFile Unit Tests" {
         Clear-MockEnvironment
     }
 
-    Remove-Item -Path $MockParametersFilePath -ErrorAction "SilentlyContinue"
+    #Remove-Item -Path $MockParametersFilePath -ErrorAction "SilentlyContinue"
 }
