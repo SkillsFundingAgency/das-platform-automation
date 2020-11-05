@@ -9,6 +9,10 @@
       "type": "string",
       "defaultValue": "String"
     },
+    "DefaultEmptyString": {
+      "type": "string",
+      "defaultValue": ""
+    },
     "Integer": {
       "type": "int"
     },
