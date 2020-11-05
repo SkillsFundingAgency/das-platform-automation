@@ -45,6 +45,10 @@ foreach ($ParameterObject in $ParameterObjects) {
             Write-Verbose -Message "Using default value for $ParameterName"
             $ParameterValue = $ParameterObject.Value.defaultValue
         }
+
+        if ($ParameterType -eq "object") {
+            $ParameterValue = $ParameterValue | ConvertTo-Json -Depth 10
+        }
     }
     else {
         Write-Verbose -Message "Using environment variable value for $ParameterName"
