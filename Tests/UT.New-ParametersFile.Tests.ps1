@@ -15,12 +15,12 @@ function Set-MockEnvironment {
 
 function Clear-MockEnvironment {
     Remove-Item -Path @(
-        "env:String",
-        "env:Integer",
-        "env:Boolean",
-        "env:Object",
-        "env:Array",
-        "env:ObjectArray"
+        "env:STRING",
+        "env:INTEGER",
+        "env:BOOLEAN",
+        "env:OBJECT",
+        "env:ARRAY",
+        "env:OBJECTARRAY"
     ) -Force -ErrorAction "SilentlyContinue"
 }
 
