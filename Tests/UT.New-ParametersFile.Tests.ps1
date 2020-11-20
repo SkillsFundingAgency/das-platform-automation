@@ -5,22 +5,22 @@ $MockTemplateFilePath = "$PSScriptRoot/Resources/mock.template.json"
 $MockParametersFilePath = "$PSScriptRoot/Resources/mock.template.parameters.json"
 
 function Set-MockEnvironment {
-    $env:String = $Config.String
-    $env:Integer = $Config.Integer
-    $env:Boolean = $Config.Boolean
-    $env:Object = $Config.Object
-    $env:Array = $Config.Array
-    $env:ObjectArray = $Config.ObjectArray
+    $env:STRING = $Config.String
+    $env:INTEGER = $Config.Integer
+    $env:BOOLEAN = $Config.Boolean
+    $env:OBJECT = $Config.Object
+    $env:ARRAY = $Config.Array
+    $env:OBJECTARRAY = $Config.ObjectArray
 }
 
 function Clear-MockEnvironment {
     Remove-Item -Path @(
-        "env:String",
-        "env:Integer",
-        "env:Boolean",
-        "env:Object",
-        "env:Array",
-        "env:ObjectArray"
+        "env:STRING",
+        "env:INTEGER",
+        "env:BOOLEAN",
+        "env:OBJECT",
+        "env:ARRAY",
+        "env:OBJECTARRAY"
     ) -Force -ErrorAction "SilentlyContinue"
 }
 
