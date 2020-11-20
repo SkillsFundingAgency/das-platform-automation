@@ -32,7 +32,7 @@ $ParameterObjects = $TemplateParameters.PSObject.Members | Where-Object MemberTy
 
 foreach ($ParameterObject in $ParameterObjects) {
     $ParameterType = $ParameterObject.Value.Type
-    $ParameterName = $ParameterObject.Name
+    $ParameterName = $ParameterObject.Name.ToUpper()
     $ParameterValue = (Get-Item -Path "env:$ParameterName" -ErrorAction SilentlyContinue).Value
 
     if (!$ParameterValue) {
