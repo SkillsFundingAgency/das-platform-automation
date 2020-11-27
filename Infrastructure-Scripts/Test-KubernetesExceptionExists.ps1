@@ -1,6 +1,6 @@
 <#
     .SYNOPSIS
-    Used within an Azure DevOps pipeline as part of create-kubernetes-exception.yml to
+    Used within an Azure DevOps pipeline as part of create-kubernetes-exception.yml in das-platform-building-blocks to
     test whether the resource exists in the JSON output of a 'kubectl get crd' command.
 
     .DESCRIPTION
@@ -8,7 +8,7 @@
     ExceptionExists Azure DevOps variable to true or false depending on if it is found.
 
     .PARAMETER KubectlOutput
-    JSON output from kubectl task get crd command.
+    JSON output from 'kubectl get crd' command.
 
     .PARAMETER ExceptionName
     Exception name to test for.
