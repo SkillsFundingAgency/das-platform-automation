@@ -82,7 +82,7 @@ while ($RetryCounter -lt 4) {
     else {
         Write-Verbose "No app start up errors found, staging slot looks alright, continuing"
         if ($Errors) {
-            Write-Debug "Following errors were ignored`n$Errors"
+            Write-Warning "Following errors were ignored`n$Errors"
         }
         Write-Output "##vso[task.setvariable variable=CompleteSwap]true"
         break
