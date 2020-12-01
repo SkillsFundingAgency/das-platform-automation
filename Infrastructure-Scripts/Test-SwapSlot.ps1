@@ -80,7 +80,7 @@ while ($RetryCounter -lt 4) {
         $RetryCounter++
     }
     else {
-        Write-Warning "No app start up errors found, staging slot looks alright, continuing"
+        Write-Verbose "No app start up errors found, staging slot looks alright, continuing"
         if ($Errors) {
             Write-Debug "Following errors were ignored`n$Errors"
         }
