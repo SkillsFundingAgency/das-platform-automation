@@ -66,7 +66,7 @@ while ($RetryCounter -lt 4) {
                 continue
             }
             Write-Verbose "Response code $($_.Exception.Response.StatusCode.Value__) received"
-            Write-Error $_
+            Write-Output $_
             break
         }
     }
