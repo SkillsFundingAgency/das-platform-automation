@@ -5,22 +5,22 @@ $MockTemplateFilePath = "$PSScriptRoot/Resources/mock.template.json"
 $MockParametersFilePath = "$PSScriptRoot/Resources/mock.template.parameters.json"
 
 function Set-MockEnvironment {
-    $env:String = $Config.String
-    $env:Integer = $Config.Integer
-    $env:Boolean = $Config.Boolean
-    $env:Object = $Config.Object
-    $env:Array = $Config.Array
-    $env:ObjectArray = $Config.ObjectArray
+    $env:STRING = $Config.String
+    $env:INTEGER = $Config.Integer
+    $env:BOOLEAN = $Config.Boolean
+    $env:OBJECT = $Config.Object
+    $env:ARRAY = $Config.Array
+    $env:OBJECTARRAY = $Config.ObjectArray
 }
 
 function Clear-MockEnvironment {
     Remove-Item -Path @(
-        "env:String",
-        "env:Integer",
-        "env:Boolean",
-        "env:Object",
-        "env:Array",
-        "env:ObjectArray"
+        "env:STRING",
+        "env:INTEGER",
+        "env:BOOLEAN",
+        "env:OBJECT",
+        "env:ARRAY",
+        "env:OBJECTARRAY"
     ) -Force -ErrorAction "SilentlyContinue"
 }
 
@@ -59,9 +59,19 @@ Describe "New-ParametersFile Unit Tests" {
             foreach ($Parameter in $TemplateFileParameters) {
                 $ParameterValue = ($ParametersFileParameters | Where-Object { $_.Name -eq $Parameter.Name }).Value.Value
                 if (!$ParameterValue -and $Parameter.Value.Type -eq "array") {
-                    $ParameterValue = @()
+                    $ParameterValue.Length | Should -Be 0
                 }
-                $ParameterValue | Should Not be NullOrEmpty
+                elseif ($ParameterValue.ToString() -eq "" -and $Parameter.Value.Type -eq "object") {
+                    $ParameterValue | Should -BeOfType System.Management.Automation.PSCustomObject
+                }
+                elseif (!$ParameterValue -and $Parameter.Value.Type -eq "string") {
+                    $ParameterValue | Should -BeNullOrEmpty
+                    $ParameterValue | Should -BeOfType System.String
+                }
+                else {
+                    $ParameterValue | Should -Not -BeNullOrEmpty
+                }
+
             }
 
         }
