@@ -31,11 +31,13 @@ if ($ExceptionSearch) {
 
     Write-Verbose "Exception $ExceptionName found."
     Write-Output "##vso[task.setvariable variable=ExceptionExists]true"
+    Return "Exception $ExceptionName found."
 
 }
 else {
 
     Write-Verbose "Exception $ExceptionName not found."
     Write-Output "##vso[task.setvariable variable=ExceptionExists]false"
+    Return "Exception $ExceptionName not found."
 
 }

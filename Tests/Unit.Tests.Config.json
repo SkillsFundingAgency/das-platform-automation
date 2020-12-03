@@ -43,5 +43,9 @@
   "Array": "['a','b','c']",
   "ObjectArray": "[{'1':'a','2':'b'},{'3':'c','4':'d'}]",
   "ArmOutput": "{'foo':{'type':'String','value':'bar'}}",
-  "ArmOutputSecure": "{'foo':{'type':'SecureString','value':'bar'}}"
+  "ArmOutputSecure": "{'foo':{'type':'SecureString','value':'bar'}}",
+  "KubernetesNamespaceReduced": "{'items':[{'metadata':{'name':'engineering'}}]}",
+  "KubernetesNamespace": "engineering",
+  "KubernetesExceptionReduced": "{'items':[{'metadata':{'name':'azurepodidentityexceptions.aadpodidentity.k8s.io'}}]}",
+  "KubernetesExceptionName": "azurepodidentityexceptions.aadpodidentity.k8s.io"
 }

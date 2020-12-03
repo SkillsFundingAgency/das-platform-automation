@@ -31,11 +31,13 @@ if ($NamespaceSearch) {
 
     Write-Verbose "Namespace $Namespace found."
     Write-Output "##vso[task.setvariable variable=NamespaceExists]true"
+    Return "Namespace $Namespace found."
 
 }
 else {
 
     Write-Verbose "Namespace $Namespace not found."
     Write-Output "##vso[task.setvariable variable=NamespaceExists]false"
+    Return "Namespace $Namespace not found."
 
 }
