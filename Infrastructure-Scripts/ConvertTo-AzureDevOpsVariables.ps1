@@ -50,6 +50,8 @@ foreach ($OutputName in ($JsonVars | Get-Member -MemberType NoteProperty).name) 
         Write-Output "Creating Azure DevOps variable $OutputName from $OldName"
     }
     else {
+        ##TO DO: remove this troubleshooting line
+        Get-ChildItem ENV:* | Sort-Object Name | Format-Table -AutoSize
         Write-Output "Creating Azure DevOps variables $OutputName and $AGENT_JOBNAME$OutputName"
     }
 
