@@ -43,14 +43,19 @@ foreach ($OutputName in ($JsonVars | Get-Member -MemberType NoteProperty).name) 
     $OutputType = $OutputTypeValue.type
     $OutputValue = $OutputTypeValue.value
 
+    if ($ENV:AGENT_NAME) {
+        $TaskName = $ENV:SYSTEM_TASKINSTANCENAME.ToUpper()
+    }
+
     # Check if variable name needs renaming
     if ($OutputName -in $Rename.keys) {
         $OldName = $OutputName
-        $OutputName = $Rename[$OutputName]
-        Write-Output "Creating Azure DevOps variables $($OutputName.ToUpper()) and $($ENV:SYSTEM_TASKINSTANCENAME.ToUpper())_$($OutputName.ToUpper()) from $OldName"
+        $OutputName = $Rename[$OutputName].ToUpper()
+        Write-Output "Creating Azure DevOps variables $OutputName and $TaskName_$OutputName from $OldName"
     }
     else {
-        Write-Output "Creating Azure DevOps variables $($OutputName.ToUpper()) and $($ENV:SYSTEM_TASKINSTANCENAME.ToUpper())_$($OutputName.ToUpper())"
+        $OutputName = $OutputName.ToUpper()
+        Write-Output "Creating Azure DevOps variables $OutputName and $TaskName_$OutputName"
     }
 
     # Set Azure DevOps variable
