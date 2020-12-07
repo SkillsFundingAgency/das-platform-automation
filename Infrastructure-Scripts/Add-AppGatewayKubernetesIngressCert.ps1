@@ -24,7 +24,7 @@ The name of the KeyVault that stores the certificate, must be in the same Azure 
 #>
 [CmdletBinding()]
 param(
-    [Parameter(Mandatory = $true)]    
+    [Parameter(Mandatory = $true)]
     $AppGatewayName,
     [Parameter(Mandatory = $true)]
     $AppGatewayResourceGroup,

@@ -28,7 +28,7 @@ Describe "Add-AppGatewayKubernetesIngressCert unit tests" -Tag "Unit" {
     Context "Create a certificate from a valid manifest" {
         It "Should create a cert if the cert doesn't exist in the app gateway" {
             Mock Get-AzApplicationGatewaySslCertificate
-            
+
             $Params["IngressManifestPath"] = "../Tests/Resources/mock-ingress.yml"
 
             ./Add-AppGatewayKubernetesIngressCert @Params
@@ -46,7 +46,7 @@ Describe "Add-AppGatewayKubernetesIngressCert unit tests" -Tag "Unit" {
                     Name = "wildcard-foo-gov-uk"
                 }
             }
-            
+
             $Params["IngressManifestPath"] = "../Tests/Resources/mock-ingress.yml"
 
             ./Add-AppGatewayKubernetesIngressCert @Params
@@ -62,7 +62,7 @@ Describe "Add-AppGatewayKubernetesIngressCert unit tests" -Tag "Unit" {
     Context "Create a certificate from a valid manifest" {
         It "Should do nothing if the manifest doesn't include the correct annotation" {
             Mock Get-AzApplicationGatewaySslCertificate
-            
+
             $Params["IngressManifestPath"] = "../Tests/Resources/mock-invalid-ingress.yml"
 
             { ./Add-AppGatewayKubernetesIngressCert @Params } | Should throw "appgw.ingress.kubernetes.io/appgw-ssl-certificate annotation not found in ingress manifest"
