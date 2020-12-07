@@ -36,6 +36,9 @@ catch {
     throw "Unable to convert ARMOutput to JSON.  Add System.Debug switch to view ARMOutput."
 }
 
+##TO DO: remove this troubleshooting line
+Get-ChildItem ENV:* | Sort-Object Name | Format-Table -AutoSize
+
 # The outputs will be of type NoteProperty, get a list of all of them
 foreach ($OutputName in ($JsonVars | Get-Member -MemberType NoteProperty).name) {
     # Get the type and value for each output
@@ -47,12 +50,10 @@ foreach ($OutputName in ($JsonVars | Get-Member -MemberType NoteProperty).name) 
     if ($OutputName -in $Rename.keys) {
         $OldName = $OutputName
         $OutputName = $Rename[$OutputName]
-        Write-Output "Creating Azure DevOps variable $OutputName from $OldName"
+        Write-Output "Creating Azure DevOps variables $($OutputName.ToUpper()) and $($ENV:SYSTEM_TASKINSTANCENAME.ToUpper())_$($OutputName.ToUpper()) from $OldName"
     }
     else {
-        ##TO DO: remove this troubleshooting line
-        Get-ChildItem ENV:* | Sort-Object Name | Format-Table -AutoSize
-        Write-Output "Creating Azure DevOps variables $OutputName and $ENV:SYSTEM_TASKINSTANCENAME$OutputName"
+        Write-Output "Creating Azure DevOps variables $($OutputName.ToUpper()) and $($ENV:SYSTEM_TASKINSTANCENAME.ToUpper())_$($OutputName.ToUpper())"
     }
 
     # Set Azure DevOps variable
