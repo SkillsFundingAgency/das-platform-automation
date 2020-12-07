@@ -52,7 +52,7 @@ foreach ($OutputName in ($JsonVars | Get-Member -MemberType NoteProperty).name) 
     else {
         ##TO DO: remove this troubleshooting line
         Get-ChildItem ENV:* | Sort-Object Name | Format-Table -AutoSize
-        Write-Output "Creating Azure DevOps variables $OutputName and $AGENT_JOBNAME$OutputName"
+        Write-Output "Creating Azure DevOps variables $OutputName and $ENV:SYSTEM_TASKINSTANCENAME$OutputName"
     }
 
     # Set Azure DevOps variable
