@@ -1,4 +1,4 @@
-﻿Set-Location $PSScriptRoot\..\Infrastructure-Scripts\
+Set-Location $PSScriptRoot\..\Infrastructure-Scripts\
 
 Describe "Add-AppGatewayKubernetesIngressCert unit tests" -Tag "Unit" {
     Mock Get-AzApplicationGateway -MockWith {
