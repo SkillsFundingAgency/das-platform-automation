@@ -19,8 +19,8 @@ ConvertTo-AzureDevOpsVariables.ps1 -ARMOutput '$(ARMOutput)'
 where ARMOutputs is the deploymentOutputs value from the Azure Deployment task. Note that $(ARMOutput) is wrapped in single quotes.
 
 #>
-[CmdletBinding()]
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('UseDeclaredVarsMoreThanAssignments', '', Justification='Use of $TaskName not recognised')]
+[CmdletBinding()]
 param (
     [Parameter(Mandatory=$true)]
     [string]$ARMOutput,
