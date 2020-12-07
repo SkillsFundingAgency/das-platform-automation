@@ -20,6 +20,7 @@ where ARMOutputs is the deploymentOutputs value from the Azure Deployment task. 
 
 #>
 [CmdletBinding()]
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('UseDeclaredVarsMoreThanAssignments', '', Justification='Use of $TaskName not recognised')]
 param (
     [Parameter(Mandatory=$true)]
     [string]$ARMOutput,
