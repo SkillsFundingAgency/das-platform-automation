@@ -44,6 +44,10 @@ foreach ($Line in $IngressManifestContent) {
     }
 }
 
+if (!$Matches) {
+    throw "appgw.ingress.kubernetes.io/appgw-ssl-certificate annotation not found in ingress manifest"
+}
+
 $AppGateway = Get-AzApplicationGateway -Name $AppGatewayName -ResourceGroupName $AppGatewayResourceGroup
 if (!(Get-AzApplicationGatewaySslCertificate -Name $CertificateName -ApplicationGateway $AppGateway -ErrorAction SilentlyContinue)) {
     $KeyVaultCertificate = Get-AzKeyVaultCertificate -VaultName $KeyVaultName -Name $CertificateName
