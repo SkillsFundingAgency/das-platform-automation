@@ -50,14 +50,16 @@ foreach ($OutputName in ($JsonVars | Get-Member -MemberType NoteProperty).name) 
         Write-Output "Creating Azure DevOps variable $OutputName from $OldName"
     }
     else {
-        Write-Output "Creating Azure DevOps variable $OutputName"
+        Write-Output "Creating Azure DevOps variables $OutputName and $AGENT_JOBNAME$OutputName"
     }
 
     # Set Azure DevOps variable
     if ($OutputType.toLower() -eq 'securestring') {
+        Write-Output "##vso[task.setvariable variable=$OutputName;issecret=true;isOutput=false]$OutputValue"
         Write-Output "##vso[task.setvariable variable=$OutputName;issecret=true;isOutput=true]$OutputValue"
     }
     else {
+        Write-Output "##vso[task.setvariable variable=$OutputName;isOutput=false]$OutputValue"
         Write-Output "##vso[task.setvariable variable=$OutputName;isOutput=true]$OutputValue"
     }
 }
