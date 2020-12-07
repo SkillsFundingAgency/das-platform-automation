@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
 Adds a certificate to an Application Gateway from a KeyVault based on configuration contained in a Kubernetes Ingress manifest.
 
