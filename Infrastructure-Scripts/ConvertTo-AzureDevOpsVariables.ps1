@@ -19,6 +19,7 @@ ConvertTo-AzureDevOpsVariables.ps1 -ARMOutput '$(ARMOutput)'
 where ARMOutputs is the deploymentOutputs value from the Azure Deployment task. Note that $(ARMOutput) is wrapped in single quotes.
 
 #>
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '', Justification='Use of $TaskName not recognised')]
 [CmdletBinding()]
 param (
     [Parameter(Mandatory=$true)]
@@ -43,21 +44,28 @@ foreach ($OutputName in ($JsonVars | Get-Member -MemberType NoteProperty).name) 
     $OutputType = $OutputTypeValue.type
     $OutputValue = $OutputTypeValue.value
 
+    if ($ENV:AGENT_NAME) {
+        $TaskName = $ENV:SYSTEM_TASKINSTANCENAME.ToUpper()
+    }
+
     # Check if variable name needs renaming
     if ($OutputName -in $Rename.keys) {
         $OldName = $OutputName
-        $OutputName = $Rename[$OutputName]
-        Write-Output "Creating Azure DevOps variable $OutputName from $OldName"
+        $OutputName = $Rename[$OutputName].ToUpper()
+        Write-Output "Creating Azure DevOps variables $OutputName and $TaskName_$OutputName from $OldName"
     }
     else {
-        Write-Output "Creating Azure DevOps variable $OutputName"
+        $OutputName = $OutputName.ToUpper()
+        Write-Output "Creating Azure DevOps variables $OutputName and $TaskName_$OutputName"
     }
 
     # Set Azure DevOps variable
     if ($OutputType.toLower() -eq 'securestring') {
+        Write-Output "##vso[task.setvariable variable=$OutputName;issecret=true;isOutput=false]$OutputValue"
         Write-Output "##vso[task.setvariable variable=$OutputName;issecret=true;isOutput=true]$OutputValue"
     }
     else {
+        Write-Output "##vso[task.setvariable variable=$OutputName;isOutput=false]$OutputValue"
         Write-Output "##vso[task.setvariable variable=$OutputName;isOutput=true]$OutputValue"
     }
 }
