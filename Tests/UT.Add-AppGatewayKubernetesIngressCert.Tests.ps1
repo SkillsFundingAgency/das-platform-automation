@@ -8,7 +8,7 @@ Describe "Add-AppGatewayKubernetesIngressCert unit tests" -Tag "Unit" {
     }
     Mock Get-AzKeyVaultCertificate -MockWith {
         return @{
-            SecretId = "https://das-dev-shared-kv.vault.azure.net:443/secrets/wildcard-apprenticeships-education-gov-uk/1234567890a1234567b1c1d12efg12h1"
+            SecretId = "https://foo-bar-shared-kv.vault.azure.net:443/secrets/foo-bar-gov-uk/1234567890a1234567b1c1d12efg12h1"
             Version = "1234567890a1234567b1c1d12efg12h1"
         }
     }
