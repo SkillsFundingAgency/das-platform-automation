@@ -17,8 +17,7 @@ Describe "ConvertTo-AzureDevOpsVariables unit tests" -Tag "Unit" {
     Context "Secure string Conversion" {
         It "Should return a securestring correctly" {
             $Expected = @('Creating Azure DevOps variables FOO and FOO',
-                '##vso[task.setvariable variable=foo;issecret=true;isOutput=false]bar',
-                '##vso[task.setvariable variable=foo;issecret=true;isOutput=true]bar')
+                'Output type for foo is securestring, no value to write to variable.')
 
             $Output = ./ConvertTo-AzureDevOpsVariables -ARMOutput $Config.ArmOutputSecure
             $Output | Should be $Expected

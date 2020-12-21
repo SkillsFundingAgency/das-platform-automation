@@ -61,8 +61,7 @@ foreach ($OutputName in ($JsonVars | Get-Member -MemberType NoteProperty).name) 
 
     # Set Azure DevOps variable
     if ($OutputType.toLower() -eq 'securestring') {
-        Write-Output "##vso[task.setvariable variable=$OutputName;issecret=true;isOutput=false]$OutputValue"
-        Write-Output "##vso[task.setvariable variable=$OutputName;issecret=true;isOutput=true]$OutputValue"
+        Write-Output "Output type for $OutputName is securestring, no value to write to variable."
     }
     else {
         Write-Output "##vso[task.setvariable variable=$OutputName;isOutput=false]$OutputValue"
