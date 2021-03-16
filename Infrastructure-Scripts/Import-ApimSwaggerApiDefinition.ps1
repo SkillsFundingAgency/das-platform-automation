@@ -145,7 +145,7 @@ foreach ($SwaggerPath in $SwaggerPaths) {
             $Result
             break
         }
-        Write-Verbose "API definition import failed, retrying attempt $($r + 1)"
+        Write-Warning "API definition import failed, retrying attempt $($r + 1)"
     }
 
     Add-AzApiManagementApiToProduct -Context $Context -ProductId $ProductId -ApiId $ApiId
