@@ -40,7 +40,9 @@ Param(
     [Parameter(Mandatory = $true)]
     [String]$ApplicationIdentifierUri,
     [Parameter(Mandatory = $true)]
-    [String]$ProductId
+    [String]$ProductId,
+    [Parameter(Mandatory = $false)]
+    [int]$ImportRetries = 3
 )
 
 function Invoke-RetryWebRequest ($ApiUrl) {
@@ -129,8 +131,15 @@ foreach ($SwaggerPath in $SwaggerPaths) {
     else {
         $versionSetId = $VersionSet.Id
     }
-
-    Import-AzApiManagementApi -Context $Context -SpecificationFormat OpenApi -ServiceUrl $ApiBaseUrl -SpecificationUrl $SwaggerSpecificationUrl -Path $ApiPath -ApiId $ApiId -ApiVersion $Version -ApiVersionSetId $VersionSetId -ErrorAction Stop -Verbose:$VerbosePreference
+    
+    for ($r = 0; $r -lt $ImportRetries; $r++) {
+        try {
+            Import-AzApiManagementApi -Context $Context -SpecificationFormat OpenApi -ServiceUrl $ApiBaseUrl -SpecificationUrl $SwaggerSpecificationUrl -Path $ApiPath -ApiId $ApiId -ApiVersion $Version -ApiVersionSetId $VersionSetId -ErrorAction Stop
+        }
+        catch {
+            Write-Error $_
+        }
+    }
 
     Add-AzApiManagementApiToProduct -Context $Context -ProductId $ProductId -ApiId $ApiId
 
