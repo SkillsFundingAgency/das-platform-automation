@@ -134,11 +134,18 @@ foreach ($SwaggerPath in $SwaggerPaths) {
     
     for ($r = 0; $r -lt $ImportRetries; $r++) {
         try {
-            Import-AzApiManagementApi -Context $Context -SpecificationFormat OpenApi -ServiceUrl $ApiBaseUrl -SpecificationUrl $SwaggerSpecificationUrl -Path $ApiPath -ApiId $ApiId -ApiVersion $Version -ApiVersionSetId $VersionSetId -ErrorAction Stop
+            $Result = Import-AzApiManagementApi -Context $Context -SpecificationFormat OpenApi -ServiceUrl $ApiBaseUrl -SpecificationUrl $SwaggerSpecificationUrl -Path $ApiPath -ApiId $ApiId -ApiVersion $Version -ApiVersionSetId $VersionSetId -ErrorAction Stop
         }
         catch {
             Write-Error $_
         }
+
+        if ($Result) {
+            Write-Verbose "API definition successfully imported"
+            $Result
+            break
+        }
+        Write-Verbose "API definition import failed, retrying attempt $($r + 1)"
     }
 
     Add-AzApiManagementApiToProduct -Context $Context -ProductId $ProductId -ApiId $ApiId
