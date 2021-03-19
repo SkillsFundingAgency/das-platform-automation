@@ -133,7 +133,7 @@ foreach ($SwaggerPath in $SwaggerPaths) {
     else {
         $versionSetId = $VersionSet.Id
     }
-    
+
     for ($r = 0; $r -lt $ImportRetries; $r++) {
         try {
             $Result = Import-AzApiManagementApi -Context $Context -SpecificationFormat OpenApi -ServiceUrl $ApiBaseUrl -SpecificationUrl $SwaggerSpecificationUrl -Path $ApiPath -ApiId $ApiId -ApiVersion $Version -ApiVersionSetId $VersionSetId -ErrorAction Stop

@@ -46,7 +46,7 @@ Describe "Import-ApimSwaggerApiDefinition Unit Tests" -Tags @("Unit") {
                     "DisplayName" = $Config.apiVersionSetName
                 }
             }
-            Mock Import-AzApiManagementApi -MockWith { Return $null }
+            Mock Import-AzApiManagementApi -MockWith { Return "api-definition" }
             Mock Add-AzApiManagementApiToProduct -MockWith { Return $null }
             Mock Set-AzApiManagementPolicy -MockWith { Return $null }
             Mock Remove-AzWebAppAccessRestrictionRule -MockWith { Return $null }
