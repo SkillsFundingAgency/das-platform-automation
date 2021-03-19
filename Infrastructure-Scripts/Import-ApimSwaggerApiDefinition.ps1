@@ -19,6 +19,8 @@
     The Application Identifier URI of the API app registration
     .PARAMETER ProductId
     The Id of the Product that the API will be assigned to
+    .PARAMETER ImportRetries
+    (optional) The number of times to retry importing the API definition, defaults to 3
     .EXAMPLE
     Import-ApimSwaggerApiDefinition -ApimResourceGroup das-at-foobar-rg -InstanceName das-at-foobar-apim -AppServiceResourceGroup das-at-foobar-rg -ApiVersionSetName foobar-api -ApiBaseUrl "https://at-foobar-api.apprenticeships.education.gov.uk" -ApiPath "foo-bar" -ApplicationIdentifierUri "https://<tenant>.onmicrosoft.com/das-at-foobar-as-ar" -ProductId ProductId
 #>
@@ -145,7 +147,12 @@ foreach ($SwaggerPath in $SwaggerPaths) {
             $Result
             break
         }
+
         Write-Warning "API definition import failed, retrying attempt $($r + 1)"
+    }
+
+    if (!$Result) {
+        throw "Failed to import API definition after $ImportRetries attempts"
     }
 
     Add-AzApiManagementApiToProduct -Context $Context -ProductId $ProductId -ApiId $ApiId
