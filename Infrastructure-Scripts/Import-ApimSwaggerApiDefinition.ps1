@@ -19,6 +19,8 @@
     The Application Identifier URI of the API app registration
     .PARAMETER ProductId
     The Id of the Product that the API will be assigned to
+    .PARAMETER ImportRetries
+    (optional) The number of times to retry importing the API definition, defaults to 3
     .EXAMPLE
     Import-ApimSwaggerApiDefinition -ApimResourceGroup das-at-foobar-rg -InstanceName das-at-foobar-apim -AppServiceResourceGroup das-at-foobar-rg -ApiVersionSetName foobar-api -ApiBaseUrl "https://at-foobar-api.apprenticeships.education.gov.uk" -ApiPath "foo-bar" -ApplicationIdentifierUri "https://<tenant>.onmicrosoft.com/das-at-foobar-as-ar" -ProductId ProductId
 #>
@@ -40,7 +42,9 @@ Param(
     [Parameter(Mandatory = $true)]
     [String]$ApplicationIdentifierUri,
     [Parameter(Mandatory = $true)]
-    [String]$ProductId
+    [String]$ProductId,
+    [Parameter(Mandatory = $false)]
+    [int]$ImportRetries = 3
 )
 
 function Invoke-RetryWebRequest ($ApiUrl) {
@@ -72,6 +76,7 @@ function Get-AllSwaggerFilePaths ($IndexHtml) {
     foreach ($MatchedString in $MatchedStrings) {
         $Paths += $MatchedString.matches -split ' '
     }
+    Write-Verbose "Retrieved $($Paths.Count) swagger file paths"
     $Paths
 }
 
@@ -89,6 +94,7 @@ function Get-AppServiceName ($ApiBaseUrl, $AppServiceResourceGroup) {
 
 function Add-AppServiceWhitelist ($AppServiceResourceGroup, $AppServiceName) {
     $IpRestrictions = Get-AzWebAppAccessRestrictionConfig -ResourceGroupName $AppServiceResourceGroup -Name $AppServiceName
+    Write-Verbose "Getting IP address"
     $MyIp = (Invoke-RestMethod ifconfig.me/ip -UseBasicParsing)
     if ($IpRestrictions.MainSiteAccessRestrictions.RuleName -notcontains "Allow all" -and ($IpRestrictions.MainSiteAccessRestrictions | Where-Object { $_.Action -eq "Allow" }).IpAddress -notcontains "$MyIp/32") {
         Write-Verbose "Whitelisting $MyIp"
@@ -124,13 +130,35 @@ foreach ($SwaggerPath in $SwaggerPaths) {
 
     $VersionSet = Get-AzApiManagementApiVersionSet -Context $Context | Where-Object { $_.DisplayName -eq "$ApiVersionSetName" }
     if ($null -eq $VersionSet) {
+        Write-Verbose "Creating new version set $ApiVersionSetName"
         $VersionSetId = (New-AzApiManagementApiVersionSet -Context $Context -Name "$ApiVersionSetName" -Scheme "Header" -HeaderName "X-Version" -Description $ApiVersionSetName).Id
     }
     else {
-        $versionSetId = $VersionSet.Id
+        Write-Verbose "Setting VersionSetId to $($VersionSet.Id)"
+        $VersionSetId = $VersionSet.Id
     }
 
-    Import-AzApiManagementApi -Context $Context -SpecificationFormat OpenApi -ServiceUrl $ApiBaseUrl -SpecificationUrl $SwaggerSpecificationUrl -Path $ApiPath -ApiId $ApiId -ApiVersion $Version -ApiVersionSetId $VersionSetId -ErrorAction Stop -Verbose:$VerbosePreference
+    for ($r = 0; $r -lt $ImportRetries; $r++) {
+        try {
+            Write-Verbose "Importing API definition from swagger file $SwaggerSpecificationUrl"
+            $Result = Import-AzApiManagementApi -Context $Context -SpecificationFormat OpenApi -ServiceUrl $ApiBaseUrl -SpecificationUrl $SwaggerSpecificationUrl -Path $ApiPath -ApiId $ApiId -ApiVersion $Version -ApiVersionSetId $VersionSetId -ErrorAction Stop
+        }
+        catch {
+            Write-Error $_
+        }
+
+        if ($Result) {
+            Write-Verbose "API definition successfully imported"
+            $Result
+            break
+        }
+
+        Write-Warning "API definition import failed, retrying attempt $($r + 1)"
+    }
+
+    if (!$Result) {
+        throw "Failed to import API definition after $ImportRetries attempts"
+    }
 
     Add-AzApiManagementApiToProduct -Context $Context -ProductId $ProductId -ApiId $ApiId
 
