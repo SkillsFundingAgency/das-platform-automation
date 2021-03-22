@@ -76,6 +76,7 @@ function Get-AllSwaggerFilePaths ($IndexHtml) {
     foreach ($MatchedString in $MatchedStrings) {
         $Paths += $MatchedString.matches -split ' '
     }
+    Write-Verbose "Retrieved $($Paths.Count) swagger file paths"
     $Paths
 }
 
@@ -93,6 +94,7 @@ function Get-AppServiceName ($ApiBaseUrl, $AppServiceResourceGroup) {
 
 function Add-AppServiceWhitelist ($AppServiceResourceGroup, $AppServiceName) {
     $IpRestrictions = Get-AzWebAppAccessRestrictionConfig -ResourceGroupName $AppServiceResourceGroup -Name $AppServiceName
+    Write-Verbose "Getting IP address"
     $MyIp = (Invoke-RestMethod ifconfig.me/ip -UseBasicParsing)
     if ($IpRestrictions.MainSiteAccessRestrictions.RuleName -notcontains "Allow all" -and ($IpRestrictions.MainSiteAccessRestrictions | Where-Object { $_.Action -eq "Allow" }).IpAddress -notcontains "$MyIp/32") {
         Write-Verbose "Whitelisting $MyIp"
@@ -128,14 +130,17 @@ foreach ($SwaggerPath in $SwaggerPaths) {
 
     $VersionSet = Get-AzApiManagementApiVersionSet -Context $Context | Where-Object { $_.DisplayName -eq "$ApiVersionSetName" }
     if ($null -eq $VersionSet) {
+        Write-Verbose "Creating new version set $ApiVersionSetName"
         $VersionSetId = (New-AzApiManagementApiVersionSet -Context $Context -Name "$ApiVersionSetName" -Scheme "Header" -HeaderName "X-Version" -Description $ApiVersionSetName).Id
     }
     else {
-        $versionSetId = $VersionSet.Id
+        Write-Verbose "Setting VersionSetId to $($VersionSet.Id)"
+        $VersionSetId = $VersionSet.Id
     }
 
     for ($r = 0; $r -lt $ImportRetries; $r++) {
         try {
+            Write-Verbose "Importing API definition from swagger file $SwaggerSpecificationUrl"
             $Result = Import-AzApiManagementApi -Context $Context -SpecificationFormat OpenApi -ServiceUrl $ApiBaseUrl -SpecificationUrl $SwaggerSpecificationUrl -Path $ApiPath -ApiId $ApiId -ApiVersion $Version -ApiVersionSetId $VersionSetId -ErrorAction Stop
         }
         catch {
