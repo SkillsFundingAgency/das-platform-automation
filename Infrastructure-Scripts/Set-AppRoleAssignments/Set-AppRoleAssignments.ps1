@@ -46,7 +46,7 @@ try {
     $Environment = Get-Environment -AppServiceName $AppServiceName
     $ResourceNamePrefix = "das-$Environment"
     $AppServiceNameSuffix = $AppServiceName.Replace($ResourceNamePrefix, "")
-    $AppRegistrationsToProcess = $AppRegistrationConfiguration | Where-Object { $_.appRegistrationSuffix -match $AppServiceNameSuffix -or $_.appRoles.resourceNameSuffix -match $AppServiceNameSuffix }
+    $AppRegistrationsToProcess = $AppRegistrationConfiguration.configuration | Where-Object { $_.appRegistrationSuffix -match $AppServiceNameSuffix -or $_.appRoles.resourceNameSuffix -match $AppServiceNameSuffix }
 
     if (!$AppRegistrationsToProcess) {
         throw "No app registrations to process. Check app service name or update configuration."
