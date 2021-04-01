@@ -1,4 +1,4 @@
-$Scripts = Get-ChildItem -Path $PSScriptRoot/../Infrastructure-Scripts/*.ps1 -File
+$Scripts = Get-ChildItem -Path $PSScriptRoot/../Infrastructure-Scripts/*.ps1 -Recurse -File
 
 Describe "Script documentation tests" -Tags @("Quality") {
 
