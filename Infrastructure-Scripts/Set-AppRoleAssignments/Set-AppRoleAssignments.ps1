@@ -107,23 +107,28 @@ try {
                     continue
                 }
 
-                if ($ServicePrincipal.ObjectId) {
-                    $AppRoleAssignments = Get-AppRoleAssignments -ServicePrincipalId $ServicePrincipal.ObjectId
-                    $AppRoleAssignmentExists = $AppRoleAssignments.value | Where-Object { $_.appRoleId -eq $MatchedAppRole.id -and $_.principalId -eq $ManagedIdentity.ObjectId }
+                try {
+                    if ($ServicePrincipal.ObjectId) {
+                        $AppRoleAssignments = Get-AppRoleAssignments -ServicePrincipalId $ServicePrincipal.ObjectId
+                        $AppRoleAssignmentExists = $AppRoleAssignments.value | Where-Object { $_.appRoleId -eq $MatchedAppRole.id -and $_.principalId -eq $ManagedIdentity.ObjectId }
 
-                    if ($AppRoleAssignmentExists) {
-                        Write-Output "      -> App role assignment already exists"
-                        continue
+                        if ($AppRoleAssignmentExists) {
+                            Write-Output "      -> App role assignment already exists"
+                            continue
+                        }
+                    }
+                    else {
+                        Write-Output "      -> Processing new app role assignment for $ManagedIdentityResourceName with role: $($MatchedAppRole.value)"
+
+                        if (!$DryRun) {
+                            New-AppRoleAssignment -ServicePrincipalId $ServicePrincipal.ObjectId -AppRoleId $MatchedAppRole.id -ManagedIdentity $ManagedIdentity.ObjectId
+                        }
+
+                        Write-Output "      -> Successfully created app role assignment"
                     }
                 }
-                else {
-                    Write-Output "      -> Processing new app role assignment for $ManagedIdentityResourceName with role: $($MatchedAppRole.value)"
-
-                    if (!$DryRun) {
-                        New-AppRoleAssignment -ServicePrincipalId $ServicePrincipal.ObjectId -AppRoleId $MatchedAppRole.id -ManagedIdentity $ManagedIdentity.ObjectId
-                    }
-
-                    Write-Output "      -> Successfully created app role assignment"
+                catch {
+                    Write-Error "        -> Error: $_"
                 }
             }
         }
