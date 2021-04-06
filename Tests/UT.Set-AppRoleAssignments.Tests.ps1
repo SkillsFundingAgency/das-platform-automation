@@ -16,7 +16,7 @@ Describe "Set-AppRoleAssignments Unit Tests" -Tags @("Unit") {
         It "No app registrations found to process, throw an error" {
 
             $AppServiceName = "das-test-foobar-as"
-            { ./Set-AppRoleAssignments -AppRegistrationConfigurationFilePath "$PSScriptRoot\..\Infrastructure-Scripts\Set-AppRoleAssignments\config.json" -AppServiceName $AppServiceName -Tenant $Config.Tenant -DryRun $true } | Should Throw "No app registrations to process. Check app service name or update configuration."
+            { ./Set-AppRoleAssignments -AppRegistrationConfigurationFilePath "$PSScriptRoot\..\Infrastructure-Scripts\Set-AppRoleAssignments\config.json" -AppServiceName $AppServiceName -Tenant $Config.Tenant -DryRun $true } | Should Throw "No app registrations to process for app service name $AppServiceName"
 
         }
     }
@@ -27,7 +27,7 @@ Describe "Set-AppRoleAssignments Unit Tests" -Tags @("Unit") {
             Mock Get-ServicePrincipal -MockWith { return @("", "") }
             $AppServiceName = "das-test-ui-as"
 
-            { ./Set-AppRoleAssignments -AppRegistrationConfigurationFilePath "$PSScriptRoot\..\Infrastructure-Scripts\Set-AppRoleAssignments\config.json" -AppServiceName $AppServiceName -Tenant $Config.Tenant -DryRun $true } | Should Throw "-> Found a duplicate app registrations with the same display name. Investigate"
+            { ./Set-AppRoleAssignments -AppRegistrationConfigurationFilePath "$PSScriptRoot\..\Infrastructure-Scripts\Set-AppRoleAssignments\config.json" -AppServiceName $AppServiceName -Tenant $Config.Tenant -DryRun $true } | Should Throw
             Assert-MockCalled Get-ServicePrincipal -Times 1
 
         }
