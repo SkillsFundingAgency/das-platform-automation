@@ -45,5 +45,6 @@
   "ArmOutput": "{'foo':{'type':'String','value':'bar'}}",
   "ArmOutputSecure": "{'foo':{'type':'SecureString','value':'bar'}}",
   "KubernetesNamespaceReduced": "{'items':[{'metadata':{'name':'engineering'}}]}",
-  "KubernetesNamespace": "engineering"
+  "KubernetesNamespace": "engineering",
+  "tenant": "tenant.onmicrosoft.com"
 }

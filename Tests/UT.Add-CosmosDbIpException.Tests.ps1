@@ -1,4 +1,4 @@
-$Config = Get-Content $PSScriptRoot\..\Tests\Unit.Tests.Config.json -Raw | ConvertFrom-Json
+$Config = Get-Content $PSScriptRoot\..\Tests\Configuration\Unit.Tests.Config.json -Raw | ConvertFrom-Json
 Set-Location $PSScriptRoot\..\Infrastructure-Scripts\
 
 Describe "Add-CosmosDbIpException Unit Tests" -Tags @("Unit") {
