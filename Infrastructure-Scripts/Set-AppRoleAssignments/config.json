@@ -1,0 +1,33 @@
+{
+  "configuration": [
+    {
+      "appRegistrationSuffix": "-api-as-ar",
+      "appRoles": [
+        {
+          "appRoleName": "AppRole1",
+          "resourceNameSuffix": [
+            "-ui-as",
+            "-ui2-as"
+          ]
+        },
+        {
+          "appRoleName": "AppRole2",
+          "resourceNameSuffix": [
+            "-ui-as"
+          ]
+        }
+      ]
+    },
+    {
+      "appRegistrationSuffix": "-api2-as-ar",
+      "appRoles": [
+        {
+          "appRoleName": "AppRole2",
+          "resourceNameSuffix": [
+            "-ui-as"
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -61,8 +61,7 @@ try {
             Write-Output "-> Processing app registration $AppRegistrationName"
         }
         elseif ($ServicePrincipal.Count -gt 1) {
-            Write-Output "-> Found duplicate app registrations with name $AppRegistrationName - Investigate"
-            continue
+            throw "-> Found a duplicate app registrations with the same display name. Investigate"
         }
         else {
             Write-Output "-> App registration $AppRegistrationName not found in AAD - Creating"
