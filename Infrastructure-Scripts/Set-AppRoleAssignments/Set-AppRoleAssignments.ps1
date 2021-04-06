@@ -49,7 +49,7 @@ try {
     $AppRegistrationsToProcess = $AppRegistrationConfiguration.configuration | Where-Object { $_.appRegistrationSuffix -match $AppServiceNameSuffix -or $_.appRoles.resourceNameSuffix -match $AppServiceNameSuffix }
 
     if (!$AppRegistrationsToProcess) {
-        throw "No app registrations to process. Check app service name or update configuration."
+        throw "No app registrations to process for app service name $AppServiceName. Check app service name or update configuration."
     }
 
     foreach ($AppRegistration in $AppRegistrationsToProcess) {
@@ -61,7 +61,7 @@ try {
             Write-Output "-> Processing app registration $AppRegistrationName"
         }
         elseif ($ServicePrincipal.Count -gt 1) {
-            throw "-> Found a duplicate app registrations with the same display name. Investigate"
+            Write-Error "-> Found duplicate app registrations with the same display name of $AppRegistrationName. Investigate"
         }
         else {
             Write-Output "-> App registration $AppRegistrationName not found in AAD - Creating"
@@ -99,7 +99,7 @@ try {
                     Write-Output "    -> Processing Managed Identity of $ManagedIdentityResourceName"
                 }
                 elseif ($ManagedIdentity.Count -gt 1) {
-                    Write-Output "    -> Found duplicate app registrations with name $ManagedIdentityResourceName - Investigate"
+                    Write-Error "    -> Found duplicate app registrations with the same display name of $ManagedIdentityResourceName. Investigate"
                     continue
                 }
                 else {
