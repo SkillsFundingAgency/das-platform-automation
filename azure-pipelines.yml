@@ -102,4 +102,6 @@ stages:
                   tagSource: "manual"
                   tag: "$(Build.BuildNumber)"
                   addChangeLog: true
-                  assets: "$(Pipeline.Workspace)/Infrastructure-Scripts/**/*.ps1"
+                  assets:
+                    $(Pipeline.Workspace)/Infrastructure-Scripts/*.ps1
+                    $(Pipeline.Workspace)/Infrastructure-Scripts/Set-AppRoleAssignments
