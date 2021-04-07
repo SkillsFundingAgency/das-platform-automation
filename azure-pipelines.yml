@@ -80,7 +80,7 @@ stages:
     dependsOn:
       - Versioning
       - Test
-    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/assets-fix'))
     jobs:
     - deployment: "GitHubRelease"
       displayName: "Create Release in GitHub"
@@ -102,4 +102,5 @@ stages:
                   tagSource: "manual"
                   tag: "$(Build.BuildNumber)"
                   addChangeLog: true
-                  assets: $(Pipeline.Workspace)/Infrastructure-Scripts/*
+                  assets: $(Pipeline.Workspace)/Infrastructure-Scripts/**
+                  isPreRelease: true
