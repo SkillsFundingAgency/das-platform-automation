@@ -10,11 +10,11 @@ class AppRoleAssignment {
 function Get-Environment {
     Param(
         [Parameter(Mandatory = $true)]
-        [String]$AppServiceName
+        [String]$ResourceName
     )
 
     $ValidEnvironments = @("at", "test", "test2", "demo", "pp", "prd", "mo")
-    $Environment = $AppServiceName.Split('-')[1]
+    $Environment = $ResourceName.Split('-')[1]
 
     if ($Environment -in $ValidEnvironments) {
         return $Environment

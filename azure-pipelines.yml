@@ -102,4 +102,4 @@ stages:
                   tagSource: "manual"
                   tag: "$(Build.BuildNumber)"
                   addChangeLog: true
-                  assets: $(Pipeline.Workspace)/Infrastructure-Scripts/*
+                  assets: $(Pipeline.Workspace)/Infrastructure-Scripts/**/*.ps1
