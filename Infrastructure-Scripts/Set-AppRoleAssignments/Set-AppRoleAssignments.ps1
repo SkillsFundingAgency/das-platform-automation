@@ -9,7 +9,7 @@
     .PARAMETER AppRegistrationConfigurationFilePath
     File path of the app registration configuration file
 
-    .PARAMETER AppServiceName
+    .PARAMETER ResourceName
     The name of the App Service to grant access to its relevant app registrations' roles.
 
     .PARAMETER Tenant
@@ -19,7 +19,8 @@
     Writes an output of the changes that would be made with no actual execution.
 
     .EXAMPLE
-    .\Set-AppRoleAssignments.ps1 -AppRegistrationConfigurationFilePath "C:\config.json" -AppServiceName das-env-foobar-as -Tenant tenant.onmicrosoft.com -DryRun $true
+    .\Set-AppRoleAssignments.ps1 -AppRegistrationConfigurationFilePath "C:\config.json" -ResourceName das-env-foobar-as -Tenant tenant.onmicrosoft.com -DryRun $true
+    .\Set-AppRoleAssignments.ps1 -AppRegistrationConfigurationFilePath "C:\config.json" -ResourceName das-env-foobar-apim -Tenant tenant.onmicrosoft.com -DryRun $true
 #>
 
 [CmdletBinding()]
@@ -27,7 +28,7 @@ Param(
     [Parameter(Mandatory = $true)]
     [String]$AppRegistrationConfigurationFilePath,
     [Parameter(Mandatory = $true)]
-    [String]$AppServiceName,
+    [String]$ResourceName,
     [Parameter(Mandatory = $true)]
     [String]$Tenant,
     [Parameter(Mandatory = $false)]
@@ -43,13 +44,13 @@ If ($DryRun) {
 
 try {
     $AppRegistrationConfiguration = Get-Content -Path $AppRegistrationConfigurationFilePath -Raw | ConvertFrom-Json
-    $Environment = Get-Environment -AppServiceName $AppServiceName
+    $Environment = Get-Environment -ResourceName $ResourceName
     $ResourceNamePrefix = "das-$Environment"
-    $AppServiceNameSuffix = $AppServiceName.Replace($ResourceNamePrefix, "")
-    $AppRegistrationsToProcess = $AppRegistrationConfiguration.configuration | Where-Object { $_.appRegistrationSuffix -match $AppServiceNameSuffix -or $_.appRoles.resourceNameSuffix -match $AppServiceNameSuffix }
+    $ResourceNameSuffix = $ResourceName.Replace($ResourceNamePrefix, "")
+    $AppRegistrationsToProcess = $AppRegistrationConfiguration.configuration | Where-Object { $_.appRegistrationSuffix -match $ResourceNameSuffix -or $_.appRoles.resourceNameSuffix -match $ResourceNameSuffix }
 
     if (!$AppRegistrationsToProcess) {
-        throw "No app registrations to process for app service name $AppServiceName. Check app service name or update configuration."
+        throw "No app registrations to process for app service name $ResourceName. Check app service name or update configuration."
     }
 
     foreach ($AppRegistration in $AppRegistrationsToProcess) {
@@ -92,6 +93,7 @@ try {
                 $ServicePrincipal = Get-ServicePrincipal -DisplayName $AppRegistrationName
                 $MatchedAppRole = $ServicePrincipal.appRoles | Where-Object { $_.value -eq $AppRole.appRoleName }
             }
+
             foreach ($MIResource in $AppRole.resourceNameSuffix) {
                 $ManagedIdentityResourceName = "$ResourceNamePrefix$MIResource"
                 $ManagedIdentity = Get-ServicePrincipal -DisplayName $ManagedIdentityResourceName
@@ -116,15 +118,15 @@ try {
                             Write-Output "      -> App role assignment already exists"
                             continue
                         }
-                    }
-                    else {
-                        Write-Output "      -> Processing new app role assignment for $ManagedIdentityResourceName with role: $($MatchedAppRole.value)"
+                        else {
+                            Write-Output "      -> Processing new app role assignment for $ManagedIdentityResourceName with role: $($MatchedAppRole.value)"
 
-                        if (!$DryRun) {
-                            New-AppRoleAssignment -ServicePrincipalId $ServicePrincipal.ObjectId -AppRoleId $MatchedAppRole.id -ManagedIdentity $ManagedIdentity.ObjectId
+                            if (!$DryRun) {
+                                New-AppRoleAssignment -ServicePrincipalId $ServicePrincipal.ObjectId -AppRoleId $MatchedAppRole.id -ManagedIdentity $ManagedIdentity.ObjectId
+                            }
+
+                            Write-Output "      -> Successfully created app role assignment"
                         }
-
-                        Write-Output "      -> Successfully created app role assignment"
                     }
                 }
                 catch {
