@@ -47,7 +47,7 @@ try {
     $Environment = Get-Environment -ResourceName $ResourceName
     $ResourceNamePrefix = "das-$Environment"
     $ResourceNameSuffix = $ResourceName.Replace($ResourceNamePrefix, "")
-    $AppRegistrationsToProcess = $AppRegistrationConfiguration.configuration | Where-Object { $_.appRegistrationSuffix -match $ResourceNameSuffix -or $_.appRoles.resourceNameSuffix -match $ResourceNameSuffix }
+    $AppRegistrationsToProcess = $AppRegistrationConfiguration.configuration | Where-Object { $_.appRoles.resourceNameSuffix -match $ResourceNameSuffix }
 
     if (!$AppRegistrationsToProcess) {
         throw "No app registrations to process for app service name $ResourceName. Check app service name or update configuration."
@@ -94,18 +94,17 @@ try {
                 $MatchedAppRole = $ServicePrincipal.appRoles | Where-Object { $_.value -eq $AppRole.appRoleName }
             }
 
-            foreach ($MIResource in $AppRole.resourceNameSuffix) {
-                $ManagedIdentityResourceName = "$ResourceNamePrefix$MIResource"
-                $ManagedIdentity = Get-ServicePrincipal -DisplayName $ManagedIdentityResourceName
+            if ($ResourceNameSuffix -in $AppRole.resourceNameSuffix) {
+                $ManagedIdentity = Get-ServicePrincipal -DisplayName $ResourceName
                 if ($ManagedIdentity.Count -eq 1) {
-                    Write-Output "    -> Processing Managed Identity of $ManagedIdentityResourceName"
+                    Write-Output "    -> Processing Managed Identity of $ResourceName"
                 }
                 elseif ($ManagedIdentity.Count -gt 1) {
-                    Write-Error "    -> Found duplicate app registrations with the same display name of $ManagedIdentityResourceName. Investigate"
+                    Write-Error "    -> Found duplicate app registrations with the same display name of $ResourceName. Investigate"
                     continue
                 }
                 else {
-                    Write-Output "    -> Managed Identity of $ManagedIdentityResourceName not found"
+                    Write-Output "    -> Managed Identity of $ResourceName not found"
                     continue
                 }
 
@@ -119,7 +118,7 @@ try {
                             continue
                         }
                         else {
-                            Write-Output "      -> Processing new app role assignment for $ManagedIdentityResourceName with role: $($MatchedAppRole.value)"
+                            Write-Output "      -> Processing new app role assignment for $ResourceName with role: $($MatchedAppRole.value)"
 
                             if (!$DryRun) {
                                 New-AppRoleAssignment -ServicePrincipalId $ServicePrincipal.ObjectId -AppRoleId $MatchedAppRole.id -ManagedIdentity $ManagedIdentity.ObjectId
@@ -132,6 +131,9 @@ try {
                 catch {
                     Write-Error "        -> Error: $_"
                 }
+            }
+            else {
+                Write-Output "    -> No role assignments to process for $ResourceName"
             }
         }
     }
