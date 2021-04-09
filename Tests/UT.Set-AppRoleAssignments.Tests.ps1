@@ -44,7 +44,12 @@ Describe "Set-AppRoleAssignments Unit Tests" -Tags @("Unit") {
 
         It "Single service principal found" {
 
-            Mock Get-ServicePrincipal -MockWith { @("") }
+            Mock Get-ServicePrincipal -MockWith {
+                return @{
+                    ObjectId = $Config.resourceId
+                }
+            }
+            Mock Get-AppRoleAssignments -MockWith { }
             Mock Write-Output { }
             $AppServiceName = "das-test-ui-as"
 
