@@ -101,7 +101,7 @@ if ($RetryCounter -eq 4) {
     throw @"
 Staging slot is dead after 3 restarts.
 1. Check Kibana for the app’s logs during the timeframe of the failed slot swap, the app should log the failed exception. Share the failed exception with the application team. If the failed exception cannot be found, proceed with the following steps.
-2. Go to the Azure portal https://portal.azure.com , logging in with your @citizenazuresfabisgov.onmicrosoft.com account if a dev environment, @fcsazuresfabisgov.onmicrosoft.com account if none-dev.
+2. Go to the Azure portal https://portal.azure.com , logging in with your relevant account.
 3. Navigate to the Application Insights resource with the same name as the App Service, by searching in the top search bar.
 4. Select the Failures blade.
 5. Select the relevant time range for the failed slot swap.
