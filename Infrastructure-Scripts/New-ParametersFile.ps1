@@ -58,7 +58,7 @@ foreach ($ParameterObject in $ParameterObjects) {
     switch ($ParameterType) {
         'array' {
             # If Default value is an empty array
-            if (!$ParameterValue -or "[]") {
+            if (!$ParameterValue -or $ParameterValue -eq "[]") {
                 $ParameterValue = @()
             }
             elseif (($ParameterValue | ConvertFrom-Json | Get-Member)[0].TypeName -eq "System.String") {
