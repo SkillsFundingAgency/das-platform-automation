@@ -1,29 +1,24 @@
 <#
     .SYNOPSIS
-    Gets an APIM subscription primary key for a given product and outputs the value as a Azure DevOps pipeline variable. 
-    Creates a subscription key if it does not exist in the given product
+    Gets an APIM subscription primary key for a given product subscription id
 
     .DESCRIPTION
-    Gets an APIM subscription primary key for a given product and outputs the value as a Azure DevOps pipeline variable. 
-    Creates a subscription key if it does not exist in the given product.
+    Gets an APIM subscription primary key for a given product subscription id
 
     .PARAMETER ApimResourceGroup
-    The name of the resource group the APIM instance is deployed in
+    The name of the resource group the APIM instance is deployed to
 
     .PARAMETER ApimName
     The name of the APIM instance
 
-    .PARAMETER Product
-    The name of the APIM product
-
-    .PARAMETER SubscriptionName
-    The display name of the subscription to search for/create.
+    .PARAMETER SubscriptionId
+    The subscription id of the subscription to get
 
     .PARAMETER PipelineVariableName
     The pipeline variable name that will store the subscription key
 
     .EXAMPLE
-    .\Set-ApimSubscriptionkey.ps1 -ApimResourceGroup das-foo-bar-rg -ApimName das-foo-bar-apim -Product FooBarProduct -SubscriptionName Foobar -PipelineVariableName FooBar
+    .\Set-ApimSubscriptionkey.ps1 -ApimResourceGroup das-foo-bar-rg -ApimName das-foo-bar-apim -SubscriptionId Foobar -PipelineVariableName FooBar
 #>
 
 [CmdletBinding()]
@@ -39,6 +34,14 @@ Param (
 )
 
 $Context = New-AzApiManagementContext -ResourceGroupName $ApimResourceGroup -ServiceName $ApimName
-$ApimSubscriptionKey = (Get-AzApiManagementSubscriptionKey -Context $Context -SubscriptionId $SubscriptionId).PrimaryKey
+$ApimSubscription = (Get-AzApiManagementSubscriptionKey -Context $Context -SubscriptionId $SubscriptionId).PrimaryKey
+
+if ($ApimSubscription) {
+    $ApimSubscriptionKey = $ApimSubscription.PrimaryKey
+}
+else {
+    throw "APIM subscription not found with subcription id: $SubscriptionId"
+}
+
 
 Write-Output "##vso[task.setvariable variable=$PipelineVariableName;issecret=true]$ApimSubscriptionKey"
