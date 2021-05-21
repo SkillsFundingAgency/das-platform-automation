@@ -21,6 +21,6 @@ Describe "Get-ApimSubscriptionKey Unit Tests" -Tags @("Unit") {
             Assert-MockCalled -CommandName 'Get-AzApiManagementSubscriptionKey' -Times 1 -Scope It
         }
 
-    }    
+    }
 
 }
