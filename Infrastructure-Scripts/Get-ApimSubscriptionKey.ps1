@@ -26,7 +26,7 @@ Param (
     [Parameter(Mandatory = $true)]
     [String]$ApimResourceGroup,
     [Parameter(Mandatory = $true)]
-    [String]$ApimName,    
+    [String]$ApimName,
     [Parameter(Mandatory = $true)]
     [String]$SubscriptionId,
     [Parameter(Mandatory = $true)]
@@ -34,7 +34,7 @@ Param (
 )
 
 $Context = New-AzApiManagementContext -ResourceGroupName $ApimResourceGroup -ServiceName $ApimName
-$ApimSubscription = (Get-AzApiManagementSubscriptionKey -Context $Context -SubscriptionId $SubscriptionId).PrimaryKey
+$ApimSubscription = Get-AzApiManagementSubscriptionKey -Context $Context -SubscriptionId $SubscriptionId
 
 if ($ApimSubscription) {
     $ApimSubscriptionKey = $ApimSubscription.PrimaryKey
