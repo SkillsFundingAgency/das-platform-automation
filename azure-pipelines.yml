@@ -24,7 +24,7 @@ stages:
     jobs:
       - job: "Windows_PS51_Build_DAS_Continuous_Deployment"
         pool:
-          name: "DAS - Continuous Deployment Agents"
+          name: "DAS - Continuous Deployment"
           demands:
             - npm
             - node.js
