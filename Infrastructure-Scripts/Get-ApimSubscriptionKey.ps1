@@ -43,5 +43,5 @@ else {
     throw "APIM subscription not found with subcription id: $SubscriptionId"
 }
 
-
+Write-Output "Setting value of subscription key to secret pipeline variable $PipelineVariableName"
 Write-Output "##vso[task.setvariable variable=$PipelineVariableName;issecret=true]$ApimSubscriptionKey"
