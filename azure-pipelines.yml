@@ -22,10 +22,11 @@ stages:
   - stage: Test
     dependsOn: []
     jobs:
-      - job: "Windows_PS51_Build_DAS_Continuous_Deployment"
+      - job: "Windows_PSCore_Build_DAS_Continuous_Integration"
         pool:
-          name: "DAS - Continuous Deployment"
+          name: "DAS - Continuous Integration"
           demands:
+            - agent.OS -equals Windows_NT
             - npm
             - node.js
         workspace:
