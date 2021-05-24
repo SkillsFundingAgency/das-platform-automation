@@ -18,7 +18,7 @@
     The pipeline variable name that will store the subscription key
 
     .EXAMPLE
-    .\Set-ApimSubscriptionkey.ps1 -ApimResourceGroup das-foo-bar-rg -ApimName das-foo-bar-apim -SubscriptionId Foobar -PipelineVariableName FooBar
+    .\Get-ApimSubscriptionkey.ps1 -ApimResourceGroup das-foo-bar-rg -ApimName das-foo-bar-apim -SubscriptionId Foobar -PipelineVariableName FooBar
 #>
 
 [CmdletBinding()]
