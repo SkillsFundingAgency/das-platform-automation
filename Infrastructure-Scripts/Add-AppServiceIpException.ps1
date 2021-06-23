@@ -1,5 +1,4 @@
 <#
-
     .SYNOPSIS
     Update the access restriction rules for an app service
 
@@ -17,7 +16,6 @@
 
     .EXAMPLE
     Add-AppServiceIpException -IpAddress 192.168.0.1 -ResourceName das-prd-sms-as
-
 #>
 
 [CmdletBinding()]

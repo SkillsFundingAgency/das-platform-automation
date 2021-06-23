@@ -1,26 +1,37 @@
 <#
     .SYNOPSIS
     Update an APIM API with a swagger definition with multiple versions
+
     .DESCRIPTION
     Update an APIM API with a swagger definition with multiple versions
+
     .PARAMETER ApimResourceGroup
     The name of the resource group that contains the APIM instance
+
     .PARAMETER InstanceName
     The name of the APIM instance
+
     .PARAMETER AppServiceResourceGroup
     The name of the resource group that contains the App Service
+
     .PARAMETER ApiVersionSetName
     The name of the API version set to update
+
     .PARAMETER ApiPath
     The URL suffix that APIM will apply to the API URL.
+
     .PARAMETER ApiBaseUrl
     The full path to the swagger defintion
+
     .PARAMETER ApplicationIdentifierUri
     The Application Identifier URI of the API app registration
+
     .PARAMETER ProductId
     The Id of the Product that the API will be assigned to
+
     .PARAMETER ImportRetries
     (optional) The number of times to retry importing the API definition, defaults to 3
+    
     .EXAMPLE
     Import-ApimSwaggerApiDefinition -ApimResourceGroup das-at-foobar-rg -InstanceName das-at-foobar-apim -AppServiceResourceGroup das-at-foobar-rg -ApiVersionSetName foobar-api -ApiBaseUrl "https://at-foobar-api.apprenticeships.education.gov.uk" -ApiPath "foo-bar" -ApplicationIdentifierUri "https://<tenant>.onmicrosoft.com/das-at-foobar-as-ar" -ProductId ProductId
 #>

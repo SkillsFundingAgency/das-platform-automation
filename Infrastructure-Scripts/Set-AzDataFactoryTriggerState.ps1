@@ -1,5 +1,4 @@
 <#
-
     .SYNOPSIS
     Disables or enables triggers associated with a Data Factory.
 
@@ -18,7 +17,6 @@
     .EXAMPLE
     Set-AzDataFactoryTriggerState -DataFactoryName aDataFactory -ResourceGroupName aResourceGroup -TriggerState disable
     Set-AzDataFactoryTriggerState -DataFactoryName aDataFactory -ResourceGroupName aResourceGroup -TriggerState enable
-
 #>
 Param (
     [Parameter(Mandatory = $true)]

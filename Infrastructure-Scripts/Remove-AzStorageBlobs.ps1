@@ -1,30 +1,30 @@
 <#
-.SYNOPSIS
-Delete blobs from specified storage container
+    .SYNOPSIS
+    Delete blobs from specified storage container
 
-.DESCRIPTION
-This script will remove all files from the specified container. It can be used in an Azure DevOps release pipeline.
+    .DESCRIPTION
+    This script will remove all files from the specified container. It can be used in an Azure DevOps release pipeline.
 
-.PARAMETER StorageAccount
-This is the name of the storage account which will contain the storage container
+    .PARAMETER StorageAccount
+    This is the name of the storage account which will contain the storage container
 
-.PARAMETER SASToken
-This is the SAS Token for the storage account
+    .PARAMETER SASToken
+    This is the SAS Token for the storage account
 
-.PARAMETER StorageContainer
-This is the name of blob container where the files reside
+    .PARAMETER StorageContainer
+    This is the name of blob container where the files reside
 
-.PARAMETER FilesToIgnore
-This specifies the file to ignore. Accepts comma delimited, full file names and wildcards e.g "*.csv, *.fmt, DoNotDelete.txt"
+    .PARAMETER FilesToIgnore
+    This specifies the file to ignore. Accepts comma delimited, full file names and wildcards e.g "*.csv, *.fmt, DoNotDelete.txt"
 
-.PARAMETER DaysFilesOlderThan
-This specifies blob files older than 'x' days that you'd like to remove from the container
+    .PARAMETER DaysFilesOlderThan
+    This specifies blob files older than 'x' days that you'd like to remove from the container
 
-.PARAMETER DryRun
-This defaults to True so file deletion will only occur if passed in as false
+    .PARAMETER DryRun
+    This defaults to True so file deletion will only occur if passed in as false
 
-.EXAMPLE
-Remove-AzStorageBlobs -StorageAccount dasdevgrafstr -SASToken $(SASToken) -StorageContainer alerts -DaysFilesOlderThan 7 -FilesToIgnore "*.csv, *.fmt, DoNotDelete.txt" -DryRun $false
+    .EXAMPLE
+    Remove-AzStorageBlobs -StorageAccount dasdevgrafstr -SASToken $(SASToken) -StorageContainer alerts -DaysFilesOlderThan 7 -FilesToIgnore "*.csv, *.fmt, DoNotDelete.txt" -DryRun $false
 #>
 
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSReviewUnusedParameter", "", Justification = "Known bug - https://github.com/PowerShell/PSScriptAnalyzer/issues/1472")]
