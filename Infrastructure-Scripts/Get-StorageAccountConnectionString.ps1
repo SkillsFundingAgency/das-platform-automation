@@ -1,9 +1,9 @@
 <#
     .SYNOPSIS
-    Return either the primary or secondary connection string for a Storage Account and write to a Azure Pipelines variable.
+    Return either the primary or secondary connection string for a Storage Account and write to an Azure Pipelines variable.
 
     .DESCRIPTION
-    Return either the primary or secondary connection string for a Storage Account and write to a Azure Pipelines variable.
+    Return either the primary or secondary connection string for a Storage Account and write to an Azure Pipelines variable.
 
     .PARAMETER ResourceGroup
     The name of the Resource Group that contains the Storage Account.

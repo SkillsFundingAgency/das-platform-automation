@@ -1,9 +1,9 @@
 <#
     .SYNOPSIS
-    Creates an Azure Storage Queue or Table Receptacle in a Storage Account if there is not one with the supplied Name and Type.
+    Creates an Azure Storage Queue or Table receptacle in a Storage Account if there is not one with the supplied Name and Type.
 
     .DESCRIPTION
-    Creates an Azure Storage Queue or Table Receptacle in a Storage Account if there is not one with the supplied Name and Type.
+    Creates an Azure Storage Queue or Table receptacle in a Storage Account if there is not one with the supplied Name and Type.
 
     .PARAMETER ResourceGroup
     The name of the Resource Group that contains the Storage Account.
@@ -12,10 +12,10 @@
     The name of the Storage Account.
 
     .PARAMETER ReceptacleType
-    The Name of the table to be create will only accept table and queue.
+    The type of the storage receptable to create, can only accept table and queue.
 
     .PARAMETER ReceptacleName
-    The Name of the table to be create.
+    The name of the table to be create.
 
     .EXAMPLE
     .\New-StorageAccountReceptacle.ps1 -ResourceGroup rgname -StorageAccount saname -ReceptacleType Receptacle type -ReceptacleName tablename

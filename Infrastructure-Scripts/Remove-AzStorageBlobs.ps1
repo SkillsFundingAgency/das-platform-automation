@@ -1,9 +1,9 @@
 <#
 .SYNOPSIS
-Deleted blobs from specified storage container
+Delete blobs from specified storage container
 
 .DESCRIPTION
-This script will remove all files from the specified container. It will be able to be used in an Azure DevOps release pipeline.
+This script will remove all files from the specified container. It can be used in an Azure DevOps release pipeline.
 
 .PARAMETER StorageAccount
 This is the name of the storage account which will contain the storage container

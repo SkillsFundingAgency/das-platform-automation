@@ -1,10 +1,10 @@
 <#
     .SYNOPSIS
-    Sets Tags on All Resources in a Resource Group to match the Tags set on the Resource Group.
+    Sets Tags on all Resources in a Resource Group to match the Tags set on the Resource Group.
 
     .DESCRIPTION
-    If The Resource Group exists and has been tagged reads the Tags assigned to the Resource Group and replicates them to all Resources within that Resource Group.
-    If there is a Tag with a different Value it will be overwrittend,
+    If the Resource Group exists and has been tagged reads the Tags assigned to the Resource Group and replicates them to all Resources within that Resource Group.
+    If there is a Tag with a different Value it will be overwritten,
 
     .PARAMETER ResourceGroupName
     Name of the Resource Group to be created and/or have tags applied.

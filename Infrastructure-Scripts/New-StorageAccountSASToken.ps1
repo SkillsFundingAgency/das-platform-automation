@@ -1,9 +1,9 @@
 <#
     .SYNOPSIS
-    Create a new Storage Account level ad-hoc SAS token and write to a Azure Pipelines variable.
+    Create a new Storage Account level SAS token and write to a Azure Pipelines variable.
 
     .DESCRIPTION
-    Create a new Storage Account level ad-hoc SAS token and write to a Azure Pipelines variable. Secured using the secondary account key.
+    Create a new Storage Account level SAS token and write to a Azure Pipelines variable. Secured using the secondary account key.
     Use the -GenerateForSQLExternalDatasource switch to remove the ? character from the SAS token so that is can be used for SQL External Data Sources.
     Account SAS parameters: https://docs.microsoft.com/en-gb/rest/api/storageservices/create-account-sas?redirectedfrom=MSDN
 
