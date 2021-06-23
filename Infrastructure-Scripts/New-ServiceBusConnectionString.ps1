@@ -12,7 +12,7 @@
     The name of the authorization rule to be created.
 
     .PARAMETER Rights
-    A list of authorization rule rights. This can be one or all of the following:
+    An array of authorization rule rights. This can be one or all of the following:
     Listen
     Send
     Manage

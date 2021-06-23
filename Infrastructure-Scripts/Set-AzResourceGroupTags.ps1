@@ -4,7 +4,6 @@
 
     .DESCRIPTION
     Checks if a Resource Group exists, if it doesn't, create with specified tags.  If it does exist, validates that the tags are match those specified in the parameters and updates them if necessary.
-    Removed ValidateSet for ParentBusiness and ServiceOffering so it's more generic and there are loads for AS.
 
     .PARAMETER ResourceGroupName
     Name of the Resource Group to be created and/or have tags applied.

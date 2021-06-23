@@ -1,23 +1,22 @@
 <#
-.SYNOPSIS
-Takes ARM template output and turns them into Azure DevOps variables
+    .SYNOPSIS
+    Takes ARM template output and turns them into Azure DevOps variables
 
-.DESCRIPTION
-Takes the ARM template output (usually from the Azure Deployment task in Azure DevOps) and creates Azure DevOps variables of the same name with the values so they can be used in subsequent tasks.
+    .DESCRIPTION
+    Takes the ARM template output (usually from the Azure Deployment task in Azure DevOps) and creates Azure DevOps variables of the same name with the values so they can be used in subsequent tasks.
 
-.PARAMETER ARMOutput
-The JSON output from the ARM template to convert into variables.
-If using the Azure Deployment task in an Azure Pipeline, you can set the output to a variable by specifying a deploymentOutputs value
+    .PARAMETER ARMOutput
+    The JSON output from the ARM template to convert into variables.
+    If using the Azure Deployment task in an Azure Pipeline, you can set the output to a variable by specifying a deploymentOutputs value
 
-.PARAMETER Rename
-[Optional] Allows you to create a AzureDevOps variable with a different name to the output name.
-Takes a dictionary where the key is the name of the ARM template output and the value is the desired name of the AzureDevOps variable.
-This variable must be wrapped in single quotes when passing to this parameter in an Azure DevOps task.
+    .PARAMETER Rename
+    [Optional] Allows you to create a AzureDevOps variable with a different name to the output name.
+    Takes a dictionary where the key is the name of the ARM template output and the value is the desired name of the AzureDevOps variable.
+    This variable must be wrapped in single quotes when passing to this parameter in an Azure DevOps task.
 
-.EXAMPLE
-ConvertTo-AzureDevOpsVariables.ps1 -ARMOutput '$(ARMOutput)'
-where ARMOutputs is the deploymentOutputs value from the Azure Deployment task. Note that $(ARMOutput) is wrapped in single quotes.
-
+    .EXAMPLE
+    ConvertTo-AzureDevOpsVariables.ps1 -ARMOutput '$(ARMOutput)'
+    where ARMOutputs is the deploymentOutputs value from the Azure Deployment task. Note that $(ARMOutput) is wrapped in single quotes.
 #>
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '', Justification='Use of $TaskName not recognised')]
 [CmdletBinding()]

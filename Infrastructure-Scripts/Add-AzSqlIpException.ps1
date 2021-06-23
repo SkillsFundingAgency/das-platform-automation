@@ -1,5 +1,4 @@
 <#
-
     .SYNOPSIS
     Update the firewall of an Azure SQL Server
 
@@ -14,7 +13,6 @@
 
     .EXAMPLE
     Add-AzSqlIpException -IpAddress 192.168.0.1 -ResourceNamePattern das-*
-
 #>
 [CmdletBinding()]
 Param (
