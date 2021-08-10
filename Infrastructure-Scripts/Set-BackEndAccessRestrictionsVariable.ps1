@@ -68,7 +68,7 @@ foreach ($BackEndAccessRestrictionObject in $BackEndAccessRestrictionsArray) {
 
 $BackEndAccessRestrictionsArray
 
-$BackEndAccessRestrictionsArrayJson = Convert-ToJson $BackEndAccessRestrictionsArray
+$BackEndAccessRestrictionsArrayJson = ConvertTo-Json $BackEndAccessRestrictionsArray
 
 $BackEndAccessRestrictionsArrayJson
 
