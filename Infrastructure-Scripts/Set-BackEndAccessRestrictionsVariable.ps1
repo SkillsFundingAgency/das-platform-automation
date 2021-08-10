@@ -54,9 +54,9 @@ foreach ($Subnet in $Subnets) {
     $AllowedSubnetsArray += $AllowedSubnetObject
 }
 
+$UptimeMonitoringAccessRestrictions = $UptimeMonitoringAccessRestrictions -Replace '\\"','"'
 
-
-$BackEndAccessRestrictionsArray = $AllowedSubnetsArray + (ConvertFrom-Json ($UptimeMonitoringAccessRestrictions -Replace '\\"','"'))
+$BackEndAccessRestrictionsArray = $AllowedSubnetsArray + (ConvertFrom-Json $UptimeMonitoringAccessRestrictions)
 
 $Priority = 100
 
