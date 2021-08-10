@@ -36,7 +36,7 @@ Param (
     [Parameter(Mandatory = $true)]
     [String[]]$BackEndAccessRestrictionsExcludedSubnets,
     [Parameter(Mandatory = $false)]
-    [Array]$UptimeMonitoringAccessRestrictions = @()
+    [String]$UptimeMonitoringAccessRestrictions = "[]"
 )
 
 $SubscriptionId = (Get-AzSubscription).Id
