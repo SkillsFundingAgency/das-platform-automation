@@ -69,4 +69,4 @@ foreach ($BackEndAccessRestrictionObject in $BackEndAccessRestrictionsArray) {
 $BackEndAccessRestrictionsArray
 
 Write-Output "Setting value of BackEndAccessRestrictionsArray variable to BackEndAccessRestrictions pipeline variable"
-Write-Output "##vso[task.setvariable variable=$BackEndAccessRestrictions]$BackEndAccessRestrictionsArray"
+Write-Output "##vso[task.setvariable variable=BackEndAccessRestrictions]$BackEndAccessRestrictionsArray"
