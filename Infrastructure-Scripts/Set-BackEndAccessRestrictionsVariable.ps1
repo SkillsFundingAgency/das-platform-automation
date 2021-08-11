@@ -19,12 +19,20 @@
     The array of subnets to exclude from the BackEndAccessRestrictions outputted variable.
     E.g. foo-sn,bar-sn
 
+    .PARAMETER ResourceEnvironmentName
+    The resource environment name
+    E.g. foo
+
+    .PARAMETER UnrestrictedEnvironments
+    The array of resource environment names for environments to have an empty array for BackEndAccessRestrictions outputted variable and therefore no access restrictions.
+    E.g. foo,bar
+
     .PARAMETER UptimeMonitoringAccessRestrictions
     The array of the name / IP address objects to allow for uptime monitoring. The IP addresses can be public or private.
     E.g. @(@{name="UptimeMonitor"; ipAddress="10.0.0.0/32"})
 
     .EXAMPLE
-    .\Set-BackEndAccessRestrictionsVariable.ps1 -SharedEnvResourceGroup foo-rg -SharedEnvVirtualNetworkName foo-vnet -BackEndAccessRestrictionsExcludedSubnets foo-sn,bar-sn -UptimeMonitoringAccessRestrictions @(@{name="UptimeMonitor"; ipAddress="10.0.0.0/32"})
+    .\Set-BackEndAccessRestrictionsVariable.ps1 -SharedEnvResourceGroup foo-rg -SharedEnvVirtualNetworkName foo-vnet -BackEndAccessRestrictionsExcludedSubnets foo-sn,bar-sn -ResourceEnvironmentName foo -UnrestrictedEnvironments foo,bar -UptimeMonitoringAccessRestrictions @(@{name="UptimeMonitor"; ipAddress="10.0.0.0/32"})
 #>
 
 [CmdletBinding()]
@@ -35,44 +43,48 @@ Param (
     [String]$SharedEnvVirtualNetworkName,
     [Parameter(Mandatory = $true)]
     [String[]]$BackEndAccessRestrictionsExcludedSubnets,
+    [Parameter(Mandatory = $true)]
+    [String]$ResourceEnvironmentName,
+    [Parameter(Mandatory = $true)]
+    [String[]]$UnrestrictedEnvironments,
     [Parameter(Mandatory = $false)]
     [String]$UptimeMonitoringAccessRestrictions = "[]"
 )
 
-$SubscriptionId = (Get-AzSubscription).Id
 
-$Subnets = (Get-AzVirtualNetwork -Name $SharedEnvVirtualNetworkName -ResourceGroupName $SharedEnvResourceGroup).Subnets.Name | Where-Object {$_ -notin $BackEndAccessRestrictionsExcludedSubnets} | Sort-Object
-
-$AllowedSubnetsArray = @()
-
-foreach ($Subnet in $Subnets) {
-    $AllowedSubnetObject = New-Object PSObject
-    $AllowedSubnetObject | Add-Member -NotePropertyMembers @{
-        vnetSubnetResourceId = "/subscriptions/$($SubscriptionId)/resourceGroups/$($SharedEnvResourceGroup)/providers/Microsoft.Network/virtualNetworks/$($SharedEnvVirtualNetworkName)/subnets/$($Subnet)"
-        name                 = $Subnet
-    }
-    $AllowedSubnetsArray += $AllowedSubnetObject
+if ($ResourceEnvironmentName -in $UnrestrictedEnvironments) {
+    $BackEndAccessRestrictionsArrayJson = "[]"
 }
+else {
+    $AllowedSubnetsArray = @()
 
+    $SubscriptionId = (Get-AzSubscription).Id
 
+    $Subnets = (Get-AzVirtualNetwork -Name $SharedEnvVirtualNetworkName -ResourceGroupName $SharedEnvResourceGroup).Subnets.Name | Where-Object {$_ -notin $BackEndAccessRestrictionsExcludedSubnets} | Sort-Object
 
-$BackEndAccessRestrictionsArray = $AllowedSubnetsArray + (ConvertFrom-Json ($UptimeMonitoringAccessRestrictions -Replace '\\"','"'))
-
-$Priority = 100
-
-foreach ($BackEndAccessRestrictionObject in $BackEndAccessRestrictionsArray) {
-    $BackEndAccessRestrictionObject | Add-Member -NotePropertyMembers @{
-        action   = "Allow"
-        priority = $Priority
+    foreach ($Subnet in $Subnets) {
+        $AllowedSubnetObject = New-Object PSObject
+        $AllowedSubnetObject | Add-Member -NotePropertyMembers @{
+            vnetSubnetResourceId = "/subscriptions/$($SubscriptionId)/resourceGroups/$($SharedEnvResourceGroup)/providers/Microsoft.Network/virtualNetworks/$($SharedEnvVirtualNetworkName)/subnets/$($Subnet)"
+            name                 = $Subnet
+        }
+        $AllowedSubnetsArray += $AllowedSubnetObject
     }
-    $Priority++
+
+    $BackEndAccessRestrictionsArray = $AllowedSubnetsArray + (ConvertFrom-Json ($UptimeMonitoringAccessRestrictions -Replace '\\"','"'))
+
+    $Priority = 100
+
+    foreach ($BackEndAccessRestrictionObject in $BackEndAccessRestrictionsArray) {
+        $BackEndAccessRestrictionObject | Add-Member -NotePropertyMembers @{
+            action   = "Allow"
+            priority = $Priority
+        }
+        $Priority++
+    }
+
+    $BackEndAccessRestrictionsArrayJson = ConvertTo-Json $BackEndAccessRestrictionsArray -Compress
 }
-
-$BackEndAccessRestrictionsArray
-
-$BackEndAccessRestrictionsArrayJson = ConvertTo-Json $BackEndAccessRestrictionsArray -Compress
-
-$BackEndAccessRestrictionsArrayJson
 
 Write-Output "Setting value of BackEndAccessRestrictionsArrayJson variable to BackEndAccessRestrictions pipeline variable"
 Write-Output "##vso[task.setvariable variable=BackEndAccessRestrictions]$BackEndAccessRestrictionsArrayJson"
