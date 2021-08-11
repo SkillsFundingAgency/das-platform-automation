@@ -62,7 +62,7 @@ try {
 
         $VirtualNetwork = (Get-AzVirtualNetwork -Name $SharedEnvVirtualNetworkName -ResourceGroupName $SharedEnvResourceGroup)
 
-        if (!$VirtualNetworkSubnets) {
+        if (!$VirtualNetwork) {
             throw "Could not find a virtual network matching $SharedEnvVirtualNetworkName and $SharedEnvResourceGroup in the subscription"
         }
 
