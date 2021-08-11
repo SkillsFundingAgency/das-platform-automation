@@ -58,15 +58,15 @@ try {
     else {
         $AllowedSubnetsArray = @()
 
-        $SubscriptionId = (Get-AzSubscription).Id
-
         $VirtualNetwork = (Get-AzVirtualNetwork -Name $SharedEnvVirtualNetworkName -ResourceGroupName $SharedEnvResourceGroup)
 
         if (!$VirtualNetwork) {
-            throw "Could not find a virtual network matching $SharedEnvVirtualNetworkName and $SharedEnvResourceGroup in the subscription"
+            throw "Could not find a virtual network matching $($SharedEnvVirtualNetworkName) and $($SharedEnvResourceGroup) in the subscription"
         }
 
         $Subnets = $VirtualNetwork.Subnets.Name | Where-Object {$_ -notin $BackEndAccessRestrictionsExcludedSubnets} | Sort-Object
+
+        $SubscriptionId = (Get-AzSubscription).Id
 
         foreach ($Subnet in $Subnets) {
             $AllowedSubnetObject = New-Object PSObject

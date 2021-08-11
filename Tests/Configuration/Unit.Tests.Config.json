@@ -47,5 +47,11 @@
   "KubernetesNamespaceReduced": "{'items':[{'metadata':{'name':'engineering'}}]}",
   "KubernetesNamespace": "engineering",
   "tenant": "tenant.onmicrosoft.com",
-  "pipelineVariableName": "variableName"
+  "pipelineVariableName": "variableName",
+  "virtualNetworkName": "das-test-pester-vn",
+  "virtualNetworkSubnets": "'foo-sn','bar-sn'",
+  "resourceEnvironmentName": "foo",
+  "unrestrictedEnvironments": "'foo','bar'",
+  "nameIpAddressObject": "[{'IpAddressA':'10.0.0.0/32','IpAddressB':'10.0.0.1/32'}]",
+  "invalidJson": "[{"
 }
