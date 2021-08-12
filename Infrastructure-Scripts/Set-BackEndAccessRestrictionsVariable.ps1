@@ -67,7 +67,7 @@ try {
 
         $Subnets = $VirtualNetwork.Subnets.Name | Where-Object {$_ -notin $BackEndAccessRestrictionsExcludedSubnets} | Sort-Object
 
-        $SubscriptionId = (Get-AzSubscription).Id
+        $SubscriptionId = (Get-AzSubscription).Id[0]
 
         foreach ($Subnet in $Subnets) {
             $AllowedSubnetObject = New-Object PSObject
