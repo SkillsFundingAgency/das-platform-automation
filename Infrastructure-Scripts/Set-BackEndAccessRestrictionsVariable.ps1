@@ -35,6 +35,7 @@
     .\Set-BackEndAccessRestrictionsVariable.ps1 -SharedEnvResourceGroup foo-rg -SharedEnvVirtualNetworkName foo-vnet -BackEndAccessRestrictionsExcludedSubnets foo-sn,bar-sn -ResourceEnvironmentName foo -UnrestrictedEnvironments foo,bar -UptimeMonitoringAccessRestrictions @(@{name="UptimeMonitor"; ipAddress="10.0.0.0/32"})
 #>
 
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSReviewUnusedParameter", "", Justification = "Known bug - https://github.com/PowerShell/PSScriptAnalyzer/issues/1472")]
 [CmdletBinding()]
 Param (
     [Parameter(Mandatory = $true)]
