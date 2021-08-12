@@ -53,5 +53,6 @@
   "resourceEnvironmentName": "foo",
   "unrestrictedEnvironments": "'foo','bar'",
   "nameIpAddressObject": "[{'IpAddressA':'10.0.0.0/32','IpAddressB':'10.0.0.1/32'}]",
-  "invalidJson": "[{"
+  "invalidJson": "[{",
+  "guid": "8bb58c80-06f9-4007-ba54-1f7e919c16d7"
 }

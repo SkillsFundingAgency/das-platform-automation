@@ -20,6 +20,11 @@ Describe "Set-BackEndAccessRestrictions Unit Tests" -Tags @("Unit") {
                     )
                 }
             }
+            Mock Get-AzSubscription -MockWith {
+                return @{
+                    Id = $Config.guid
+                }
+            }
             { .\Set-BackEndAccessRestrictionsVariable.ps1 -SharedEnvResourceGroup $Config.resourceGroupName -SharedEnvVirtualNetworkName $Config.virtualNetworkName -BackEndAccessRestrictionsExcludedSubnets $Config.virtualNetworkSubnets -ResourceEnvironmentName $Config.resourceEnvironmentName -UnrestrictedEnvironments $Config.unrestrictedEnvironments -UptimeMonitoringAccessRestrictions $Config.invalidJson } | Should throw "Could not convert invalid JSON of UptimeMonitoringAccessRestrictions parameter"
             Assert-MockCalled -CommandName 'Get-AzVirtualNetwork' -Times 1 -Scope It
         }

@@ -47,8 +47,8 @@ Param (
     [String]$ResourceEnvironmentName,
     [Parameter(Mandatory = $true)]
     [String[]]$UnrestrictedEnvironments,
-    [Parameter(Mandatory = $false)]
-    [String]$UptimeMonitoringAccessRestrictions = "[]"
+    [Parameter(Mandatory = $true)]
+    [String]$UptimeMonitoringAccessRestrictions
 )
 
 try {
