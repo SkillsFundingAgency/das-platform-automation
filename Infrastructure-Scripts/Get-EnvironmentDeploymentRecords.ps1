@@ -10,8 +10,6 @@ Param (
     [String]$PipelineName,
     [Parameter(Mandatory = $true)]
     [Int]$RunId,
-    [Parameter(Mandatory = $true)]
-    [String]$AccessToken,
     [Parameter(Mandatory = $false)]
     [Int]$SleepTime = 20
 )
