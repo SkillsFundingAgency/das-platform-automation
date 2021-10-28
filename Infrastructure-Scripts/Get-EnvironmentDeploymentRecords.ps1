@@ -25,8 +25,8 @@ while ($true){
     $EnvironmentPipelineRuns = (Invoke-RestMethod -Method GET -Uri $Url -Headers $header).value
     #Filter down results of API call to just contain relevant pipeline runs with matching Pipeline names and only ones that are still running.
     $RunningEnvironmentPipelineRuns = $EnvironmentPipelineRuns.value | where-object {$_.definition.name -eq $pipelineName -and -not $_.result}
-    #$RunningEnvironmentPipelineRuns = $EnvironmentPipelineRuns | where-object {$_.definition.name -eq $pipelineName -and $_.result}
-    $LowestRunId = ($RunningEnvironmentPipelineRuns.owner.id | Sort-Object)[0]
+    $OrderedRunningEnvironmentPipelineRuns = $RunningEnvironmentPipelineRuns.owner.id | Sort-Object
+    $LowestRunId = $OrderedRunningEnvironmentPipelineRuns[0]
     if ($runid -eq $LowestRunId) {
         Write-Host("Continuing with deployment.")
         break;
