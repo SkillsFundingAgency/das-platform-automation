@@ -24,7 +24,7 @@ while ($true){
     #Invoke call to Azure DevOps Rest API to get all build data for given environment.
     $EnvironmentPipelineRuns = (Invoke-RestMethod -Method GET -Uri $Url -Headers $header).value
     #Filter down results of API call to just contain relevant pipeline runs with matching Pipeline names and only ones that are still running.
-    $RunningEnvironmentPipelineRuns = $EnvironmentPipelineRuns.value | where-object {$_.definition.name -eq $PipelineName -and -not $_.result}
+    $RunningEnvironmentPipelineRuns = $EnvironmentPipelineRuns | where-object {$_.definition.name -eq $PipelineName -and -not $_.result}
     $LowestRunId = ($RunningEnvironmentPipelineRuns.owner.id | Sort-Object)[0]
     if ($RunId -eq $LowestRunId) {
         Write-Host("Continuing with deployment.")
