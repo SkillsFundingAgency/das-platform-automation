@@ -16,7 +16,7 @@ Param (
     [Int]$SleepTime = 20
 )
 
-$Url = "https://dev.azure.com/$Organization/$Project/_apis/distributedtask/environments/$EnvironmentId/environmentdeploymentrecords?top=100?api-version=6.0-preview.1"
+$Url = "https://dev.azure.com/$Organisation/$Project/_apis/distributedtask/environments/$EnvironmentId/environmentdeploymentrecords?top=100?api-version=6.0-preview.1"
 $token = [System.Convert]::ToBase64String([System.Text.Encoding]::ASCII.GetBytes(":$($AccessToken)"))
 $header = @{authorization = "Basic $token"}
 
