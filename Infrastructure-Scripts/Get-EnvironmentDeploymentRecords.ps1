@@ -15,12 +15,10 @@ Param (
 )
 
 $Url = "https://dev.azure.com/$Organisation/$Project/_apis/distributedtask/environments/$EnvironmentId/environmentdeploymentrecords?top=100?api-version=6.0-preview.1"
-Write-Host("TOKEN IS: $env:GLOBAL_SYSTEM_ACCESSTOKEN")
+
 while ($true){
     #Invoke call to Azure DevOps Rest API to get all build data for given environment.
-    $EnvironmentPipelineRuns = (Invoke-RestMethod -Method GET -Uri $Url -Headers  @{
-        Authorization = "Bearer $env:SYSTEM_ACCESSTOKEN"
-    }).value
+    $EnvironmentPipelineRuns = (Invoke-RestMethod -Method GET -Uri $Url -Headers  @{ Authorization = "Bearer $env:SYSTEM_ACCESSTOKEN" }).value
     #Filter down results of API call to just contain relevant pipeline runs with matching Pipeline names and only ones that are still running.
     $RunningEnvironmentPipelineRuns = $EnvironmentPipelineRuns | where-object {$_.definition.name -eq $PipelineName -and -not $_.result}
     $LowestRunId = ($RunningEnvironmentPipelineRuns.owner.id | Sort-Object)[0]
