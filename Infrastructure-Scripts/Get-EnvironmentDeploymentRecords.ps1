@@ -15,7 +15,7 @@ Param (
 )
 
 $Url = "https://dev.azure.com/$Organisation/$Project/_apis/distributedtask/environments/$EnvironmentId/environmentdeploymentrecords?top=100?api-version=6.0-preview.1"
-Write-Host("TOKEN IS: $env:SYSTEM_ACCESSTOKEN")
+Write-Host("TOKEN IS: $env:GLOBAL_SYSTEM_ACCESSTOKEN")
 while ($true){
     #Invoke call to Azure DevOps Rest API to get all build data for given environment.
     $EnvironmentPipelineRuns = (Invoke-RestMethod -Method GET -Uri $Url -Headers  @{
