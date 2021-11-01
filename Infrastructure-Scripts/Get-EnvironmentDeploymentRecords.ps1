@@ -1,8 +1,6 @@
 [CmdletBinding()]
 Param (
     [Parameter(Mandatory = $true)]
-    [String]$Organisation,
-    [Parameter(Mandatory = $true)]
     [String]$EnvironmentId,
     [Parameter(Mandatory = $true)]
     [String]$PipelineName,
