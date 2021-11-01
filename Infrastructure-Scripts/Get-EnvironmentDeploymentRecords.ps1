@@ -24,6 +24,6 @@ while ($true){
     }
     else {
         Start-Sleep -s $SleepTime
-        Write-Host("There is another deployment to this stage is currently running in this environment. Retrying in $SleepTime seconds")
+        Write-Host("There is another deployment to this stage currently running in this environment. Retrying in $SleepTime seconds")
     }
 }
