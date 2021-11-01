@@ -12,9 +12,7 @@ Param (
     [Int]$SleepTime = 20
 )
 
-Write-Host("Project name = $env:SYSTEM_PROJECTNAME")
-
-$Url = "https://dev.azure.com/$Organisation/$env:SYSTEM_PROJECTNAME/_apis/distributedtask/environments/$EnvironmentId/environmentdeploymentrecords?top=100?api-version=6.0-preview.1"
+$Url = "$env:SYSTEM_ORGANISATIONNAME/$env:SYSTEM_PROJECTNAME/_apis/distributedtask/environments/$EnvironmentId/environmentdeploymentrecords?top=100?api-version=6.0-preview.1"
 
 while ($true){
     #Invoke call to Azure DevOps Rest API to get all build data for given environment.
