@@ -3,8 +3,6 @@ Param (
     [Parameter(Mandatory = $true)]
     [String]$Organisation,
     [Parameter(Mandatory = $true)]
-    [String]$Project,
-    [Parameter(Mandatory = $true)]
     [String]$EnvironmentId,
     [Parameter(Mandatory = $true)]
     [String]$PipelineName,
@@ -14,7 +12,9 @@ Param (
     [Int]$SleepTime = 20
 )
 
-$Url = "https://dev.azure.com/$Organisation/$Project/_apis/distributedtask/environments/$EnvironmentId/environmentdeploymentrecords?top=100?api-version=6.0-preview.1"
+Write-Host(Project name = $env:SYSTEM_PROJECTNAME)
+
+$Url = "https://dev.azure.com/$Organisation/$env:SYSTEM_PROJECTNAME/_apis/distributedtask/environments/$EnvironmentId/environmentdeploymentrecords?top=100?api-version=6.0-preview.1"
 
 while ($true){
     #Invoke call to Azure DevOps Rest API to get all build data for given environment.
@@ -31,6 +31,3 @@ while ($true){
         Write-Host("There is another deployment to this stage is currently running in this environment. Retrying in $SleepTime seconds")
     }
 }
-
-
-
