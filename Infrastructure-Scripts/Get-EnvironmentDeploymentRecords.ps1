@@ -33,7 +33,7 @@ Param (
     [Int]$SleepTime = 20
 )
 
-$Url = "$env:SYSTEM_ORGANISATIONNAME/$env:SYSTEM_PROJECTNAME/_apis/distributedtask/environments/$EnvironmentId/environmentdeploymentrecords?top=100?api-version=6.0-preview.1"
+$Url = test#"$env:SYSTEM_ORGANISATIONNAME/$env:SYSTEM_PROJECTNAME/_apis/distributedtask/environments/$EnvironmentId/environmentdeploymentrecords?top=100?api-version=6.0-preview.1"
 
     while ($true){
         try{
