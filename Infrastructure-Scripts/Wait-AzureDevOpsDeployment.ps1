@@ -15,10 +15,10 @@
     The Run ID of the current deployment which is used to compare to the lowest active RunID returned by the API
 
     .PARAMETER SleepTime
-    The the amount of time in seconds that the process will wait before retrying the comparison if there is another deployment currently running.
+    The amount of time in seconds that the process will wait before retrying the comparison if there is another deployment currently running.
 
     .EXAMPLE
-    .\Get-EnvironmentDeploymentRecords.ps1 -EnvironmentId 139 -PipelineName das-levy-transfer-matching-api -RunId 460XXX
+    .\Wait-AzureDevOpsDeployment.ps1 -EnvironmentId 139 -PipelineName das-levy-transfer-matching-api -RunId 460XXX
 #>
 
 [CmdletBinding()]
@@ -36,27 +36,27 @@ Param (
 $Url = "$env:SYSTEM_ORGANISATIONNAME/$env:SYSTEM_PROJECTNAME/_apis/distributedtask/environments/$EnvironmentId/environmentdeploymentrecords?top=100?api-version=6.0-preview.1"
 $RetryCounter = 1
 
-while ($RetryCounter -lt 10){
+while ($RetryCounter -lt 30){
+    Write-Verbose "Attempt $RetryCounter"
     try{
-        Write-Verbose "Attempt $RetryCounter"
-        #Invoke call to Azure DevOps Rest API to get all build data for given environment.
-        $EnvironmentPipelineRuns = Invoke-RestMethod -Method GET -Uri $Url -Headers  @{ Authorization = "Bearer $env:SYSTEM_ACCESSTOKEN" } -TimeoutSec 30
+        #Invoke call to Azure DevOps Rest API to get all deployment data for given environment.
+        $EnvironmentDeployments = Invoke-RestMethod -Method GET -Uri $Url -Headers  @{ Authorization = "Bearer $env:SYSTEM_ACCESSTOKEN" } -TimeoutSec 30
     }
     catch{
-        Write-Verbose "Response code $($_.Exception.Response.StatusCode.Value__) received"
+        Write-Error "Response code $($_.Exception.Response.StatusCode.Value__) received. Terminating process, deployment will continue."
         Write-Output $_
         break;
     }
     #Filter down results of API call to just contain relevant pipeline runs with matching Pipeline names and only ones that are still running.
-    $RunningEnvironmentPipelineRuns = $EnvironmentPipelineRuns.value | where-object {$_.definition.name -eq $PipelineName -and -not $_.result}
-    $LowestRunId = ($RunningEnvironmentPipelineRuns.owner.id | Sort-Object)[0]
+    $RunningEnvironmentDeployments = $EnvironmentDeployments.value | Where-Object {$_.definition.name -eq $PipelineName -and -not $_.result}
+    $LowestRunId = $RunningEnvironmentDeployments.owner.id | Sort-Object -Top 1
     if ($RunId -eq $LowestRunId) {
         Write-Host("Continuing with deployment.")
         break;
     }
     else {
         $RetryCounter++
-        Start-Sleep -s $SleepTime
+        Start-Sleep -Seconds $SleepTime
         Write-Host("There is another deployment to this stage currently running in this environment. Retrying in $SleepTime seconds")
     }
 }
