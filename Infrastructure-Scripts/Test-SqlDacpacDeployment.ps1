@@ -25,7 +25,12 @@ if ($OverrideBlockOnPossibleDataLoss) {
         catch {
             throw "ApproveOverrideBlockOnPossibleDataLoss variable is not set in this pipeline.  See docs for this script for further info."
         }
-        Write-Verbose "Override for BlockOnPossibleDataLoss approved, setting AdditionalArgument '/p:BlockOnPossibleDataLoss=false'"
+        if($ApproveOverrideBlockOnPossibleDataLoss) {
+            Write-Verbose "Override for BlockOnPossibleDataLoss approved, setting AdditionalArgument '/p:BlockOnPossibleDataLoss=false'"
+        }
+        else {
+            Write-Verbose "Override for BlockOnPossibleDataLoss not approved, deploying DACPAC with default arguments"
+        }
     }
     else {
         Write-Verbose "Environment is not PROD, overriding BlockOnPossibleDataLoss"
