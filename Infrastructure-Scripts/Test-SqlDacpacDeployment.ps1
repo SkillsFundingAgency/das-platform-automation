@@ -18,7 +18,8 @@ if ($OverrideBlockOnPossibleDataLoss) {
     if ($Environment -eq "AT") {    
         Write-Verbose "Environment is PROD, checking for approval to override BlockOnPossibleDataLoss"
         try {
-            Get-Variable -Name ApproveOverrideBlockOnPossibleDataLoss -ErrorAction Stop
+            ##TO DO: decide whether to pass this in as parameter or if direct reference to env var is appropriate
+            Get-Variable -Name $ENV:ApproveOverrideBlockOnPossibleDataLoss -ErrorAction Stop
         }
         catch {
             throw "ApproveOverrideBlockOnPossibleDataLoss variable is not set in this pipeline.  See docs for this script for further info."
