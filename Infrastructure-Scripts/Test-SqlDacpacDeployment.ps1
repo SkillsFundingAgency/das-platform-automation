@@ -1,7 +1,7 @@
 [CmdletBinding()]
 param(
     [Parameter(Mandatory=$true)]
-    [VariableSet("AT", "TEST", "TEST2", "PP", "PROD", "MO", "DEMO")]
+    [ValidateSet("AT", "TEST", "TEST2", "PP", "PROD", "MO", "DEMO")]
     [string]$Environment,
     [Parameter(Mandatory=$true)]
     [boolean]$OverrideBlockOnPossibleDataLoss
