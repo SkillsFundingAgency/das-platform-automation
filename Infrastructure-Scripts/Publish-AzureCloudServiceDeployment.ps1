@@ -172,7 +172,7 @@ try {
         $AzureService = New-AzureService -ServiceName $ServiceName -Location $ServiceLocation
     }
 
-    $DiagnosticExtensions = Get-DiagnosticsExtension -StorageAccount $ClassicStorageAccountName -ExtensionsPath $ServiceConfigFile StorageAccountKeysMap $StorageAccountKeysMap
+    $DiagnosticExtensions = Get-DiagnosticsExtension -StorageAccount $ClassicStorageAccountName -ExtensionsPath $ServiceConfigFile -StorageAccountKeysMap $StorageAccountKeysMap
 
     Write-Host "##[command]Get-AzureDeployment -ServiceName $ServiceName -Slot $Slot -ErrorAction SilentlyContinue -ErrorVariable azureDeploymentError"
     $AzureDeployment = Get-AzureDeployment -ServiceName $ServiceName -Slot $Slot -ErrorAction SilentlyContinue -ErrorVariable azureDeploymentError
