@@ -15,7 +15,9 @@ param(
 Write-Verbose "Checking if BlockOnPossibleDataLoss has been overridden"
 if ($OverrideBlockOnPossibleDataLoss) {
     Write-Verbose "Override BlockOnPossibleDataLoss requested"
-    if ($Environment -eq "PROD") {
+    ##TO DO: change condition back to "PROD"
+    #if ($Environment -eq "PROD") {
+    if ($Environment -eq "AT") {    
         Write-Verbose "Environment is PROD, checking for approval to override BlockOnPossibleDataLoss"
         try {
             Get-Variable -Name ApproveOverrideBlockOnPossibleDataLoss -ErrorAction Stop
