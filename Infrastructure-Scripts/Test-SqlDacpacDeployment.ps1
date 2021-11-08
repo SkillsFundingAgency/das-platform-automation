@@ -24,11 +24,13 @@ if ($OverrideBlockOnPossibleDataLoss) {
         catch {
             throw "ApproveOverrideBlockOnPossibleDataLoss variable is not set in this pipeline.  See docs for this script for further info."
         }
-        if($ENV:ApproveOverrideBlockOnPossibleDataLoss eq "true") {
+        if($ENV:ApproveOverrideBlockOnPossibleDataLoss -eq "true") {
             Write-Verbose "Override for BlockOnPossibleDataLoss approved, setting AdditionalArgument '/p:BlockOnPossibleDataLoss=false'"
+            Write-Output "##vso[task.setvariable variable=SetBlockOnPossibleDataLossArgument]true"
         }
         else {
             Write-Verbose "Override for BlockOnPossibleDataLoss not approved, deploying DACPAC with default arguments"
+            Write-Output "##vso[task.setvariable variable=SetBlockOnPossibleDataLossArgument]false"
         }
     }
     else {
