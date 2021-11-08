@@ -19,12 +19,12 @@ if ($OverrideBlockOnPossibleDataLoss) {
         Write-Verbose "Environment is PROD, checking for approval to override BlockOnPossibleDataLoss"
         try {
             ##TO DO: decide whether to pass this in as parameter or if direct reference to env var is appropriate
-            Get-Variable -Name $ENV:ApproveOverrideBlockOnPossibleDataLoss -ErrorAction Stop
+            Get-Variable -Name $ENV:ApproveOverrideBlockOnPossibleDataLoss -ErrorAction Stop | Out-Null
         }
         catch {
             throw "ApproveOverrideBlockOnPossibleDataLoss variable is not set in this pipeline.  See docs for this script for further info."
         }
-        if($ENV:ApproveOverrideBlockOnPossibleDataLoss) {
+        if($ENV:ApproveOverrideBlockOnPossibleDataLoss eq "true") {
             Write-Verbose "Override for BlockOnPossibleDataLoss approved, setting AdditionalArgument '/p:BlockOnPossibleDataLoss=false'"
         }
         else {
