@@ -24,7 +24,7 @@ if ($OverrideBlockOnPossibleDataLoss) {
         catch {
             throw "ApproveOverrideBlockOnPossibleDataLoss variable is not set in this pipeline.  See docs for this script for further info."
         }
-        if($ApproveOverrideBlockOnPossibleDataLoss) {
+        if($ENV:ApproveOverrideBlockOnPossibleDataLoss) {
             Write-Verbose "Override for BlockOnPossibleDataLoss approved, setting AdditionalArgument '/p:BlockOnPossibleDataLoss=false'"
         }
         else {
