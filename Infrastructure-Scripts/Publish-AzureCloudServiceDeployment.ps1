@@ -4,6 +4,10 @@
 
     .DESCRIPTION
     Publish an Azure Cloud Service Deployment
+    This script is based on the AzureCloudPowerShellDeploymentV1 Azure DevOps task:
+    https://github.com/microsoft/azure-pipelines-tasks/tree/8c190dc05cd7e13575a16e3a25f069f5dfed8452/Tasks/AzureCloudPowerShellDeploymentV1
+    Added as an Infrastructure Script so the script can run on MSFT Hosted Agents by setting the CurrentStorageAccountName with the command:
+    Set-AzureSubscription -CurrentStorageAccountName $ClassicStorageAccountName -SubscriptionId $Subscription.SubscriptionId
 
     .PARAMETER ServiceName
     The name of the Cloud Service
