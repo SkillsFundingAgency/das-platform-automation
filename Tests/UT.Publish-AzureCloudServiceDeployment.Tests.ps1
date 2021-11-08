@@ -9,6 +9,7 @@ Describe "Publish-AzureCloudServiceDeployment Unit Tests" -Tags @("Unit") {
             Function Get-AzureService { }
             Function Get-AzureDeployment { }
             Function New-AzureService { }
+            Function New-AzureDeployment { }
             Mock Get-AzureSubscription -MockWith {
                 return @{
                     SubscriptionId = $Config.guid
@@ -18,12 +19,14 @@ Describe "Publish-AzureCloudServiceDeployment Unit Tests" -Tags @("Unit") {
             Mock Get-AzureService -MockWith { return $null }
             Mock Get-AzureDeployment { return $null }
             Mock New-AzureService -MockWith { return $null }
+            Mock New-AzureDeployment -MockWith { return $null }
             { .\Publish-AzureCloudServiceDeployment.ps1 -ServiceName das-at-foobar-cs -ServiceLocation foobar -ClassicStorageAccountName dasatfoobarstr -ServicePackageFile ./SFA.DAS.FooBar.CloudService.cspkg -ServiceConfigFile ./ServiceConfiguration.Cloud.cscfg -Slot Production } | Should not throw
             Assert-MockCalled -CommandName 'Get-AzureSubscription' -Times 1 -Scope It
             Assert-MockCalled -CommandName 'Set-AzureSubscription' -Times 1 -Scope It
             Assert-MockCalled -CommandName 'Get-AzureService' -Times 1 -Scope It
             Assert-MockCalled -CommandName 'Get-AzureDeployment' -Times 1 -Scope It
             Assert-MockCalled -CommandName 'New-AzureService' -Times 1 -Scope It
+            Assert-MockCalled -CommandName 'New-AzureDeployment' -Times 1 -Scope It
         }
     }
 }
