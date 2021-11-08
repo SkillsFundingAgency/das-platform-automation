@@ -43,10 +43,9 @@ Param(
     [ValidateSet("Production", "Staging")]
     [String]$Slot
 )
-try{
+try {
 
-    function Get-DiagnosticsExtensions($storageAccount, $extensionsPath, $storageAccountKeysMap, [switch]$useArmStorage)
-    {
+    function Get-DiagnosticsExtensions($storageAccount, $extensionsPath, $storageAccountKeysMap, [switch]$useArmStorage) {
         $diagnosticsConfigurations = @()
         
         $extensionsSearchPath = Split-Path -Parent $extensionsPath
@@ -54,98 +53,81 @@ try{
         $extensionsSearchPath = Join-Path -Path $extensionsSearchPath -ChildPath "Extensions"
         Write-Verbose "extensionsSearchPath= $extensionsSearchPath"
         #$extensionsSearchPath like C:\Agent\_work\bd5f89a2\staging\Extensions
-        if (!(Test-Path $extensionsSearchPath))
-        {
+        if (!(Test-Path $extensionsSearchPath)) {
             Write-Verbose "No Azure Cloud Extensions found at '$extensionsSearchPath'"
         }
-        else
-        {
+        else {
             Write-Host ("Applyinganyconfigureddiagnosticsextensions")
 
             Write-Verbose "Getting the primary AzureStorageKey..."
             $primaryStorageKey = Get-AzureStoragePrimaryKey $StorageAccount $useArmStorage.IsPresent
 
-            if ($primaryStorageKey)
-            {
+            if ($primaryStorageKey) {
 
                 Write-Verbose "##[command]Get-ChildItem -Path $extensionsSearchPath -Filter PaaSDiagnostics.*.PubConfig.xml"
                 $diagnosticsExtensions = Get-ChildItem -Path $extensionsSearchPath -Filter "PaaSDiagnostics.*.PubConfig.xml"
 
                 #$extPath like PaaSDiagnostics.WebRole1.PubConfig.xml
-                foreach ($extPath in $diagnosticsExtensions)
-                {
+                foreach ($extPath in $diagnosticsExtensions) {
                     $role = Get-RoleName $extPath
-                    if ($role)
-                    {
+                    if ($role) {
                         $fullExtPath = Join-Path -path $extensionsSearchPath -ChildPath $extPath
                         Write-Verbose "fullExtPath= $fullExtPath"
 
                         Write-Verbose "Loading $fullExtPath as XML..."
                         $publicConfig = New-Object XML
                         $publicConfig.Load($fullExtPath)
-                        if ($publicConfig.PublicConfig.StorageAccount)
-                        {
+                        if ($publicConfig.PublicConfig.StorageAccount) {
                             #We found a StorageAccount in the role's diagnostics configuration.  Use it.
                             $publicConfigStorageAccountName = $publicConfig.PublicConfig.StorageAccount
                             Write-Verbose "Found PublicConfig.StorageAccount= '$publicConfigStorageAccountName'"
 
-                            if ($storageAccountKeysMap.containsKey($role))
-                            {
+                            if ($storageAccountKeysMap.containsKey($role)) {
                                 Write-Verbose "##Getting diagnostics storage account name and key from passed as storage keys."
 
                                 Write-Verbose "##$storageAccountName = $publicConfigStorageAccountName"
                                 $storageAccountName = $publicConfigStorageAccountName
                                 $storageAccountKey = $storageAccountKeysMap.Get_Item($role)
                             }
-                            else
-                            {
-                                try
-                                {
+                            else {
+                                try {
                                     $publicConfigStorageKey = Get-AzureStoragePrimaryKey $publicConfigStorageAccountName $useArmStorage.IsPresent
                                 }
-                                catch
-                                {   
+                                catch {   
                                     Write-Host ("Unabletofind0usingprovidedsubscription: $publicConfigStorageAccountName")
                                     Write-Verbose $_.Exception.Message
                                 }
-                                if ($publicConfigStorageKey)
-                                {
+                                if ($publicConfigStorageKey) {
                                     Write-Verbose "##Getting storage account name and key from diagnostics config file"
 
                                     Write-Verbose "##$storageAccountName = $publicConfigStorageAccountName"
                                     $storageAccountName = $publicConfigStorageAccountName
                                     $storageAccountKey = $publicConfigStorageKey                                
                                 }                    
-                                else
-                                {
+                                else {
                                     Write-Warning ("Couldnotgettheprimarystoragekeyforthepublicconfigstorageaccount0Unabletoapplyanydiagnosticsextensions: $publicConfigStorageAccountName")
                                     return
                                 }
                             }
                         }
-                        else
-                        {
+                        else {
                             #If we don't find a StorageAccount in the XML file, use the one associated with the definition's storage account
                             Write-Verbose "No StorageAccount found in PublicConfig.  Using the storage account set on the definition..."
                             $storageAccountName = $storageAccount
                             $storageAccountKey = $primaryStorageKey
                         }
 
-                        if((CmdletHasMember "StorageAccountName") -and (CmdletHasMember "StorageAccountKey"))
-                        {
+                        if ((CmdletHasMember "StorageAccountName") -and (CmdletHasMember "StorageAccountKey")) {
                             Write-Host "New-AzureServiceDiagnosticsExtensionConfig -Role $role -StorageAccountName $storageAccountName -StorageAccountKey <storageKey> -DiagnosticsConfigurationPath $fullExtPath"
                             $wadconfig = New-AzureServiceDiagnosticsExtensionConfig -Role $role -StorageAccountName $storageAccountName -StorageAccountKey $storageAccountKey -DiagnosticsConfigurationPath $fullExtPath
                         } 
-                        else
-                        {
-                            try
-                            {
+                        else {
+                            try {
                                 $storageContext = New-AzureStorageContext -StorageAccountName $storageAccountName -StorageAccountKey $storageAccountKey
                                 Write-Host "New-AzureServiceDiagnosticsExtensionConfig -Role $role -StorageContext $StorageContext -DiagnosticsConfigurationPath $fullExtPath"
                                 $wadconfig = New-AzureServiceDiagnosticsExtensionConfig -Role $role -StorageContext $StorageContext -DiagnosticsConfigurationPath $fullExtPath 
                             }
-                            catch
-                            {
+                            catch {
                                 Write-Warning ("Currentversionofazurepowershelldontsupportexternalstorageaccountforconfiguringdiagnostics")
                                 throw $_.Exception
                             }
@@ -156,8 +138,7 @@ try{
                     }
                 }
             }
-            else
-            {
+            else {
                 Write-Warning ("Couldnotgettheprimarystoragekeyforstorageaccount0Unabletoapplyanydiagnosticsextensions: $storageAccount")
             }
         }
@@ -175,12 +156,11 @@ try{
     Write-Host "##[command]Get-AzureService -ServiceName $ServiceName -ErrorAction SilentlyContinue -ErrorVariable azureServiceError"
     $azureService = Get-AzureService -ServiceName $ServiceName -ErrorAction SilentlyContinue -ErrorVariable azureServiceError
 
-    if($azureServiceError){
-       $azureServiceError | ForEach-Object { Write-Verbose $_.Exception.ToString() }
+    if ($azureServiceError) {
+        $azureServiceError | ForEach-Object { Write-Verbose $_.Exception.ToString() }
     }   
 
-    if (!$azureService)
-    {    
+    if (!$azureService) {    
         $azureService = "New-AzureService -ServiceName `"$ServiceName`""
         $azureService += " -Location `"$ServiceLocation`""
         Write-Host "$azureService"
@@ -192,18 +172,16 @@ try{
     Write-Host "##[command]Get-AzureDeployment -ServiceName $ServiceName -Slot $Slot -ErrorAction SilentlyContinue -ErrorVariable azureDeploymentError"
     $azureDeployment = Get-AzureDeployment -ServiceName $ServiceName -Slot $Slot -ErrorAction SilentlyContinue -ErrorVariable azureDeploymentError
 
-    if($azureDeploymentError) {
-       $azureDeploymentError | ForEach-Object { Write-Verbose $_.Exception.ToString() }
+    if ($azureDeploymentError) {
+        $azureDeploymentError | ForEach-Object { Write-Verbose $_.Exception.ToString() }
     }
 
-    if (!$azureDeployment)
-    {
+    if (!$azureDeployment) {
         Write-Host "##[command]New-AzureDeployment -ServiceName $ServiceName -Package $ServicePackageFile -Configuration $ServiceConfigFile -Slot $Slot -Label $label -ExtensionConfiguration <extensions>"
         $azureDeployment = New-AzureDeployment -ServiceName $ServiceName -Package $ServicePackageFile -Configuration $ServiceConfigFile -Slot $Slot -Label $label -ExtensionConfiguration $diagnosticExtensions
         
     }
-    else
-    {
+    else {
         #Use -Upgrade
         Write-Host "##[command]Set-AzureDeployment -Upgrade -ServiceName $ServiceName -Package $ServicePackageFile -Configuration $ServiceConfigFile -Slot $Slot -Label $label -ExtensionConfiguration <extensions>"
         $azureDeployment = Set-AzureDeployment -Upgrade -ServiceName $ServiceName -Package $ServicePackageFile -Configuration $ServiceConfigFile -Slot $Slot -Label $label -ExtensionConfiguration $diagnosticExtensions
