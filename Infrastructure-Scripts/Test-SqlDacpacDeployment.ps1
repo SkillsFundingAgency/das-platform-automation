@@ -1,10 +1,12 @@
 [CmdletBinding()]
 param(
     [Parameter(Mandatory=$true)]
-    [ValidateSet("AT", "TEST", "TEST2", "PP", "PROD", "MO", "DEMO")]
-    [string]$Environment,
+    #[ValidateSet("AT", "TEST", "TEST2", "PP", "PROD", "MO", "DEMO")]
+    #[string]
+    $Environment,
     [Parameter(Mandatory=$true)]
-    [boolean]$OverrideBlockOnPossibleDataLoss
+    #[boolean]
+    $OverrideBlockOnPossibleDataLoss
 )
 
 Write-Verbose "Checking if BlockOnPossibleDataLoss has been overridden"
