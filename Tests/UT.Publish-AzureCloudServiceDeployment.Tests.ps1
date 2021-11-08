@@ -7,6 +7,7 @@ Describe "Publish-AzureCloudServiceDeployment Unit Tests" -Tags @("Unit") {
             Function Get-AzureSubscription { }
             Function Set-AzureSubscription { }
             Function Get-AzureService { }
+            Function Get-AzureDeployment { }
             Function New-AzureService { }
             Mock Get-AzureSubscription -MockWith {
                 return @{
@@ -15,11 +16,13 @@ Describe "Publish-AzureCloudServiceDeployment Unit Tests" -Tags @("Unit") {
             }
             Mock Set-AzureSubscription -MockWith { return $null }
             Mock Get-AzureService -MockWith { return $null }
+            Mock Get-AzureDeployment { return $null }
             Mock New-AzureService -MockWith { return $null }
             { .\Publish-AzureCloudServiceDeployment.ps1 -ServiceName das-at-foobar-cs -ServiceLocation foobar -ClassicStorageAccountName dasatfoobarstr -ServicePackageFile ./SFA.DAS.FooBar.CloudService.cspkg -ServiceConfigFile ./ServiceConfiguration.Cloud.cscfg -Slot Production } | Should not throw
             Assert-MockCalled -CommandName 'Get-AzureSubscription' -Times 1 -Scope It
             Assert-MockCalled -CommandName 'Set-AzureSubscription' -Times 1 -Scope It
             Assert-MockCalled -CommandName 'Get-AzureService' -Times 1 -Scope It
+            Assert-MockCalled -CommandName 'Get-AzureDeployment' -Times 1 -Scope It
             Assert-MockCalled -CommandName 'New-AzureService' -Times 1 -Scope It
         }
     }
