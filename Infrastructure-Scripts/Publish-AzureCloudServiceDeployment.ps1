@@ -47,7 +47,6 @@ try {
 
     function Get-DiagnosticsExtensions($storageAccount, $extensionsPath, $storageAccountKeysMap, [switch]$useArmStorage) {
         $diagnosticsConfigurations = @()
-        
         $extensionsSearchPath = Split-Path -Parent $extensionsPath
         Write-Verbose "extensionsSearchPath= $extensionsSearchPath"
         $extensionsSearchPath = Join-Path -Path $extensionsSearchPath -ChildPath "Extensions"
@@ -93,7 +92,7 @@ try {
                                 try {
                                     $publicConfigStorageKey = Get-AzureStoragePrimaryKey $publicConfigStorageAccountName $useArmStorage.IsPresent
                                 }
-                                catch {   
+                                catch {
                                     Write-Host ("Unabletofind0usingprovidedsubscription: $publicConfigStorageAccountName")
                                     Write-Verbose $_.Exception.Message
                                 }
