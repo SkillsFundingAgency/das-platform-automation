@@ -102,8 +102,8 @@ try {
 
                                     Write-Verbose "##$storageAccountName = $publicConfigStorageAccountName"
                                     $storageAccountName = $publicConfigStorageAccountName
-                                    $storageAccountKey = $publicConfigStorageKey                                
-                                }                    
+                                    $storageAccountKey = $publicConfigStorageKey
+                                }
                                 else {
                                     Write-Warning ("Couldnotgettheprimarystoragekeyforthepublicconfigstorageaccount0Unabletoapplyanydiagnosticsextensions: $publicConfigStorageAccountName")
                                     return
@@ -120,12 +120,12 @@ try {
                         if ((CmdletHasMember "StorageAccountName") -and (CmdletHasMember "StorageAccountKey")) {
                             Write-Host "New-AzureServiceDiagnosticsExtensionConfig -Role $role -StorageAccountName $storageAccountName -StorageAccountKey <storageKey> -DiagnosticsConfigurationPath $fullExtPath"
                             $wadconfig = New-AzureServiceDiagnosticsExtensionConfig -Role $role -StorageAccountName $storageAccountName -StorageAccountKey $storageAccountKey -DiagnosticsConfigurationPath $fullExtPath
-                        } 
+                        }
                         else {
                             try {
                                 $storageContext = New-AzureStorageContext -StorageAccountName $storageAccountName -StorageAccountKey $storageAccountKey
                                 Write-Host "New-AzureServiceDiagnosticsExtensionConfig -Role $role -StorageContext $StorageContext -DiagnosticsConfigurationPath $fullExtPath"
-                                $wadconfig = New-AzureServiceDiagnosticsExtensionConfig -Role $role -StorageContext $StorageContext -DiagnosticsConfigurationPath $fullExtPath 
+                                $wadconfig = New-AzureServiceDiagnosticsExtensionConfig -Role $role -StorageContext $StorageContext -DiagnosticsConfigurationPath $fullExtPath
                             }
                             catch {
                                 Write-Warning ("Currentversionofazurepowershelldontsupportexternalstorageaccountforconfiguringdiagnostics")
@@ -142,7 +142,6 @@ try {
                 Write-Warning ("Couldnotgettheprimarystoragekeyforstorageaccount0Unabletoapplyanydiagnosticsextensions: $storageAccount")
             }
         }
-        
         return $diagnosticsConfigurations
     }
 
@@ -158,9 +157,9 @@ try {
 
     if ($azureServiceError) {
         $azureServiceError | ForEach-Object { Write-Verbose $_.Exception.ToString() }
-    }   
+    }
 
-    if (!$azureService) {    
+    if (!$azureService) {
         $azureService = "New-AzureService -ServiceName `"$ServiceName`""
         $azureService += " -Location `"$ServiceLocation`""
         Write-Host "$azureService"
@@ -168,7 +167,7 @@ try {
     }
 
     $diagnosticExtensions = Get-DiagnosticsExtensions $ClassicStorageAccountName $ServiceConfigFile $storageAccountKeysMap
-    
+
     Write-Host "##[command]Get-AzureDeployment -ServiceName $ServiceName -Slot $Slot -ErrorAction SilentlyContinue -ErrorVariable azureDeploymentError"
     $azureDeployment = Get-AzureDeployment -ServiceName $ServiceName -Slot $Slot -ErrorAction SilentlyContinue -ErrorVariable azureDeploymentError
 
@@ -179,7 +178,7 @@ try {
     if (!$azureDeployment) {
         Write-Host "##[command]New-AzureDeployment -ServiceName $ServiceName -Package $ServicePackageFile -Configuration $ServiceConfigFile -Slot $Slot -Label $label -ExtensionConfiguration <extensions>"
         $azureDeployment = New-AzureDeployment -ServiceName $ServiceName -Package $ServicePackageFile -Configuration $ServiceConfigFile -Slot $Slot -Label $label -ExtensionConfiguration $diagnosticExtensions
-        
+
     }
     else {
         #Use -Upgrade
