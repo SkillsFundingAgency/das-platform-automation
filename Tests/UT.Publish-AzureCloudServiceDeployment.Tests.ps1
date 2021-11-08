@@ -4,6 +4,10 @@ Set-Location $PSScriptRoot\..\Infrastructure-Scripts
 Describe "Publish-AzureCloudServiceDeployment Unit Tests" -Tags @("Unit") {
     Context "Cloud service does not exist, should not throw an error" {
         It "Cloud service does not exist, should not throw an error" {
+            Function Get-AzureSubscription { }
+            Function Set-AzureSubscription { }
+            Function Get-AzureService { }
+            Function New-AzureService { }
             Mock Get-AzureSubscription -MockWith {
                 return @{
                     SubscriptionId = $Config.guid
