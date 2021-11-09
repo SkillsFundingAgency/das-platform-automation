@@ -31,14 +31,14 @@ Describe "Import-ApimSwaggerApiDefinition Unit Tests" -Tags @("Unit") {
             function Get-AppServiceName () { }
             function Add-AppServiceWhitelist () { }
             function Invoke-RetryWebRequest () { }
-            function Get-AllSwaggerFilePaths () { }
+            function Get-SwaggerFilePath () { }
             function Get-ApiTitle () { }
             Mock Get-AzApiManagement -MockWith { Return "Context" }
             Mock Get-AppServiceName -MockWith { Return "app-service-name" }
             Mock Add-AppServiceWhitelist -MockWith { Return $null }
             Mock Invoke-RetryWebRequest -MockWith { Return $null }
             Mock Start-Sleep -MockWith { Return $null }
-            Mock Get-AllSwaggerFilePaths -MockWith { Return @("/swagger/v1/swagger.json", "/swagger/v2/swagger.json") }
+            Mock Get-SwaggerFilePath -MockWith { Return @("/swagger/v1/swagger.json", "/swagger/v2/swagger.json") }
             Mock Get-ApiTitle -MockWith { Return $null }
             Mock Get-AzApiManagementApiVersionSet -MockWith {
                 return @{
@@ -54,7 +54,7 @@ Describe "Import-ApimSwaggerApiDefinition Unit Tests" -Tags @("Unit") {
             Assert-MockCalled -CommandName 'Get-AzApiManagement' -Times 1 -Scope It
             Assert-MockCalled -CommandName 'Get-AzApiManagement' -Times 1 -Scope It
             Assert-MockCalled -CommandName 'Invoke-RetryWebRequest' -Times 1 -Scope It
-            Assert-MockCalled -CommandName 'Get-AllSwaggerFilePaths' -Times 1 -Scope It
+            Assert-MockCalled -CommandName 'Get-SwaggerFilePath' -Times 1 -Scope It
             Assert-MockCalled -CommandName 'Get-ApiTitle' -Times 1 -Scope It
             Assert-MockCalled -CommandName 'Get-AzApiManagementApiVersionSet' -Times 1 -Scope It
             Assert-MockCalled -CommandName 'Import-AzApiManagementApi' -Times 1 -Scope It
