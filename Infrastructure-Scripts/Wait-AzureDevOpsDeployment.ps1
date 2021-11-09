@@ -34,7 +34,7 @@ Param (
 )
 
 $Url = "$env:SYSTEM_ORGANISATIONNAME/$env:SYSTEM_PROJECTNAME/_apis/distributedtask/environments/$EnvironmentId/environmentdeploymentrecords?top=100?api-version=6.0-preview.1"
-$RetryCounter = 1
+$RetryCounter = 0
 
 while ($RetryCounter -lt 30){
     Write-Verbose "Attempt $RetryCounter"
@@ -51,12 +51,15 @@ while ($RetryCounter -lt 30){
     $RunningEnvironmentDeployments = $EnvironmentDeployments.value | Where-Object {$_.definition.name -eq $PipelineName -and -not $_.result}
     $LowestRunId = $RunningEnvironmentDeployments.owner.id | Sort-Object -Top 1
     if ($RunId -eq $LowestRunId) {
-        Write-Host("Continuing with deployment.")
+        Write-Output("Continuing with deployment.")
         break;
     }
     else {
         $RetryCounter++
         Start-Sleep -Seconds $SleepTime
-        Write-Host("There is another deployment to this stage currently running in this environment. Retrying in $SleepTime seconds")
+        Write-Output("There is another deployment to this stage currently running in this environment. Retrying in $SleepTime seconds.")
     }
+}
+if ($RetryCounter -eq 30) {
+    Write-Output("Retry limit has been reached - Continuing with deployment.")
 }
