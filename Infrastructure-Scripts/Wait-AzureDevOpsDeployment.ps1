@@ -3,16 +3,16 @@
     Gets the latest deployment record for a given pipeline and environment and checks whether the current instance is able to run without clashing with said record.
 
     .DESCRIPTION
-    Gets payload from Azure DevOps RestAPI and filters it to produce the build ID of the newest running build. Then compares to its own build ID, if equal to it then run and if not sleep and redo.
+    Gets payload from Azure DevOps RestAPI (https://docs.microsoft.com/en-us/rest/api/azure/devops/distributedtask/environmentdeployment-records/list?view=azure-devops-rest-6.0) and filters it to produce the build ID of the newest running build. Then compares to its own build ID, if equal to it then run and if not sleep and redo.
 
     .PARAMETER EnvironmentId
-    The ID number associated with the environemnt stage being used for the deployment,
+    The ID number associated with the environemnt stage being used for the deployment.
 
     .PARAMETER PipelineName
     The name of the pipeline that the deployment is being run on.
 
     .PARAMETER RunId
-    The Run ID of the current deployment which is used to compare to the lowest active RunID returned by the API
+    The Run ID of the current deployment which is used to compare to the lowest active RunID returned by the API.
 
     .PARAMETER SleepTime
     The amount of time in seconds that the process will wait before retrying the comparison if there is another deployment currently running.
