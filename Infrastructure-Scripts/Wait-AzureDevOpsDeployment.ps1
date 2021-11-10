@@ -20,7 +20,7 @@
     .EXAMPLE
     .\Wait-AzureDevOpsDeployment.ps1 -EnvironmentId 139 -PipelineName das-levy-transfer-matching-api -RunId 460XXX
 #>
-
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSReviewUnusedParameter", "", Justification = "Known bug - https://github.com/PowerShell/PSScriptAnalyzer/issues/1472")]
 [CmdletBinding()]
 Param (
     [Parameter(Mandatory = $true)]
