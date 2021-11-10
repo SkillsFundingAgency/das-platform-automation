@@ -13,6 +13,7 @@ Describe "Wait-AzureDevOpsDeployment Unit Tests" -Tags @("Unit") {
         EnvironmentId = "150"
         PipelineName = "TEST"
         RunId = "474945"
+        SleepTime = "1"
     }
 
     Context "Wait-AzureDevOpsDeployment runs and continues with deployment with no sleep" {
@@ -29,7 +30,7 @@ Describe "Wait-AzureDevOpsDeployment Unit Tests" -Tags @("Unit") {
         Mock Write-Output
         It "Script is run with blocking deployments taking place so the following message is given over 30 iterations - 'There is another deployment to this stage currently running in this environment. Retrying in 20 seconds.'" {
             { ./Wait-AzureDevOpsDeployment.ps1 @ParamsNonMatched } | Should not Throw
-            Assert-MockCalled Write-Output -Times 2 -Scope It -ParameterFilter { $InputObject -match "There is another deployment to this stage currently running in this environment. Retrying in 20 seconds." }
+            Assert-MockCalled Write-Output -Times 2 -Scope It -ParameterFilter { $InputObject -match "There is another deployment to this stage currently running in this environment. Retrying in 1 seconds." }
             Assert-MockCalled Write-Output -Times 1 -Scope It -ParameterFilter { $InputObject -match "Retry limit has been reached - Continuing with deployment." }
         }
     }
