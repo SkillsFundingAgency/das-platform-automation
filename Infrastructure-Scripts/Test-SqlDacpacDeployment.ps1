@@ -52,8 +52,10 @@ if ($OverrideBlockOnPossibleDataLoss) {
     }
     else {
         Write-Verbose "Environment is not PROD, overriding BlockOnPossibleDataLoss"
+        Write-Output "##vso[task.setvariable variable=SetBlockOnPossibleDataLossArgument]true"
     }
 }
 else {
     Write-Verbose "Override BlockOnPossibleDataLoss not requested"
+    Write-Output "##vso[task.setvariable variable=SetBlockOnPossibleDataLossArgument]false"
 }
