@@ -35,7 +35,6 @@ if ($OverrideBlockOnPossibleDataLoss) {
     if ($Environment -eq "PROD") {    
         Write-Verbose "Environment is PROD, checking for approval to override BlockOnPossibleDataLoss"
         try {
-            ##TO DO: decide whether to pass this in as parameter or if direct reference to env var is appropriate
             Get-Variable -Name $ENV:ApproveProdOverrideBlockOnPossibleDataLoss -ErrorAction Stop | Out-Null
         }
         catch {
