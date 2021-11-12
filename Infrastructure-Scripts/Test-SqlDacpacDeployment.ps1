@@ -1,7 +1,4 @@
 <#
-##TO DO: documentation on how to set ApproveOverrideBlockOnPossibleDataLoss variable
-#>
-<#
     .SYNOPSIS
     Ran as part of the sql-dacpac-deploy.yml step.
     Checks whether the BlockOnPossibleDataLoss parameter has been overridden or not - and if PROD, has the required approval.
