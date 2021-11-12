@@ -93,6 +93,7 @@ function Get-SwaggerFilePath ($IndexHtml) {
 
 function Get-ApiTitle ($SwaggerSpecificationUrl) {
     $ApiTitle = ((Invoke-RetryWebRequest $SwaggerSpecificationUrl).Content | ConvertFrom-Json).info.title
+    $ApiTitle
 }
 
 function Get-AppServiceName ($ApiBaseUrl, $AppServiceResourceGroup) {
