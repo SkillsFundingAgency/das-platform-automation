@@ -1,4 +1,5 @@
 <#
+
     .SYNOPSIS
     Update the firewall of an Cosmos Db Account
 
@@ -12,13 +13,14 @@
     Substring of the Cosmos Db Account to search for
 
     .EXAMPLE
-    Add-CosmosDbIPException -IpAddress 192.168.0.1 -ResourceNamePattern das-*
+    Add-CosmosDBIPException -Name JoeBlogs -IPAddress 192.168.0.1 -ResourceNamePattern das-*
+
 #>
 [CmdletBinding()]
 Param (
     [Parameter(Mandatory = $true)]
     [ValidateNotNull()]
-    [IPAddress]$IpAddress,
+    [IPAddress]$IPAddress,
     [Parameter(Mandatory = $true)]
     [ValidateNotNull()]
     [String]$ResourceNamePattern
@@ -33,29 +35,25 @@ try {
 
     foreach ($CosmosDbAcc in $SubscriptionCosmosDbAccs) {
         # --- Retrieve configuration
-        $ServerName = $CosmosDbAcc.Name
-
         # --- Create or update firewall rules on the Cosmos Db Account
-        Write-Output "Processing Cosmos DB Account $ServerName using -AsJob"
-        $CosmosDbProperties = Get-AzCosmosDBAccount -ResourceId $CosmosDbAcc.ResourceId
+        Write-Host "Processing Cosmos DB Account $($CosmosDbAcc.Name) using -AsJob"
+        $CosmosDbIpRules = (Get-AzCosmosDBAccount -ResourceGroupName $CosmosDbAcc.ResourceGroupName -Name $CosmosDbAcc.Name).IpRules.IpAddressOrRangeProperty
 
-        if ($CosmosDbProperties.IpRangeFilter.length -eq 0) {
-            Write-Output "  -> ipRestrictions list is empty for this resource. Skipping."
+        if ($CosmosDbIpRules.length -eq 0) {
+            Write-Host "  -> ipRules list is empty for this resource. Skipping."
             continue
         }
 
-        $IPRangeFilterList = [System.Collections.ArrayList]::New($CosmosDbProperties.IpRangeFilter -split ',')
-
-        if ($IPRangeFilterList -notcontains $IpAddress) {
-            Write-Output "  -> Adding $($IpAddress) to ipRules ($($CosmosDbProperties.IpRangeFilter ))"
-            $null = $IPRangeFilterList.Add($IpAddress.IpAddressToString)
-            $null = Update-AzCosmosDBAccount -ResourceId $CosmosDbAcc.ResourceId -IpRangeFilter $IPRangeFilterList -AsJob
+        if ($CosmosDbIpRules -notcontains $IPAddress) {
+            Write-Host "  -> Adding $($IPAddress) to ipRules ($CosmosDbIpRules -join ','))"
+            $NewIPRules = $CosmosDbIpRules + $IPAddress.IPAddressToString
+            $null = Update-AzCosmosDBAccount -ResourceGroupName $CosmosDbAcc.ResourceGroupName -Name $CosmosDbAcc.Name -IpRule $NewIPRules -AsJob
         }
         else {
-            Write-Output "  -> $IpAddress exists in the current ipRules. Not updating"
+            Write-Host "  -> $IPAddress exists in the current ipRules. Not updating"
         }
     }
-    Write-Output "Waiting for Jobs to complete."
+    Write-Host "Waiting for Jobs adding Cosmos DB IP exceptions to complete."
     $null = Get-Job | Wait-Job
 }
 catch {
