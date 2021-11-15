@@ -7,7 +7,7 @@
     Ran as part of the sql-dacpac-deploy.yml step.
     Checks whether the BlockOnPossibleDataLoss parameter has been overridden or not.
     If the environment is PROD - Check to make sure approval has been received via built in variable.
-    Set variable SetBlockOnPossibleDataLossArgument to true if  approval confimrmed and false if approval not confirmed then set to false.
+    Set variable SetBlockOnPossibleDataLossArgument to true if approval confimrmed and false if approval not confirmed then set to false.
     If environment is not PROD - no approval is required and the override can take place.
     If environment is not PROD and override is not requested then no action is needed and override of BlockOnPossibleDataLoss does not take place.
 
@@ -18,7 +18,7 @@
     Boolean value used to distinguish if the BlockOnPossibleDataLoss parameter is attempting to be overridden or not.
 
     .EXAMPLE
-    -Environment AT -OverrideBlockOnPossibleDataLoss $true
+    ./Approve-SqlDacpacDeploymentDataLoss -Environment AT -OverrideBlockOnPossibleDataLoss $true
 #>
 [CmdletBinding()]
 param(
@@ -41,20 +41,20 @@ if ($OverrideBlockOnPossibleDataLoss) {
             throw "ApproveProdOverrideBlockOnPossibleDataLoss variable is not set in this pipeline.  See docs for this script for further info."
         }
         if($ENV:ApproveProdOverrideBlockOnPossibleDataLoss -eq "true") {
-            Write-Verbose "Override for BlockOnPossibleDataLoss approved, setting AdditionalArgument '/p:BlockOnPossibleDataLoss=false.'"
+            Write-Output "Override for BlockOnPossibleDataLoss approved, setting AdditionalArgument '/p:BlockOnPossibleDataLoss=false.'"
             Write-Output "##vso[task.setvariable variable=SetBlockOnPossibleDataLossArgument]true"
         }
         else {
-            Write-Verbose "Override for BlockOnPossibleDataLoss not approved, deploying DACPAC with default arguments"
+            Write-Output "Override for BlockOnPossibleDataLoss not approved, deploying DACPAC with default arguments"
             Write-Output "##vso[task.setvariable variable=SetBlockOnPossibleDataLossArgument]false"
         }
     }
     else {
-        Write-Verbose "Environment is not PROD, overriding BlockOnPossibleDataLoss"
+        Write-Output "Environment is not PROD, overriding BlockOnPossibleDataLoss"
         Write-Output "##vso[task.setvariable variable=SetBlockOnPossibleDataLossArgument]true"
     }
 }
 else {
-    Write-Verbose "Override BlockOnPossibleDataLoss not requested"
+    Write-Output "Override BlockOnPossibleDataLoss not requested"
     Write-Output "##vso[task.setvariable variable=SetBlockOnPossibleDataLossArgument]false"
 }
