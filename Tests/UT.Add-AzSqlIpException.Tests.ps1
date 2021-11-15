@@ -6,7 +6,7 @@ Describe "Add-AzSqlIpException Unit Tests" -Tags @("Unit") {
     $env:RELEASE_REQUESTEDFOR = $Config.ruleName
     $Params = @{
         IpAddress           = $Config.ipAddress
-        ResourceNamePattern = $Config.ResourceName
+        ResourceNamePattern = $Config.resourceName
         Name                = "TestUser"
     }
 

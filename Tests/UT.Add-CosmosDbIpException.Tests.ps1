@@ -5,7 +5,7 @@ Describe "Add-CosmosDbIpException Unit Tests" -Tags @("Unit") {
 
     $Params = @{
         IpAddress           = $Config.ipAddress
-        ResourceNamePattern = $Config.ResourceName
+        ResourceNamePattern = $Config.resourceName
     }
 
     Context "Resource does not exist" {
