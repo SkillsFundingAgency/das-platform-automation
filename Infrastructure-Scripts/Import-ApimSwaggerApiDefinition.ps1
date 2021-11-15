@@ -175,6 +175,7 @@ foreach ($SwaggerPath in $SwaggerPaths) {
 
     Add-AzApiManagementApiToProduct -Context $Context -ProductId $ProductId -ApiId $ApiId
     if ($SandboxProductId) {
+        Write-Verbose "Adding API to sandbox product"
         Add-AzApiManagementApiToProduct -Context $Context -ProductId $SandboxProductId -ApiId $ApiId
     }
 
