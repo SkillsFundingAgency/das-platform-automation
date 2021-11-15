@@ -55,6 +55,8 @@ Param(
     [Parameter(Mandatory = $true)]
     [String]$ProductId,
     [Parameter(Mandatory = $false)]
+    [String]$SandboxProductId,
+    [Parameter(Mandatory = $false)]
     [int]$ImportRetries = 3
 )
 
@@ -172,6 +174,9 @@ foreach ($SwaggerPath in $SwaggerPaths) {
     }
 
     Add-AzApiManagementApiToProduct -Context $Context -ProductId $ProductId -ApiId $ApiId
+    if ($SandboxProductId) {
+        Add-AzApiManagementApiToProduct -Context $Context -ProductId $SandboxProductId -ApiId $ApiId
+    }
 
     Set-AzApiManagementPolicy -Context $Context -ApiId $ApiId -Policy $PolicyString
 }
