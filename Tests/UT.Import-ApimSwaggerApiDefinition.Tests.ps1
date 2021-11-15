@@ -39,7 +39,7 @@ Describe "Import-ApimSwaggerApiDefinition Unit Tests" -Tags @("Unit") {
             Mock Invoke-RetryWebRequest -MockWith { Return $null }
             Mock Start-Sleep -MockWith { Return $null }
             Mock Get-SwaggerFilePath -MockWith { Return @("/swagger/v1/swagger.json", "/swagger/v2/swagger.json") }
-            Mock Get-ApiTitle -MockWith { Return $null }
+            Mock Get-ApiTitle -MockWith { Return "ApiTitle" }
             Mock Get-AzApiManagementApiVersionSet -MockWith {
                 return @{
                     "Id"          = $Config.resourceId

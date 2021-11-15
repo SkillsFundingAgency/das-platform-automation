@@ -137,7 +137,7 @@ foreach ($SwaggerPath in $SwaggerPaths) {
     $SwaggerPath -match '\d' | Out-Null
     $Version = $matches[0]
     $ApiTitle = Get-ApiTitle $SwaggerSpecificationUrl
-    $ApiId = "$ApiTitle-v" + $Version.ToUpper()
+    $ApiId = $ApiTitle.replace(" ","-") + "-v" + $Version.ToUpper()
 
     $VersionSet = Get-AzApiManagementApiVersionSet -Context $Context | Where-Object { $_.DisplayName -eq "$ApiVersionSetName" }
     if ($null -eq $VersionSet) {
