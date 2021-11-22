@@ -36,7 +36,6 @@ param(
 )
 
 try {
-
     # --- Try to retrieve the firewall rule by name
     $FirewallRules = Get-AzSqlServerFirewallRule -ServerName $ServerName -ResourceGroupName $ResourceGroupName -ErrorAction Stop
     $IPAddress = (Invoke-RestMethod $WhatsMyIpUrl -UseBasicParsing)
