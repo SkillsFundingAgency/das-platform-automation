@@ -6,7 +6,6 @@ Describe "Remove-AzSqlIpException Unit Tests" -Tags @("Unit") {
     $env:RELEASE_REQUESTEDFOR = $Config.ruleName
     $Params = @{
         StartIpAddress = $Config.ipAddress
-        EndIPAddress   = $Config.ipAddress
         servername     = $Config.servername
         Name           = "TestUser"
     }
