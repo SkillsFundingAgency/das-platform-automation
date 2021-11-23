@@ -10,7 +10,7 @@
     The name of the firewall rule
 
     .PARAMETER ServerName
-    Name of the Sql server 
+    Name of the Sql server
 
     .PARAMETER WhatsMyIpUrl
     The url value, "https://ifconfig.me/ip"  that needs to get passed in to identify the IP Address
@@ -18,7 +18,7 @@
     .PARAMETER  ResourceGroupName
     The name of the sql server's resource group, defaults to the environment variable DeploymentResourceGroup
     .EXAMPLE
-    Remove-AzureSQLIPException -Name rulename -WhatsMyIpUrl "https://ifconfig.me/ip" -ResourceGroupName das-test-rg -Name "rule01" 
+    Remove-AzureSQLIPException -Name rulename -WhatsMyIpUrl "https://ifconfig.me/ip" -ResourceGroupName das-test-rg -Name "rule01"
 #>
 
 [CmdletBinding()]
