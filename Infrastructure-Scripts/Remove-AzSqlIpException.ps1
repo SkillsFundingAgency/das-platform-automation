@@ -39,12 +39,12 @@ try {
     if ($IPAddress -notmatch $IpRegEx) {
         throw "Unable to retrieve valid IP address using $WhatsMyIpUrl, $IPAddress returned."
     }
-        # --- Remove whitelisted Ip Address
-        if ($FirewallRules) {
-            Write-Verbose "removing whitelisted IP address"
-            Remove-AzSqlServerFirewallRule -FirewallRuleName $Name -ServerName $ServerName -ResourceGroupName $ResourceGroupName  -Force -ErrorAction Stop
-            Write-Verbose "$IPAddress, removed!"
-        }
+    # --- Remove whitelisted Ip Address
+    if ($FirewallRules) {
+        Write-Verbose "removing whitelisted IP address"
+        Remove-AzSqlServerFirewallRule -FirewallRuleName $Name -ServerName $ServerName -ResourceGroupName $ResourceGroupName  -Force -ErrorAction Stop
+        Write-Verbose "$IPAddress, removed!"
+    }
 }
 catch {
     throw "Failed to remove the IP address"
