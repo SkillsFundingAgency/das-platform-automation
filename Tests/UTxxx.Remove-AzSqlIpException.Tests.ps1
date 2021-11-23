@@ -32,15 +32,15 @@ Describe "Remove-AzSqlIpException Unit Tests" -Tags @("Unit") {
             Assert-MockCalled Remove-AzSqlServerFirewallRule -Exactly 1 -Scope It
         }
     }
-
     Context "Whats My Ip Service throws response" {
         Mock Invoke-RestMethod -MockWith { return "bvasfdh%"}
         It "Throws an error with the message 'Unable to retrieve valid IP address using https://not-a-real-api.com, returned.'" {
             { ./Remove-AzSqlIpException.ps1 @Params } | Should throw
             Assert-MockCalled Get-AzSqlServerFirewallRule -Exactly 1 -Scope It
-            Assert-MockCalled Remove-AzSqlServerFirewallRule -Exactly 1 -Scope It
+            Assert-MockCalled Remove-AzSqlServerFirewallRule -Exactly 0 -Scope It
         }
     }
+
 }
 
 
