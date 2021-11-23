@@ -2,10 +2,8 @@
 
     .SYNOPSIS
     Remove the whitelisted IP from the firewall rule name
-
     .DESCRIPTION
     Remove the whitelisted IP from the firewall rule name
-
     .PARAMETER Name
     The name of the firewall rule
 
@@ -16,7 +14,6 @@
     Resource group name the sql server resides in
     .EXAMPLE
     Remove-AzureSQLIPException -Name rulename -WhatsMyIpUrl "https://ifconfig.me/ip" -ResourceGroupName das-test-rg -Name "rule01" 
-
 #>
 
 [CmdletBinding()]
