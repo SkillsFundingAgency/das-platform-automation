@@ -5,9 +5,10 @@ Describe "Remove-AzSqlIpException Unit Tests" -Tags @("Unit") {
 
     $env:RELEASE_REQUESTEDFOR = $Config.ruleName
     $Params = @{
-        IpAddress  = $Config.ipAddress
-        servername = $Config.servername
-        Name       = "TestUser"
+        WhatsMyIpUrl      = $Config.ipAddress
+        servername        = $Config.servername
+        Name              = "TestUser"
+        ResourceGroupName = $Config.resourceGroupName
     }
 
     Context "Remove firewall rulename on a sql server" {
