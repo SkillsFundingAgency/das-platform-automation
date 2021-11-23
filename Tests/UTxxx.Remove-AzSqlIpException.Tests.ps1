@@ -1,34 +1,48 @@
-$Config = Get-Content $PSScriptRoot\..\Tests\Configuration\Unit.Tests.Config.json -Raw | ConvertFrom-Json
 Set-Location $PSScriptRoot\..\Infrastructure-Scripts\
 
 Describe "Remove-AzSqlIpException Unit Tests" -Tags @("Unit") {
-
-    $env:RELEASE_REQUESTEDFOR = $Config.ruleName
     $Params = @{
-        WhatsMyIpUrl      = $Config.ipAddress
-        servername        = $Config.servername
-        Name              = $Config.rulename
-        ResourceGroupName = $Config.resourceGroupName
+        WhatsMyIpUrl = "https://not-a-real-web.com"
+        ServerName = "das-myserver"
+        ResourceGroupName = "das-foo-rg"
+        Name = "rule1"
     }
 
-    Context "Remove firewall rulename on a sql server" {
-        It "Should remove firewall rule on the given server name" {
-
-            Mock Get-AzSqlServerFirewallRule -MockWith {
-                return @{
-                    "ResourceGroupName" = $Config.resourceGroupName
-                    "Servername"        = $Config.serverName
-                    "FirewallRuleName"  = $Config.rulename
-                }
-            }
+    Mock Get-AzSqlServerFirewallRule -MockWith {
+        return @{
+            "ResourceGroupName" = "das-foo-rg"
+            "Servername"        = "das-myserver"
+            "FirewallRuleName"  = "rule1"
         }
-        Mock Remove-AzSqlServerFirewallRule -MockWith { return $null }
-        { ./Remove-AzSqlIpException @Params } | Should Not throw
-        Assert-MockCalled -CommandName 'Get-AzResource' -Times 1 -Scope It
-        Assert-MockCalled -CommandName 'Get-AzSqlServerFirewallRule' -Times 1 -Scope It
-        Assert-MockCalled -CommandName 'Remove-AzSqlServerFirewallRule' -Times 1 -Scope It
+    }
+
+    Mock Remove-AzSqlServerFirewallRule -MockWith {
+        return @{
+            "ResourceGroupName" = "das-foo-rg"
+            "Servername"        = "das-myserver"
+            "FirewallRuleName"  = "rule1"
+        }
+    }
+
+     Context "Whats My Ip Service doesn't return a response" {
+        Mock Invoke-RestMethod -MockWith { return "1.2.4.5"}
+        It "Throws an error with the message 'Unable to retrieve valid IP address using https://not-a-real-api.com, returned.'" {
+            { ./Remove-AzSqlIpException.ps1 @Params } | Should Not throw
+            Assert-MockCalled Get-AzSqlServerFirewallRule -Exactly 1 -Scope It
+            Assert-MockCalled Remove-AzSqlServerFirewallRule -Exactly 1 -Scope It
+        }
+    }
+
+    Context "Whats My Ip Service throws response" {
+        Mock Invoke-RestMethod -MockWith { return "bvasfdh%"}
+        It "Throws an error with the message 'Unable to retrieve valid IP address using https://not-a-real-api.com, returned.'" {
+            { ./Remove-AzSqlIpException.ps1 @Params } | Should throw
+            Assert-MockCalled Get-AzSqlServerFirewallRule -Exactly 1 -Scope It
+            Assert-MockCalled Remove-AzSqlServerFirewallRule -Exactly 1 -Scope It
+        }
     }
 }
+
 
 
 
