@@ -7,7 +7,7 @@ Describe "Remove-AzSqlIpException Unit Tests" -Tags @("Unit") {
     $Params = @{
         WhatsMyIpUrl      = $Config.ipAddress
         servername        = $Config.servername
-        Name              = "TestUser"
+        Name              = $Config.rulename
         ResourceGroupName = $Config.resourceGroupName
     }
 
