@@ -31,7 +31,6 @@ param(
     [string]$Name
 )
 
-try {
     # --- Try to retrieve the firewall rule by name
     $FirewallRules = Get-AzSqlServerFirewallRule -ServerName $ServerName -ResourceGroupName $ResourceGroupName -ErrorAction Stop
     $IPAddress = (Invoke-RestMethod $WhatsMyIpUrl -UseBasicParsing)
@@ -45,7 +44,4 @@ try {
         Remove-AzSqlServerFirewallRule -FirewallRuleName $Name -ServerName $ServerName -ResourceGroupName $ResourceGroupName  -Force -ErrorAction Stop
         Write-Verbose "$IPAddress, removed!"
     }
-}
-catch {
-    throw "Failed to remove the IP address"
-}
+
