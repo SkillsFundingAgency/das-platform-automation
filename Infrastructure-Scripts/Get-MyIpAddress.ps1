@@ -6,7 +6,7 @@
     Dynamically gets the current IP address from "https://ifconfig.me/ip"
 
     .PARAMETER WhatsMyIpUrl
-    The name of the resource group the APIM instance is deployed to
+    The url value, e.g. "https://ifconfig.me/ip" that is called to identify the IP Address of the machine running the script
 
     .EXAMPLE
     .\Get-MyIpAddress.ps1 -WhatsMyIpUrl "https://ifconfig.me/ip"
