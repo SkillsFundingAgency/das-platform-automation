@@ -20,13 +20,16 @@ Param (
 )
 
 #Dynamically get url from "https://ifconfig.me/ip"
-$IPAddress = (Invoke-RestMethod -Uri $WhatsMyIpUrl -UseBasicParsing)
+$MyIPAddress = (Invoke-RestMethod -Uri $WhatsMyIpUrl -UseBasicParsing)
 $IpRegEx = [regex] "\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b"
 
 #Check if IP Address matches $IpRegex
-if ($IPAddress -notmatch $IpRegEx) {
-    throw "Invalid $IPAddress"
+if ($MyIPAddress -notmatch $IpRegEx) {
+    throw "Invalid $MyIPAddress"
 }
+#Set the variables
 else {
-    return $IPAddress
+    #Write-Output "Setting value of MyIPAddress value to IP Address "
+    #Write-Output "##vso[task.setvariable variable=IPAddress]$MyIPAddress"
+    return $MyIPAddress
 }

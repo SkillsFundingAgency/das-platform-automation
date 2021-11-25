@@ -14,34 +14,41 @@
     .EXAMPLE
     Remove-AzureSQLIPException -Name rulename -WhatsMyIpUrl "https://ifconfig.me/ip" -ResourceGroupName das-test-rg -Name "rule01"
 #>
-
 [CmdletBinding()]
 param(
-    [Parameter(Mandatory = $true)]
     [ValidateNotNull()]
-    [string]$ServerName,
-    [Parameter(Mandatory = $true)]
-    [ValidateNotNull()]
-    [string]$WhatsMyIpUrl,
+    [IPAddress]$IPAddress,
     [ValidateNotNull()]
     [Parameter(Mandatory = $true)]
-    [string]$ResourceGroupName = "$env:DeploymentResourceGroup",
+    [string]$ResourceNamePattern,
     [ValidateNotNull()]
     [Parameter(Mandatory = $true)]
     [string]$Name
 )
 
-    # --- Try to retrieve the firewall rule by name
-    $FirewallRules = Get-AzSqlServerFirewallRule -ServerName $ServerName -ResourceGroupName $ResourceGroupName -ErrorAction Stop
-    $IPAddress = (Invoke-RestMethod $WhatsMyIpUrl -UseBasicParsing)
-    $IpRegEx = [regex] "\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b"
-    if ($IPAddress -notmatch $IpRegEx) {
-        throw "Unable to retrieve valid IP address using $WhatsMyIpUrl, $IPAddress returned."
-    }
-    # --- Remove whitelisted Ip Address
-    if ($FirewallRules) {
-        Write-Verbose "removing whitelisted IP address"
-        Remove-AzSqlServerFirewallRule -FirewallRuleName $Name -ServerName $ServerName -ResourceGroupName $ResourceGroupName  -Force -ErrorAction Stop
-        Write-Verbose "$IPAddress, removed!"
+$SubscriptionSqlServers = Get-AzResource -Name $ResourceNamePattern -ResourceType "Microsoft.Sql/Servers"
+
+foreach($SqlServer in $SubscriptionSqlServers) {
+    $ResourceGroupName = $SqlServer.ResourceGroupName
+    $ServerName = $SqlServer.Name
+}
+
+if ($SubscriptionSqlServers) {
+
+    $FirewallRuleParameters = @{
+        ResourceGroupName = $ResourceGroupName
+        ServerName = $ServerName
+        FirewallRuleName = $Name
     }
 
+}
+
+$FirewallRules = Get-AzSqlServerFirewallRule -ServerName $ServerName -ResourceGroupName $ResourceGroupName | Where-Object {$_.StartIpAddress -eq $IPAddress}
+
+if (!$FirewallRules) {
+    throw "Could not find whitelisted $IPAddress to remove"
+}
+else {
+    Write-Output "  -> Removing $IPAddress"
+    Remove-AzSqlServerFirewallRule  @FirewallRuleParameters
+}
