@@ -30,13 +30,15 @@ Param (
     [Parameter(Mandatory = $true)]
     [Int]$RunId,
     [Parameter(Mandatory = $false)]
-    [Int]$SleepTime = 20
+    [Int]$SleepTime = 20,
+    [Parameter(Mandatory = $false)]
+    [Int]$RetryLimit = 30
 )
 
 $Url = "$env:SYSTEM_ORGANISATIONNAME/$env:SYSTEM_PROJECTNAME/_apis/distributedtask/environments/$EnvironmentId/environmentdeploymentrecords?top=100?api-version=6.0-preview.1"
 $RetryCounter = 0
 
-while ($RetryCounter -lt 30){
+while ($RetryCounter -lt $RetryLimit) {
     Write-Verbose "Attempt $RetryCounter"
     try{
         #Invoke call to Azure DevOps Rest API to get all deployment data for given environment.
@@ -60,6 +62,6 @@ while ($RetryCounter -lt 30){
         Write-Output("There is another deployment to this stage currently running in this environment. Retrying in $SleepTime seconds.")
     }
 }
-if ($RetryCounter -eq 30) {
+if ($RetryCounter -eq $RetryLimit) {
     Write-Output("Retry limit has been reached - Continuing with deployment.")
 }
