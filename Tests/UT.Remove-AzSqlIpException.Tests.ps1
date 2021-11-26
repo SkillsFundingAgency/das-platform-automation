@@ -69,7 +69,7 @@ Describe "Remove-AzSqlIpException Unit Tests" -Tags @("Unit") {
                         }
                     )
                 }
-                Mock Get-AzResource -MockWith { return $null }
+                Mock Get-AzResource -MockWith { return $test }
                 { ./Remove-AzSqlIpException @Params } | Should Not throw
                 Assert-MockCalled -CommandName 'Get-AzResource' -Times 2 -Scope It
                 Assert-MockCalled Remove-AzSqlIpException-Times 2 -Scope It
