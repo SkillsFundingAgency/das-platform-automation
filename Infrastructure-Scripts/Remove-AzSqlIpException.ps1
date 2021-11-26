@@ -1,18 +1,18 @@
 <#
     .SYNOPSIS
-    Remove the whitelisted IP from the firewall rule name
+    Remove the whitelisted IP from the SQL Server firewall rule
     .DESCRIPTION
-    Remove the whitelisted IP from the firewall rule name
+    Remove the whitelisted IP from the SQL firewall rule
     .PARAMETER Name
     The name of the firewall rule
     .PARAMETER ServerName
     Name of the Sql server
     .PARAMETER IPAddress
-    The url value, "https://ifconfig.me/ip"  that needs to get passed in to identify the IP Address
+    The whitelisted IP Address that will get removed by this script
     .PARAMETER  ResourceNamePattern
-    The name of the sql server's resource group, defaults to the environment variable DeploymentResourceGroup
+    Substring of the SQL Server to search for
     .EXAMPLE
-    Remove-AzureSQLIPException -Name rulename -WhatsMyIpUrl "https://ifconfig.me/ip" -ResourceGroupName das-test-rg -Name "rule01"
+    Remove-AzureSQLIPException -Name rulename -IPAddress $(IPAddress) -ResourceNamePatterb das-*
 #>
 [CmdletBinding()]
 param(
@@ -46,9 +46,10 @@ if ($SubscriptionSqlServers) {
 $FirewallRules = Get-AzSqlServerFirewallRule -ServerName $ServerName -ResourceGroupName $ResourceGroupName | Where-Object {$_.StartIpAddress -eq $IPAddress}
 
 if (!$FirewallRules) {
-    throw "Could not find whitelisted $IPAddress to remove"
+    throw " -> Could not find whitelisted $IPAddress to remove!"
 }
 else {
     Write-Output "  -> Removing $IPAddress"
     Remove-AzSqlServerFirewallRule  @FirewallRuleParameters
+    Write-Output "  -> $IPAddress, removed!"
 }

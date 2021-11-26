@@ -29,7 +29,7 @@ if ($MyIPAddress -notmatch $IpRegEx) {
 }
 #Set the variables
 else {
-    #Write-Output "Setting value of MyIPAddress value to IP Address "
-    #Write-Output "##vso[task.setvariable variable=IPAddress]$MyIPAddress"
+    Write-Output "Setting value of MyIPAddress value to IP Address "
+    Write-Output "##vso[task.setvariable variable=IPAddress]$MyIPAddress"
     return $MyIPAddress
 }
