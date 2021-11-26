@@ -49,6 +49,7 @@ while ($RetryCounter -lt $RetryLimit) {
         Write-Output $_
         break;
     }
+
     #Filter down results of API call to just contain relevant pipeline runs with matching Pipeline names and only ones that are still running.
     $RunningEnvironmentDeployments = $EnvironmentDeployments.value | Where-Object {$_.definition.name -eq $PipelineName -and -not $_.result}
     $LowestRunId = $RunningEnvironmentDeployments.owner.id | Sort-Object -Top 1
@@ -62,6 +63,8 @@ while ($RetryCounter -lt $RetryLimit) {
         Write-Output("There is another deployment to this stage currently running in this environment. Retrying in $SleepTime seconds.")
     }
 }
-if ($RetryCounter -eq $RetryLimit) {
-    Write-Output("Retry limit has been reached - Continuing with deployment.")
+
+if ($RetryCounter -ge $RetryLimit) {
+    Write-Warning("Retry limit has been reached, terminating deployment - please retry later")
+    throw "Deployment timed out due to other deployments in progress"
 }
