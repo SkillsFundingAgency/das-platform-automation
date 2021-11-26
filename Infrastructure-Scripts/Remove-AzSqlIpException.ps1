@@ -31,6 +31,10 @@ param(
 
 $SubscriptionSqlServers = Get-AzResource -Name $ResourceNamePattern -ResourceType "Microsoft.Sql/Servers"
 
+if (!$SubscriptionSqlServers) {
+    throw "Could not find a resource matching $ResourceNamePattern in the subscription"
+}
+
 foreach($SqlServer in $SubscriptionSqlServers) {
     $ResourceGroupName = $SqlServer.ResourceGroupName
     $ServerName = $SqlServer.Name
