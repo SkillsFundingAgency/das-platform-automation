@@ -34,25 +34,24 @@ $SubscriptionSqlServers = Get-AzResource -Name $ResourceNamePattern -ResourceTyp
 foreach($SqlServer in $SubscriptionSqlServers) {
     $ResourceGroupName = $SqlServer.ResourceGroupName
     $ServerName = $SqlServer.Name
-}
 
-if ($SubscriptionSqlServers) {
+    if ($SubscriptionSqlServers) {
 
-    $FirewallRuleParameters = @{
-        ResourceGroupName = $ResourceGroupName
-        ServerName = $ServerName
-        FirewallRuleName = $Name
+        $FirewallRuleParameters = @{
+            ResourceGroupName = $ResourceGroupName
+            ServerName = $ServerName
+            FirewallRuleName = $Name
+        }
     }
 
-}
+    $FirewallRules = Get-AzSqlServerFirewallRule -ServerName $ServerName -ResourceGroupName $ResourceGroupName | Where-Object {$_.StartIpAddress -eq $IPAddress}
 
-$FirewallRules = Get-AzSqlServerFirewallRule -ServerName $ServerName -ResourceGroupName $ResourceGroupName | Where-Object {$_.StartIpAddress -eq $IPAddress}
-
-if (!$FirewallRules) {
-    throw " -> Could not find whitelisted $IPAddress to remove!"
-}
-else {
-    Write-Output "  -> Removing $IPAddress"
-    Remove-AzSqlServerFirewallRule  @FirewallRuleParameters
-    Write-Output "  -> $IPAddress, removed!"
+    if (!$FirewallRules) {
+        throw " -> Could not find whitelisted $IPAddress to remove!"
+    }
+    else {
+        Write-Output "  -> Removing $IPAddress"
+        Remove-AzSqlServerFirewallRule  @FirewallRuleParameters
+        Write-Output "  -> $IPAddress, removed!"
+    }
 }
