@@ -1,14 +1,19 @@
 <#
     .SYNOPSIS
     Remove the whitelisted IP from the SQL Server firewall rule
+
     .DESCRIPTION
     Remove the whitelisted IP from the SQL firewall rule
+
     .PARAMETER Name
     The name of the firewall rule
+
     .PARAMETER IPAddress
     The whitelisted IP Address that will get removed by this script
+
     .PARAMETER  ResourceNamePattern
     Substring of the SQL Server to search for
+
     .EXAMPLE
     Remove-AzureSQLIPException -Name rulename -IPAddress $(IPAddress) -ResourceNamePatterb das-*
 #>
