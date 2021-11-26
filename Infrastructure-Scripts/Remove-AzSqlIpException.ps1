@@ -38,15 +38,11 @@ if (!$SubscriptionSqlServers) {
 foreach($SqlServer in $SubscriptionSqlServers) {
     $ResourceGroupName = $SqlServer.ResourceGroupName
     $ServerName = $SqlServer.Name
-
-    if ($SubscriptionSqlServers) {
-
         $FirewallRuleParameters = @{
             ResourceGroupName = $ResourceGroupName
             ServerName = $ServerName
             FirewallRuleName = $Name
         }
-    }
 
     $FirewallRules = Get-AzSqlServerFirewallRule -ServerName $ServerName -ResourceGroupName $ResourceGroupName | Where-Object {$_.StartIpAddress -eq $IPAddress}
 
