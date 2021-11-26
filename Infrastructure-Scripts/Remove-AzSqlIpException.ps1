@@ -5,8 +5,6 @@
     Remove the whitelisted IP from the SQL firewall rule
     .PARAMETER Name
     The name of the firewall rule
-    .PARAMETER ServerName
-    Name of the Sql server
     .PARAMETER IPAddress
     The whitelisted IP Address that will get removed by this script
     .PARAMETER  ResourceNamePattern
