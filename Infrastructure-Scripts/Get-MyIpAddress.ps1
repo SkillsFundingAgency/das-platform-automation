@@ -19,7 +19,7 @@ Param (
     [string]$WhatsMyIpUrl
 )
 
-#Dynamically get url from "https://ifconfig.me/ip"
+#Dynamically gets IP from "https://ifconfig.me/ip"
 $MyIPAddress = (Invoke-RestMethod -Uri $WhatsMyIpUrl -UseBasicParsing)
 $IpRegEx = [regex] "\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b"
 
