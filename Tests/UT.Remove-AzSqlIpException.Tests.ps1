@@ -75,7 +75,7 @@ Describe "Remove-AzSqlIpException Unit Tests" -Tags @("Unit") {
                     "StartIPAddress"   = "1.2.3.4"
                 }
             }
-            Mock Remove-AzSqlServerFirewallRule
+            Mock Remove-AzSqlServerFirewallRule -MockWith {return $null}
             { ./Remove-AzSqlIpException @Params } | Should Not throw
             Assert-MockCalled -CommandName Get-AzResource -Times 1 -Scope It
             Assert-MockCalled -CommandName Remove-AzSqlServerFirewallRule -Times 2 -Scope It
