@@ -53,6 +53,7 @@ while ($RetryCounter -lt $RetryLimit) {
     #Filter down results of API call to just contain relevant pipeline runs with matching Pipeline names and only ones that are still running.
     $RunningEnvironmentDeployments = $EnvironmentDeployments.value | Where-Object {$_.definition.name -eq $PipelineName -and -not $_.result}
     $LowestRunId = $RunningEnvironmentDeployments.owner.id | Sort-Object -Top 1
+    Write-Output "Lowest run id is $LowestRunId, current run id is $RunId"
     if ($RunId -eq $LowestRunId) {
         Write-Output("Continuing with deployment.")
         break;
