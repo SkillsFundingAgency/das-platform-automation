@@ -19,7 +19,6 @@
 #>
 [CmdletBinding()]
 param(
-    [ValidateNotNull()]
     [IPAddress]$IPAddress,
     [ValidateNotNull()]
     [Parameter(Mandatory = $true)]

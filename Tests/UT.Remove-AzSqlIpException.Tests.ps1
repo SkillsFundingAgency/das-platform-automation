@@ -23,9 +23,9 @@ Describe "Remove-AzSqlIpException Unit Tests" -Tags @("Unit") {
             }
             Mock Remove-AzSqlServerFirewallRule -MockWith { return $null }
             { ./Remove-AzSqlIpException @Params } | Should not throw
-            Assert-MockCalled -CommandName 'Get-AzResource' -Times 1 -Scope It
-            Assert-MockCalled -CommandName 'Get-AzSqlServerFirewallRule' -Times 1 -Scope It
-            Assert-MockCalled -CommandName 'Remove-AzSqlServerFirewallRule' -Times 1 -Scope It
+            Assert-MockCalled -CommandName Get-AzResource -Times 1 -Scope It
+            Assert-MockCalled -CommandName Get-AzSqlServerFirewallRule -Times 1 -Scope It
+            Assert-MockCalled -CommandName Remove-AzSqlServerFirewallRule -Times 1 -Scope It
         }
 
     }
@@ -48,32 +48,39 @@ Describe "Remove-AzSqlIpException Unit Tests" -Tags @("Unit") {
             Mock Get-AzResource -MockWith { return $null }
             Mock Get-AzSqlServerFirewallRule -MockWith { return $null }
             { ./Remove-AzSqlIpException @Params } | should throw
-            Assert-MockCalled -CommandName 'Get-AzResource' -Times 1 -Scope It
-            Assert-MockCalled -CommandName 'Get-AzSqlServerFirewallRule' -Times 0 -Scope It
+            Assert-MockCalled -CommandName Get-AzResource -Times 1 -Scope It
+            Assert-MockCalled -CommandName Get-AzSqlServerFirewallRule -Times 0 -Scope It
         }
 
     }
 
-    Context "Resource exists and returns more than  one sql server" {
+    Context "Resource exists and returns more than one sql server" {
         It "Should not throw an error when it gets more than one sql server" {
             Mock Get-AzResource -MockWith {
-                return @{
-                    $test = @(
-                        {
-                            ResourceGroupName: "das-myser-rg",
-                            Name: "ser-sql"
-                        },
-                        {
-                            ResourceGroupName: "das-myserver-rg",
-                            Name: "server-sql"
-                        }
-                    )
-                }
-                Mock Get-AzResource -MockWith { return $test }
-                { ./Remove-AzSqlIpException @Params } | Should Not throw
-                Assert-MockCalled -CommandName 'Get-AzResource' -Times 2 -Scope It
-                Assert-MockCalled Remove-AzSqlIpException-Times 2 -Scope It
+                return @(
+                    @{
+                        ResourceGroupName = "das-myser-rg"
+                        Name              = "ser-sql"
+                    }
+                    @{
+                        ResourceGroupName = "das-myserver-rg"
+                        Name              = "das-myserver"
+                    }
+                )
             }
+            Mock Get-AzSqlServerFirewallRule -MockWith {
+                return @{
+                    "FirewallRuleName" = "rule1"
+                    "StartIPAddress"   = "1.2.3.4"
+                }
+            }
+            Mock Remove-AzSqlServerFirewallRule
+            { ./Remove-AzSqlIpException @Params } | Should Not throw
+            Assert-MockCalled -CommandName Get-AzResource -Times 1 -Scope It
+            Assert-MockCalled -CommandName Remove-AzSqlServerFirewallRule -Times 2 -Scope It
+            Assert-MockCalled -CommandName Get-AzSqlServerFirewallRule -Times 2 -Scope It
         }
+
     }
 }
+

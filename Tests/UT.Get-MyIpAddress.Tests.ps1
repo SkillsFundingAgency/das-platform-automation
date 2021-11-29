@@ -16,7 +16,7 @@ Describe "Invoke-RestMethod Unit Tests" -Tags @("Unit") {
     Context "Whats My Ip Service fails to get the response" {
         Mock Invoke-RestMethod -MockWith { return "djnfgsgsk%j" }
         It "Was not able to retrieve the IP Address using https://not-a-real-web.com" {
-            { ./Get-MyIpAddress @Params } | Should throw
+            { ./Get-MyIpAddress @Params } | Should throw  "ErrorMessage -> Was unable to retrieve valid IP address!"
             Assert-MockCalled -CommandName Invoke-RestMethod  -Exactly 1 -Scope It
         }
     }
