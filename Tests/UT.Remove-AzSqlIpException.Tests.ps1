@@ -47,7 +47,8 @@ Describe "Remove-AzSqlIpException Unit Tests" -Tags @("Unit") {
             }
             Mock Get-AzResource -MockWith { return $null }
             Mock Get-AzSqlServerFirewallRule -MockWith { return $null }
-            { ./Remove-AzSqlIpException @Params } | should throw
+            $ErrorMessage = $script:localizedString.LocalizedErrorMessage
+            { ./Remove-AzSqlIpException @Params } | should throw $ErrorMessage
             Assert-MockCalled -CommandName Get-AzResource -Times 1 -Scope It
             Assert-MockCalled -CommandName Get-AzSqlServerFirewallRule -Times 0 -Scope It
         }
