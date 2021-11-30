@@ -24,6 +24,10 @@
 [CmdletBinding()]
 Param (
     [Parameter(Mandatory = $true)]
+    [String]$AzureDevOpsOrganisationUri,    
+    [Parameter(Mandatory = $true)]
+    [String]$AzureDevOpsProjectName,
+    [Parameter(Mandatory = $true)]
     [String]$EnvironmentId,
     [Parameter(Mandatory = $true)]
     [String]$PipelineName,
@@ -32,17 +36,28 @@ Param (
     [Parameter(Mandatory = $false)]
     [Int]$SleepTime = 20,
     [Parameter(Mandatory = $false)]
-    [Int]$RetryLimit = 30
+    [Int]$RetryLimit = 30,
+    [Parameter(Mandatory = $false)]
+    [string]$PatToken
 )
 
-$Url = "$env:SYSTEM_ORGANISATIONNAME/$env:SYSTEM_PROJECTNAME/_apis/distributedtask/environments/$EnvironmentId/environmentdeploymentrecords?top=100?api-version=6.0-preview.1"
+$Url = "$AzureDevOpsOrganisationUri/$AzureDevOpsProjectName/_apis/distributedtask/environments/$EnvironmentId/environmentdeploymentrecords?top=100?api-version=6.0-preview.1"
 $RetryCounter = 0
+
+if ($PatToken) {
+    $Base64PatToken = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(":$($PatToken)"))
+    $Headers = @{ Authorization = "Basic $Base64PatToken" }
+}
+else {
+    $Headers = @{ Authorization = "Bearer $env:SYSTEM_ACCESSTOKEN" }
+}
 
 while ($RetryCounter -lt $RetryLimit) {
     Write-Verbose "Attempt $RetryCounter"
     try{
         #Invoke call to Azure DevOps Rest API to get all deployment data for given environment.
-        $EnvironmentDeployments = Invoke-RestMethod -Method GET -Uri $Url -Headers  @{ Authorization = "Bearer $env:SYSTEM_ACCESSTOKEN" } -TimeoutSec 30
+        Write-Verbose "Requesting: $Url"
+        $EnvironmentDeployments = Invoke-RestMethod -Method GET -Uri $Url -Headers $Headers -TimeoutSec 30
     }
     catch{
         Write-Error "Response code $($_.Exception.Response.StatusCode.Value__) received. Terminating process, deployment will continue."
@@ -50,7 +65,7 @@ while ($RetryCounter -lt $RetryLimit) {
         break;
     }
 
-    #Filter down results of API call to just contain relevant pipeline runs with matching Pipeline names and only ones that are still running.
+    #Filter down results of API call to just contain relevant pipeline runs with matching Pipeline names and only ones that are still running.  This does not include queued jobs.
     $RunningEnvironmentDeployments = $EnvironmentDeployments.value | Where-Object {$_.definition.name -eq $PipelineName -and -not $_.result}
     $LowestRunId = $RunningEnvironmentDeployments.owner.id | Sort-Object -Top 1
     Write-Output "Lowest run id is $LowestRunId, current run id is $RunId"
@@ -59,9 +74,9 @@ while ($RetryCounter -lt $RetryLimit) {
         break;
     }
     else {
+        Write-Output("There is another deployment to this stage currently running in this environment. Retrying in $SleepTime seconds.")
         $RetryCounter++
         Start-Sleep -Seconds $SleepTime
-        Write-Output("There is another deployment to this stage currently running in this environment. Retrying in $SleepTime seconds.")
     }
 }
 
