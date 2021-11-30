@@ -21,6 +21,9 @@
     .PARAMETER RunId
     The Run ID of the current deployment which is used to compare to the lowest active RunID returned by the API.
 
+    .PARAMETER RetryLimit
+    The number of times the process will retry the comparison if there is another deployment running
+    
     .PARAMETER SleepTime
     The amount of time in seconds that the process will wait before retrying the comparison if there is another deployment currently running.
 
@@ -44,9 +47,9 @@ Param (
     [Parameter(Mandatory = $true)]
     [Int]$RunId,
     [Parameter(Mandatory = $false)]
-    [Int]$SleepTime = 20,
-    [Parameter(Mandatory = $false)]
     [Int]$RetryLimit = 30,
+    [Parameter(Mandatory = $false)]
+    [Int]$SleepTime = 20,
     [Parameter(Mandatory = $false)]
     [string]$PatToken
 )
