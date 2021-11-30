@@ -23,7 +23,7 @@
 
     .PARAMETER RetryLimit
     The number of times the process will retry the comparison if there is another deployment running
-    
+
     .PARAMETER SleepTime
     The amount of time in seconds that the process will wait before retrying the comparison if there is another deployment currently running.
 
