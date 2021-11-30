@@ -84,13 +84,13 @@ while ($RetryCounter -lt $RetryLimit) {
         break;
     }
     else {
-        Write-Output("There is another deployment to this stage currently running in this environment. Retrying in $SleepTime seconds.")
+        Write-Output "There is another deployment to this stage currently running in this environment. Retrying in $SleepTime seconds."
         $RetryCounter++
         Start-Sleep -Seconds $SleepTime
     }
 }
 
 if ($RetryCounter -ge $RetryLimit) {
-    Write-Warning("Retry limit has been reached, terminating deployment - please retry later")
+    Write-Warning "Retry limit has been reached, terminating deployment - please retry later"
     throw "Deployment timed out due to other deployments in progress"
 }
