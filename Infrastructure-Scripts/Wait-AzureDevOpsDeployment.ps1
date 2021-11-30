@@ -54,7 +54,7 @@ Param (
     [string]$PatToken
 )
 
-$Url = "$AzureDevOpsOrganisationUri$AzureDevOpsProjectName/_apis/distributedtask/environments/$EnvironmentId/environmentdeploymentrecords?top=100?api-version=6.0-preview.1"
+$Url = "$AzureDevOpsOrganisationUri$AzureDevOpsProjectName/_apis/distributedtask/environments/$EnvironmentId/environmentdeploymentrecords?top=500&api-version=6.1-preview.1"
 $RetryCounter = 0
 
 if ($PatToken) {
