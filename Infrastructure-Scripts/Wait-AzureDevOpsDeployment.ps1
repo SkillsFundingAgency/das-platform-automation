@@ -67,10 +67,19 @@ else {
 
 while ($RetryCounter -lt $RetryLimit) {
     Write-Verbose "Attempt $RetryCounter"
+    $EnvironmentDeployments = @()
     try{
         #Invoke call to Azure DevOps Rest API to get all deployment data for given environment.
         Write-Verbose "Requesting: $Url"
-        $EnvironmentDeployments = Invoke-RestMethod -Method GET -Uri $Url -Headers $Headers -TimeoutSec 30
+        $EnvironmentDeployments += (Invoke-RestMethod -Method GET -Uri $Url -Headers $Headers -TimeoutSec 30 -ResponseHeadersVariable ResponseHeaders).value
+        while ($ResponseHeaders.'x-ms-continuationtoken') {
+            $ContinationUrl = "$Url&continuationToken=$($ResponseHeaders.'x-ms-continuationtoken')"
+            $EnvironmentDeployments += (Invoke-RestMethod -Method GET -Uri $ContinationUrl -Headers $Headers -TimeoutSec 30 -ResponseHeadersVariable ResponseHeaders).value
+            if ($ResponseHeaders.'Retry-After') {
+                Write-Warning "Request is being rate limited"
+                ##TO DO: implement logic to handle rate limiting responses - https://docs.microsoft.com/en-us/azure/devops/integrate/concepts/rate-limits?view=azure-devops#api-client-experience
+            }
+        }
     }
     catch{
         Write-Error "Response code $($_.Exception.Response.StatusCode.Value__) received. Terminating process, deployment will continue."
@@ -79,7 +88,8 @@ while ($RetryCounter -lt $RetryLimit) {
     }
 
     #Filter down results of API call to just contain relevant pipeline runs with matching Pipeline names and only ones that are still running.  This does not include queued jobs.
-    $RunningEnvironmentDeployments = $EnvironmentDeployments.value | Where-Object {$_.definition.name -eq $PipelineName -and -not $_.result}
+    $RunningEnvironmentDeployments = $EnvironmentDeployments | Where-Object {$_.definition.name -eq $PipelineName -and -not $_.result}
+    Write-Host "Running jobs:`n$($RunningEnvironmentDeployments | select-object -Property startTime, @{ label="pipelineName"; expression={$_.definition.name}}, result, id, planId, jobName, stageName, @{label="ownerId";expression={$_.owner.id}}, @{label="ownerName";expression={$_.owner.name}} | Where-Object { $_.pipelineName -eq "das-recruit" } | Format-Table | Out-String)"
     $LowestRunId = $RunningEnvironmentDeployments.owner.id | Sort-Object -Top 1
     Write-Output "Lowest run id is $LowestRunId, current run id is $RunId"
     if ($RunId -eq $LowestRunId) {
