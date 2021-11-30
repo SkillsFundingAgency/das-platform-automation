@@ -4,6 +4,13 @@
 
     .DESCRIPTION
     Gets payload from Azure DevOps RestAPI (https://docs.microsoft.com/en-us/rest/api/azure/devops/distributedtask/environmentdeployment-records/list?view=azure-devops-rest-6.0) and filters it to produce the build ID of the newest running build. Then compares to its own build ID, if equal to it then run and if not sleep and redo.
+    Relies in System.AccessToken when running in a pipeline, ensure this is mapped as described here - https://docs.microsoft.com/en-us/azure/devops/pipelines/build/variables?view=azure-devops&tabs=yaml#systemaccesstoken
+
+    .PARAMETER AzureDevOpsOrganisationUri
+    The URI of the Azure DevOps organisation the pipeline is running in, typically passed in using the predefined variable System.CollectionUri (https://docs.microsoft.com/en-us/azure/devops/pipelines/build/variables?view=azure-devops&tabs=yaml#system-variables-devops-services)
+
+    .PARAMETER AzureDevOpsProjectName
+    The name (or id) of the Azure DevOps project the pipeline is defined in, best passed in using the predefined variable System.TeamProjectId
 
     .PARAMETER EnvironmentId
     The ID number associated with the environemnt stage being used for the deployment.
@@ -17,6 +24,9 @@
     .PARAMETER SleepTime
     The amount of time in seconds that the process will wait before retrying the comparison if there is another deployment currently running.
 
+    .PARAMETER PatToken
+    A PAT token for local debugging
+
     .EXAMPLE
     .\Wait-AzureDevOpsDeployment.ps1 -EnvironmentId 139 -PipelineName das-levy-transfer-matching-api -RunId 459282
 #>
@@ -24,7 +34,7 @@
 [CmdletBinding()]
 Param (
     [Parameter(Mandatory = $true)]
-    [String]$AzureDevOpsOrganisationUri,    
+    [String]$AzureDevOpsOrganisationUri,
     [Parameter(Mandatory = $true)]
     [String]$AzureDevOpsProjectName,
     [Parameter(Mandatory = $true)]
