@@ -89,7 +89,7 @@ while ($RetryCounter -lt $RetryLimit) {
 
     #Filter down results of API call to just contain relevant pipeline runs with matching Pipeline names and only ones that are still running.  This does not include queued jobs.
     $RunningEnvironmentDeployments = $EnvironmentDeployments | Where-Object {$_.definition.name -eq $PipelineName -and -not $_.result}
-    Write-Host "Running jobs:`n$($RunningEnvironmentDeployments | Select-Object -Property startTime, @{ label="pipelineName"; expression={$_.definition.name}}, result, id, stageName, jobName, @{label="ownerName";expression={$_.owner.name}}, @{label="ownerId";expression={$_.owner.id}}, planId | Where-Object { $_.pipelineName -eq $PipelineName } | Format-Table | Out-String)"
+    Write-Output "##vso[task.logissue type=group]Running jobs:`n$($RunningEnvironmentDeployments | Select-Object -Property startTime, @{ label="pipelineName"; expression={$_.definition.name}}, result, id, stageName, jobName, @{label="ownerName";expression={$_.owner.name}}, @{label="ownerId";expression={$_.owner.id}}, planId | Where-Object { $_.pipelineName -eq $PipelineName } | Format-Table | Out-String)`n##vso[task.logissue type=endgroup]"
     $LowestRunId = $RunningEnvironmentDeployments.owner.id | Sort-Object -Top 1
     Write-Output "Lowest run id is $LowestRunId, current run id is $RunId"
     if ($RunId -eq $LowestRunId) {
