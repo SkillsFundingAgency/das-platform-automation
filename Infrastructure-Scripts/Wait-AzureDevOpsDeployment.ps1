@@ -73,8 +73,8 @@ while ($RetryCounter -lt $RetryLimit) {
         Write-Verbose "Requesting: $Url"
         $EnvironmentDeployments += (Invoke-RestMethod -Method GET -Uri $Url -Headers $Headers -TimeoutSec 30 -ResponseHeadersVariable ResponseHeaders).value
         while ($ResponseHeaders.'x-ms-continuationtoken') {
-            $ContinationUrl = "$Url&continuationToken=$($ResponseHeaders.'x-ms-continuationtoken')"
-            $EnvironmentDeployments += (Invoke-RestMethod -Method GET -Uri $ContinationUrl -Headers $Headers -TimeoutSec 30 -ResponseHeadersVariable ResponseHeaders).value
+            $ContinuationUrl = "$Url&continuationToken=$($ResponseHeaders.'x-ms-continuationtoken')"
+            $EnvironmentDeployments += (Invoke-RestMethod -Method GET -Uri $ContinuationUrl -Headers $Headers -TimeoutSec 30 -ResponseHeadersVariable ResponseHeaders).value
             if ($ResponseHeaders.'Retry-After') {
                 Write-Warning "Request is being rate limited"
                 ##TO DO: implement logic to handle rate limiting responses - https://docs.microsoft.com/en-us/azure/devops/integrate/concepts/rate-limits?view=azure-devops#api-client-experience
