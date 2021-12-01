@@ -32,6 +32,9 @@
     .PARAMETER ImportRetries
     (optional) The number of times to retry importing the API definition, defaults to 3
 
+    .PARAMETER SandboxProductId
+    (optional) The ProducId of an APIM sandbox product to optionally add the API to
+
     .EXAMPLE
     Import-ApimSwaggerApiDefinition -ApimResourceGroup das-at-foobar-rg -InstanceName das-at-foobar-apim -AppServiceResourceGroup das-at-foobar-rg -ApiVersionSetName foobar-api -ApiBaseUrl "https://at-foobar-api.apprenticeships.education.gov.uk" -ApiPath "foo-bar" -ApplicationIdentifierUri "https://<tenant>.onmicrosoft.com/das-at-foobar-as-ar" -ProductId ProductId
 #>
@@ -54,6 +57,8 @@ Param(
     [String]$ApplicationIdentifierUri,
     [Parameter(Mandatory = $true)]
     [String]$ProductId,
+    [Parameter(Mandatory = $false)]
+    [String]$SandboxProductId,
     [Parameter(Mandatory = $false)]
     [int]$ImportRetries = 3
 )
@@ -151,7 +156,7 @@ foreach ($SwaggerPath in $SwaggerPaths) {
 
     for ($r = 0; $r -lt $ImportRetries; $r++) {
         try {
-            Write-Verbose "Importing API definition from swagger file $SwaggerSpecificationUrl"
+            Write-Verbose "Importing API definition from swagger file $SwaggerSpecificationUrl into ApiId $ApiId with ApiVersion $Version of ApiVersionSet $VersionSetId"
             $Result = Import-AzApiManagementApi -Context $Context -SpecificationFormat OpenApi -ServiceUrl $ApiBaseUrl -SpecificationUrl $SwaggerSpecificationUrl -Path $ApiPath -ApiId $ApiId -ApiVersion $Version -ApiVersionSetId $VersionSetId -ErrorAction Stop
         }
         catch {
@@ -172,6 +177,10 @@ foreach ($SwaggerPath in $SwaggerPaths) {
     }
 
     Add-AzApiManagementApiToProduct -Context $Context -ProductId $ProductId -ApiId $ApiId
+    if ($SandboxProductId) {
+        Write-Verbose "Adding API to sandbox product"
+        Add-AzApiManagementApiToProduct -Context $Context -ProductId $SandboxProductId -ApiId $ApiId
+    }
 
     Set-AzApiManagementPolicy -Context $Context -ApiId $ApiId -Policy $PolicyString
 }
