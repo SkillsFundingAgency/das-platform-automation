@@ -4,7 +4,7 @@
 
     .DESCRIPTION
     Gets payload from Azure DevOps RestAPI (https://docs.microsoft.com/en-us/rest/api/azure/devops/distributedtask/environmentdeployment-records/list?view=azure-devops-rest-6.0) and filters it to produce the build ID of the newest running build. Then compares to its own build ID, if equal to it then run and if not sleep and redo.
-    Relies in System.AccessToken when running in a pipeline, ensure this is mapped as described here - https://docs.microsoft.com/en-us/azure/devops/pipelines/build/variables?view=azure-devops&tabs=yaml#systemaccesstoken
+    Relies on System.AccessToken when running in a pipeline, ensure this is mapped as described here - https://docs.microsoft.com/en-us/azure/devops/pipelines/build/variables?view=azure-devops&tabs=yaml#systemaccesstoken
 
     .PARAMETER AzureDevOpsOrganisationUri
     The URI of the Azure DevOps organisation the pipeline is running in, typically passed in using the predefined variable System.CollectionUri (https://docs.microsoft.com/en-us/azure/devops/pipelines/build/variables?view=azure-devops&tabs=yaml#system-variables-devops-services)
@@ -22,13 +22,13 @@
     The Run ID of the current deployment which is used to compare to the lowest active RunID returned by the API.
 
     .PARAMETER RetryLimit
-    The number of times the process will retry the comparison if there is another deployment running
+    (optional) The number of times the process will retry the comparison if there is another deployment running, defaults to 30.
 
     .PARAMETER SleepTime
-    The amount of time in seconds that the process will wait before retrying the comparison if there is another deployment currently running.
+    (optional) The amount of time in seconds that the process will wait before retrying the comparison if there is another deployment currently running, defaults to 20 seconds.
 
     .PARAMETER PatToken
-    A PAT token for local debugging
+    (optional) A PAT token for local debugging
 
     .EXAMPLE
     .\Wait-AzureDevOpsDeployment.ps1 -EnvironmentId 139 -PipelineName das-levy-transfer-matching-api -RunId 459282
