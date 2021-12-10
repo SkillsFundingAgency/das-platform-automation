@@ -47,7 +47,7 @@ Describe "New-ParametersFile Unit Tests" {
             ./New-ParametersFile -TemplateFilePath $MockTemplateFilePath -ParametersFilePath $MockParametersFilePath
             $TemplateFileParameterNames = (Get-Content -Path $MockTemplateFilePath -Raw | ConvertFrom-Json).Parameters.PSObject.Properties.Name | Sort-Object
             $ParametersFileParameterNames = (Get-Content -Path $MockParametersFilePath -Raw | ConvertFrom-Json).Parameters.PSObject.Properties.Name | Sort-Object
-            $TemplateFileParameterNames | Should -Be $ParametersFileParameterNames
+            $TemplateFileParameterNames | Should Be $ParametersFileParameterNames
         }
 
         It "Should return values in the parameters file" {
@@ -59,17 +59,17 @@ Describe "New-ParametersFile Unit Tests" {
             foreach ($Parameter in $TemplateFileParameters) {
                 $ParameterValue = ($ParametersFileParameters | Where-Object { $_.Name -eq $Parameter.Name }).Value.Value
                 if (!$ParameterValue -and $Parameter.Value.Type -eq "array") {
-                    $ParameterValue.Length | Should -Be 0
+                    $ParameterValue.Length | Should Be 0
                 }
                 elseif ($ParameterValue.ToString() -eq "" -and $Parameter.Value.Type -eq "object") {
-                    $ParameterValue | Should -BeOfType System.Management.Automation.PSCustomObject
+                    $ParameterValue | Should BeOfType System.Management.Automation.PSCustomObject
                 }
                 elseif (!$ParameterValue -and $Parameter.Value.Type -eq "string") {
-                    $ParameterValue | Should -BeNullOrEmpty
-                    $ParameterValue | Should -BeOfType System.String
+                    $ParameterValue | Should BeNullOrEmpty
+                    $ParameterValue | Should BeOfType System.String
                 }
                 else {
-                    $ParameterValue | Should -Not -BeNullOrEmpty
+                    $ParameterValue | Should Not BeNullOrEmpty
                 }
 
             }
