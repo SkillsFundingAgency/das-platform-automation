@@ -45,9 +45,9 @@ Describe "New-ParametersFile Unit Tests" {
         It "Should return the same parmeters as the arm template" {
             Remove-Item -Path $MockParametersFilePath -ErrorAction "SilentlyContinue"
             ./New-ParametersFile -TemplateFilePath $MockTemplateFilePath -ParametersFilePath $MockParametersFilePath
-            $TemplateFileParameterNames = (Get-Content -Path $MockTemplateFilePath -Raw | ConvertFrom-Json).Parameters.PSObject.Properties.Name | Sort-Object
+            $TemplateFileNotDefaultedParameterNames = ((Get-Content -Path $MockTemplateFilePath -Raw | ConvertFrom-Json).Parameters | Get-Member | Where-Object { $_.Definition -notmatch "defaultValue=.*" -and $_.MemberType -eq "NoteProperty" }).Name | Sort-Object
             $ParametersFileParameterNames = (Get-Content -Path $MockParametersFilePath -Raw | ConvertFrom-Json).Parameters.PSObject.Properties.Name | Sort-Object
-            $TemplateFileParameterNames | Should Be $ParametersFileParameterNames
+            $TemplateFileNotDefaultedParameterNames | Should Be $ParametersFileParameterNames
         }
 
         It "Should return values in the parameters file" {
