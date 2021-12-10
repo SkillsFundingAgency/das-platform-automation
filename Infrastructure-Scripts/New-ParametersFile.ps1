@@ -49,8 +49,8 @@ foreach ($ParameterObject in $ParameterObjects) {
             throw "Could not find environment variable or default value for template parameter $ParameterName"
         }
         else {
-            Write-Verbose -Message "Using default value for $ParameterName"
-            $ParameterValue = $ParameterObject.Value.defaultValue
+            Write-Verbose -Message "Parameter $ParameterName has a default value, skipping this parameter"
+            continue
         }
 
         if ($ParameterType -eq "object") {
