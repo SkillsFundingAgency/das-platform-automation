@@ -45,8 +45,8 @@ if ($MyIp -notmatch $IpRegEx) {
 }
 
 if ($HasIpRestrictions) {
-    Write-Verbose "Whitelisting $MyIp"
     $Priority = ($IpRestrictions.MainSiteAccessRestrictions | Where-Object { $_.Action -eq "Allow" }).Priority[-1] + 1
+    Write-Verbose "Whitelisting $MyIp on app service $AppServiceName with priority $Priority"
     $null = Add-AzWebAppAccessRestrictionRule -ResourceGroupName $ResourceGroupName -WebAppName $AppServiceName -SlotName $SlotName -Name "DeployServer" -IpAddress "$MyIp/32" -Priority $Priority -Action Allow
 }
 
