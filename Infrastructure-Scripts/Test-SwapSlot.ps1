@@ -36,8 +36,9 @@ param(
 Write-Output "##vso[task.setvariable variable=CompleteSwap]false"
 
 $IpRestrictions = Get-AzWebAppAccessRestrictionConfig -ResourceGroupName $ResourceGroupName -Name $AppServiceName -SlotName $SlotName
+Write-Verbose "MainSiteAccessRestrictions: `n$($IpRestrictions.MainSiteAccessRestrictions | Format-Table | Out-String)"
 $HasIpRestrictions = $IpRestrictions.MainSiteAccessRestrictions.RuleName -notcontains "Allow all" -and ($IpRestrictions.MainSiteAccessRestrictions | Where-Object { $_.Action -eq "Allow" }).IpAddress -notcontains "$MyIp/32"
-
+""
 $MyIp = (Invoke-RestMethod $WhatsMyIpServiceUrl -UseBasicParsing)
 $IpRegEx = [regex] "\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b"
 if ($MyIp -notmatch $IpRegEx) {
