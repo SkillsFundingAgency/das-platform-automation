@@ -22,7 +22,14 @@ Param(
     [String]$ParametersFilePath
 )
 
-$TemplateParameters = (Get-Content -Path $TemplateFilePath -Raw | ConvertFrom-Json).Parameters
+try {
+    $TemplateParameters = (Get-Content -Path $TemplateFilePath -Raw | ConvertFrom-Json).Parameters
+}
+catch {
+    Write-Error "Failed to convert $TemplateFilePath to JSON"
+    throw $_
+}
+
 $ParametersFile = [PSCustomObject]@{
     "`$schema"     = "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#"
     contentVersion = "1.0.0.0"
@@ -42,8 +49,8 @@ foreach ($ParameterObject in $ParameterObjects) {
             throw "Could not find environment variable or default value for template parameter $ParameterName"
         }
         else {
-            Write-Verbose -Message "Using default value for $ParameterName"
-            $ParameterValue = $ParameterObject.Value.defaultValue
+            Write-Verbose -Message "Parameter $ParameterName has a default value, skipping this parameter"
+            continue
         }
 
         if ($ParameterType -eq "object") {

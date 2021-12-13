@@ -42,34 +42,34 @@ Describe "New-ParametersFile Unit Tests" {
             { Get-Content -Path $MockParametersFilePath -Raw | ConvertFrom-Json } | Should Not Throw
         }
 
-        It "Should return the same parmeters as the arm template" {
+        It "Should return the same parmeters as the arm template except those with default values" {
             Remove-Item -Path $MockParametersFilePath -ErrorAction "SilentlyContinue"
             ./New-ParametersFile -TemplateFilePath $MockTemplateFilePath -ParametersFilePath $MockParametersFilePath
-            $TemplateFileParameterNames = (Get-Content -Path $MockTemplateFilePath -Raw | ConvertFrom-Json).Parameters.PSObject.Properties.Name | Sort-Object
+            $TemplateFileNotDefaultedParameterNames = ((Get-Content -Path $MockTemplateFilePath -Raw | ConvertFrom-Json).Parameters | Get-Member | Where-Object { $_.Definition -notmatch "defaultValue=.*" -and $_.MemberType -eq "NoteProperty" }).Name | Sort-Object
             $ParametersFileParameterNames = (Get-Content -Path $MockParametersFilePath -Raw | ConvertFrom-Json).Parameters.PSObject.Properties.Name | Sort-Object
-            $TemplateFileParameterNames | Should -Be $ParametersFileParameterNames
+            $TemplateFileNotDefaultedParameterNames | Should Be $ParametersFileParameterNames
         }
 
-        It "Should return values in the parameters file" {
+        It "Should return values in the parameters file for all parameters without a default value" {
             Remove-Item -Path $MockParametersFilePath -ErrorAction "SilentlyContinue"
             ./New-ParametersFile -TemplateFilePath $MockTemplateFilePath -ParametersFilePath $MockParametersFilePath
-            $TemplateFileParameters = (Get-Content -Path $MockTemplateFilePath -Raw | ConvertFrom-Json).Parameters.PSObject.Properties | Sort-Object
+            $TemplateFileNotDefaultedParameterNames = ((Get-Content -Path $MockTemplateFilePath -Raw | ConvertFrom-Json).Parameters | Get-Member | Where-Object { $_.Definition -notmatch "defaultValue=.*" -and $_.MemberType -eq "NoteProperty" }).Name | Sort-Object
             $ParametersFileParameters = (Get-Content -Path $MockParametersFilePath -Raw | ConvertFrom-Json).Parameters.PSObject.Properties | Sort-Object
 
-            foreach ($Parameter in $TemplateFileParameters) {
-                $ParameterValue = ($ParametersFileParameters | Where-Object { $_.Name -eq $Parameter.Name }).Value.Value
+            foreach ($Parameter in $TemplateFileNotDefaultedParameterNames) {
+                $ParameterValue = ($ParametersFileParameters | Where-Object { $_.Name -eq $Parameter }).Value.Value
                 if (!$ParameterValue -and $Parameter.Value.Type -eq "array") {
-                    $ParameterValue.Length | Should -Be 0
+                    $ParameterValue.Length | Should Be 0
                 }
                 elseif ($ParameterValue.ToString() -eq "" -and $Parameter.Value.Type -eq "object") {
-                    $ParameterValue | Should -BeOfType System.Management.Automation.PSCustomObject
+                    $ParameterValue | Should BeOfType System.Management.Automation.PSCustomObject
                 }
                 elseif (!$ParameterValue -and $Parameter.Value.Type -eq "string") {
-                    $ParameterValue | Should -BeNullOrEmpty
-                    $ParameterValue | Should -BeOfType System.String
+                    $ParameterValue | Should BeNullOrEmpty
+                    $ParameterValue | Should BeOfType System.String
                 }
                 else {
-                    $ParameterValue | Should -Not -BeNullOrEmpty
+                    $ParameterValue | Should Not BeNullOrEmpty
                 }
 
             }
