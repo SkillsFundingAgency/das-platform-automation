@@ -29,16 +29,17 @@
     .PARAMETER ProductId
     The Id of the Product that the API will be assigned to
 
+    .PARAMETER SandboxEnabled
+    (optional) The boolean for creating a sandbox API version set and its sandbox APIs for sandbox equivalent of provided ProductId. Defaults to false
+
     .PARAMETER ImportRetries
     (optional) The number of times to retry importing the API definition, defaults to 3
-
-    .PARAMETER SandboxProductId
-    (optional) The ProducId of an APIM sandbox product to optionally add the API to
 
     .EXAMPLE
     Import-ApimSwaggerApiDefinition -ApimResourceGroup das-at-foobar-rg -InstanceName das-at-foobar-apim -AppServiceResourceGroup das-at-foobar-rg -ApiVersionSetName foobar-api -ApiBaseUrl "https://at-foobar-api.apprenticeships.education.gov.uk" -ApiPath "foo-bar" -ApplicationIdentifierUri "https://<tenant>.onmicrosoft.com/das-at-foobar-as-ar" -ProductId ProductId
 #>
 
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSReviewUnusedParameter", "", Justification = "Known bug - https://github.com/PowerShell/PSScriptAnalyzer/issues/1472")]
 [CmdletBinding()]
 Param(
     [Parameter(Mandatory = $true)]
@@ -166,7 +167,6 @@ function Import-Api {
     }
 
     $VersionSet = Get-AzApiManagementApiVersionSet -Context $Context | Where-Object { $_.DisplayName -eq "$ApiVersionSetName" }
-    
     if ($null -eq $VersionSet) {
         Write-Verbose "Creating new version set $ApiVersionSetName"
         $VersionSetId = (New-AzApiManagementApiVersionSet -Context $Context -Name "$ApiVersionSetName" -Scheme "Header" -HeaderName "X-Version" -Description $ApiVersionSetName).Id
