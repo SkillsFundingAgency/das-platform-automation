@@ -178,7 +178,7 @@ function Import-Api {
 
     for ($r = 0; $r -lt $ImportRetries; $r++) {
         try {
-            Write-Verbose "Importing API definition from swagger file $SwaggerSpecificationUrl into ApiId $ApiId with ApiVersion $Version of ApiVersionSet $VersionSetId"
+            Write-Verbose "Importing API definition from swagger file path $SwaggerSpecificationFilePath defined at $SwaggerSpecificationUrl into ApiId $ApiId with ApiVersion $Version of ApiVersionSet $VersionSetId"
             $Result = Import-AzApiManagementApi -Context $Context -SpecificationFormat OpenApi -ServiceUrl $ApiBaseUrl -SpecificationPath $SwaggerSpecificationFilePath -Path $ApiPath -ApiId $ApiId -ApiVersion $Version -ApiVersionSetId $VersionSetId -ErrorAction Stop
         }
         catch {
