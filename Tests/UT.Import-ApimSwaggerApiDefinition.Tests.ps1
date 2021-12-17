@@ -60,7 +60,7 @@ Describe "Import-ApimSwaggerApiDefinition Unit Tests" -Tags @("Unit") {
             Assert-MockCalled -CommandName 'Add-AzApiManagementApiToProduct' -Times 2 -Scope It -Exactly
             Assert-MockCalled -CommandName 'Set-AzApiManagementPolicy' -Times 2 -Scope It -Exactly
         }
- 
+
         It "Sandbox is enabled, import of API and its sandbox was successful, do not throw an error" {
             function Get-AppServiceName () { }
             function Add-AppServiceWhitelist () { }
