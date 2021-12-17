@@ -58,7 +58,7 @@ Param(
     [Parameter(Mandatory = $true)]
     [String]$ProductId,
     [Parameter(Mandatory = $false)]
-    [String]$SandboxProductId,
+    [bool]$SandboxEnabled = $false,
     [Parameter(Mandatory = $false)]
     [int]$ImportRetries = 3
 )
@@ -101,6 +101,23 @@ function Get-ApiTitle ($SwaggerSpecificationUrl) {
     $ApiTitle
 }
 
+function Save-SwaggerSpecification {
+    Param(
+        [String]$SwaggerSpecificationUrl,
+        [string]$ApiName,
+        [switch]$SandboxEnabled
+    )
+    $SwaggerContent = (Invoke-RetryWebRequest $SwaggerSpecificationUrl).Content
+    if ($SandboxEnabled.IsPresent) {
+        $ApiName += " Sandbox"
+        $SwaggerContentObject = $SwaggerContent | ConvertFrom-Json -Depth 20
+        $SwaggerContentObject.info.title = $ApiName
+        $SwaggerContent = $SwaggerContentObject | ConvertTo-Json -Depth 20
+    }
+    Write-Verbose "Saving swagger specification to $($SwaggerSpecificationFilePath)"
+    $SwaggerContent | Out-File -FilePath $SwaggerSpecificationFilePath
+}
+
 function Get-AppServiceName ($ApiBaseUrl, $AppServiceResourceGroup) {
     $AppServices = Get-AzWebApp -ResourceGroupName $AppServiceResourceGroup
     $Hostname = ($ApiBaseUrl -replace "https://", "").TrimEnd('/')
@@ -118,6 +135,77 @@ function Add-AppServiceWhitelist ($AppServiceResourceGroup, $AppServiceName) {
         $null = Add-AzWebAppAccessRestrictionRule -ResourceGroupName $AppServiceResourceGroup -WebAppName $AppServiceName -Name "DeployServer" -IpAddress "$MyIp/32" -Priority $Priority -Action Allow
     }
 }
+
+function Import-Api {
+    Param(
+        [Parameter(Mandatory = $true)]
+        [String]$ProductId,
+        [Parameter(Mandatory = $true)]
+        [String]$ApiVersionSetName,
+        [Parameter(Mandatory = $true)]
+        [String]$SwaggerPath,
+        [Parameter(Mandatory = $true)]
+        [String]$ApiPath,
+        [Parameter(Mandatory = $false)]
+        [switch]$SandboxEnabled
+    )
+    $SwaggerSpecificationUrl = $ApiBaseUrl + $SwaggerPath
+    $SwaggerPath -match '\d' | Out-Null
+    $Version = $matches[0]
+    $ApiTitle = Get-ApiTitle $SwaggerSpecificationUrl
+    if ($SandboxEnabled.IsPresent) {
+        $ProductId = $ProductId + "-Sandbox"
+        $ApiId = $ApiTitle.replace(" ","-") + "-Sandbox-v" + $Version.ToUpper()
+        $ApiVersionSetName = $ApiVersionSetName + "-Sandbox"
+        $ApiPath = "sandbox/" + $ApiPath
+        Save-SwaggerSpecification -SwaggerSpecificationUrl $SwaggerSpecificationUrl -ApiName $ApiTitle -SandboxEnabled
+    }
+    else {
+        $ApiId = $ApiTitle.replace(" ","-") + "-v" + $Version.ToUpper()
+        Save-SwaggerSpecification -SwaggerSpecificationUrl $SwaggerSpecificationUrl
+    }
+
+    $VersionSet = Get-AzApiManagementApiVersionSet -Context $Context | Where-Object { $_.DisplayName -eq "$ApiVersionSetName" }
+    
+    if ($null -eq $VersionSet) {
+        Write-Verbose "Creating new version set $ApiVersionSetName"
+        $VersionSetId = (New-AzApiManagementApiVersionSet -Context $Context -Name "$ApiVersionSetName" -Scheme "Header" -HeaderName "X-Version" -Description $ApiVersionSetName).Id
+    }
+    else {
+        Write-Verbose "Setting VersionSetId to $($VersionSet.Id)"
+        $VersionSetId = $VersionSet.Id
+    }
+
+    for ($r = 0; $r -lt $ImportRetries; $r++) {
+        try {
+            Write-Verbose "Importing API definition from swagger file $SwaggerSpecificationUrl into ApiId $ApiId with ApiVersion $Version of ApiVersionSet $VersionSetId"
+            $Result = Import-AzApiManagementApi -Context $Context -SpecificationFormat OpenApi -ServiceUrl $ApiBaseUrl -SpecificationPath $SwaggerSpecificationFilePath -Path $ApiPath -ApiId $ApiId -ApiVersion $Version -ApiVersionSetId $VersionSetId -ErrorAction Stop
+        }
+        catch {
+            Write-Error $_
+        }
+
+        if ($Result) {
+            Write-Verbose "API definition successfully imported"
+            $Result
+            break
+        }
+
+        Write-Warning "API definition import failed, retrying attempt $($r + 1)"
+    }
+
+    if (!$Result) {
+        throw "Failed to import API definition after $ImportRetries attempts"
+    }
+
+    Remove-Item -Path $SwaggerSpecificationFilePath
+
+    Add-AzApiManagementApiToProduct -Context $Context -ProductId $ProductId -ApiId $ApiId
+
+    Set-AzApiManagementPolicy -Context $Context -ApiId $ApiId -Policy $PolicyString
+}
+
+$SwaggerSpecificationFilePath = "./swagger-specification.json"
 
 $PolicyString = "<policies><inbound><base/><authentication-managed-identity resource=`"$ApplicationIdentifierUri`"/></inbound><backend><base/></backend><outbound><base/></outbound><on-error><base/></on-error></policies>"
 
@@ -138,51 +226,10 @@ $SwaggerPaths = Get-SwaggerFilePath -IndexHtml $IndexHtml
 
 Write-Verbose "Loop through each versioned Swagger definition and import to APIM"
 foreach ($SwaggerPath in $SwaggerPaths) {
-    $SwaggerSpecificationUrl = $ApiBaseUrl + $SwaggerPath
-    $SwaggerPath -match '\d' | Out-Null
-    $Version = $matches[0]
-    $ApiTitle = Get-ApiTitle $SwaggerSpecificationUrl
-    $ApiId = $ApiTitle.replace(" ","-") + "-v" + $Version.ToUpper()
-
-    $VersionSet = Get-AzApiManagementApiVersionSet -Context $Context | Where-Object { $_.DisplayName -eq "$ApiVersionSetName" }
-    if ($null -eq $VersionSet) {
-        Write-Verbose "Creating new version set $ApiVersionSetName"
-        $VersionSetId = (New-AzApiManagementApiVersionSet -Context $Context -Name "$ApiVersionSetName" -Scheme "Header" -HeaderName "X-Version" -Description $ApiVersionSetName).Id
+    Import-Api -ProductId $ProductId -ApiVersionSetName $ApiVersionSetName -SwaggerPath $SwaggerPath -ApiPath $ApiPath
+    if ($SandboxEnabled) {
+        Import-Api -ProductId $ProductId -ApiVersionSetName $ApiVersionSetName -SwaggerPath $SwaggerPath -ApiPath $ApiPath -SandboxEnabled
     }
-    else {
-        Write-Verbose "Setting VersionSetId to $($VersionSet.Id)"
-        $VersionSetId = $VersionSet.Id
-    }
-
-    for ($r = 0; $r -lt $ImportRetries; $r++) {
-        try {
-            Write-Verbose "Importing API definition from swagger file $SwaggerSpecificationUrl into ApiId $ApiId with ApiVersion $Version of ApiVersionSet $VersionSetId"
-            $Result = Import-AzApiManagementApi -Context $Context -SpecificationFormat OpenApi -ServiceUrl $ApiBaseUrl -SpecificationUrl $SwaggerSpecificationUrl -Path $ApiPath -ApiId $ApiId -ApiVersion $Version -ApiVersionSetId $VersionSetId -ErrorAction Stop
-        }
-        catch {
-            Write-Error $_
-        }
-
-        if ($Result) {
-            Write-Verbose "API definition successfully imported"
-            $Result
-            break
-        }
-
-        Write-Warning "API definition import failed, retrying attempt $($r + 1)"
-    }
-
-    if (!$Result) {
-        throw "Failed to import API definition after $ImportRetries attempts"
-    }
-
-    Add-AzApiManagementApiToProduct -Context $Context -ProductId $ProductId -ApiId $ApiId
-    if ($SandboxProductId) {
-        Write-Verbose "Adding API to sandbox product"
-        Add-AzApiManagementApiToProduct -Context $Context -ProductId $SandboxProductId -ApiId $ApiId
-    }
-
-    Set-AzApiManagementPolicy -Context $Context -ApiId $ApiId -Policy $PolicyString
 }
 
 Write-Verbose "Removing whitelisted IP"
