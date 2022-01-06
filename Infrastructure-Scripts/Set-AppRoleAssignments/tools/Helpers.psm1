@@ -42,8 +42,8 @@ function New-AppRegistration {
         [String]$IdentifierUri
     )
 
-    az ad app create --display-name $AppRegistrationName --identifier-uris $IdentifierUri --output none 2>$null
-    az ad sp create --id $IdentifierUri --output none 2>$null
+    az ad app create --display-name $AppRegistrationName --identifier-uris $IdentifierUri
+    az ad sp create --id $IdentifierUri
 }
 
 function New-AppRegistrationAppRole {
@@ -101,5 +101,5 @@ function New-AppRoleAssignment {
     "--uri", "https://graph.microsoft.com/beta/servicePrincipals/$ServicePrincipalId/appRoleAssignedTo",
     "--body", "{'appRoleId': '$AppRoleId', 'principalId': '$ManagedIdentity', 'resourceId': '$ServicePrincipalId', 'principalType': 'ServicePrincipal'}"
 
-    az rest @AppRoleRegistrationRequestParameters --output none 2>$null
+    az rest @AppRoleRegistrationRequestParameters
 }
