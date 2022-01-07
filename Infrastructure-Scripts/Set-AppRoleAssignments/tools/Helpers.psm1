@@ -80,7 +80,7 @@ function Get-AppRoleAssignments {
 
     $AppRoleRegistrationRequestParameters =
     "--method", "get",
-    "--uri", "https://graph.microsoft.com/beta/servicePrincipals/$ServicePrincipalId/appRoleAssignedTo"
+    "--uri", "https://graph.microsoft.com/v1.0/servicePrincipals/$ServicePrincipalId/appRoleAssignedTo"
 
     $AppRoleAssignments = az rest @AppRoleRegistrationRequestParameters | ConvertFrom-Json
     return $AppRoleAssignments
@@ -98,7 +98,7 @@ function New-AppRoleAssignment {
 
     $AppRoleRegistrationRequestParameters =
     "--method", "post",
-    "--uri", "https://graph.microsoft.com/beta/servicePrincipals/$ServicePrincipalId/appRoleAssignedTo",
+    "--uri", "https://graph.microsoft.com/v1.0/servicePrincipals/$ServicePrincipalId/appRoleAssignedTo",
     "--body", "{'appRoleId': '$AppRoleId', 'principalId': '$ManagedIdentity', 'resourceId': '$ServicePrincipalId', 'principalType': 'ServicePrincipal'}"
 
     az rest @AppRoleRegistrationRequestParameters
