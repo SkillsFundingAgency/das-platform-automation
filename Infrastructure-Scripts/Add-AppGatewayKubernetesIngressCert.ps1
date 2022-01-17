@@ -48,7 +48,8 @@ if (!$Matches) {
 }
 
 $AppGateway = Get-AzApplicationGateway -Name $AppGatewayName -ResourceGroupName $AppGatewayResourceGroup
-if (!(Get-AzApplicationGatewaySslCertificate -Name $CertificateName -ApplicationGateway $AppGateway -ErrorAction SilentlyContinue)) {
+$AppGatewayCert = Get-AzApplicationGatewaySslCertificate -Name $CertificateName -ApplicationGateway $AppGateway -ErrorAction SilentlyContinue
+if (!$AppGatewayCert) {
     $KeyVaultCertificate = Get-AzKeyVaultCertificate -VaultName $KeyVaultName -Name $CertificateName
     $VersionLessSecretId = $KeyVaultCertificate.SecretId -replace $KeyVaultCertificate.Id, ""
     Write-Verbose "Certificate versionless secret id is $VersionLessSecretId"
@@ -58,5 +59,17 @@ if (!(Get-AzApplicationGatewaySslCertificate -Name $CertificateName -Application
     Set-AzApplicationGateway -ApplicationGateway $UpdatedAg
 }
 else {
-    Write-Verbose "Certificate $CertficateName already exists, no action."
+    $KeyVaultCertVersion = ($AppGatewayCert.KeyVaultSecretId -split "/")[-1]
+    $KeyVaultCertificate = Get-AzKeyVaultCertificate -VaultName $KeyVaultName -Name $CertificateName -Version $KeyVaultCertVersion
+    if ($KeyVaultCertificate.Expires -ge (Get-Date) -and $KeyVaultCertificate.Expires -lt (Get-Date).AddDays(20)) {
+        $VersionLessSecretId = $KeyVaultCertificate.SecretId -replace $KeyVaultCertificate.Id, ""
+        Write-Verbose "Certificate versionless secret id is $VersionLessSecretId"  
+        
+        Write-Verbose "App gateway ssl certificate is due to expired on $($KeyVaultCertificate.Expires), updating..."
+        $UpdatedAg = Set-AzApplicationGatewaySslCertificate -ApplicationGateway $AppGateway -Name $CertificateName -KeyVaultSecretId $VersionLessSecretId
+        Set-AzApplicationGateway -ApplicationGateway $UpdatedAg
+    }
+    else {
+        Write-Verbose "Certificate $CertficateName already exists and expires on $($KeyVaultCertificate.Expires), no action."
+    }
 }
