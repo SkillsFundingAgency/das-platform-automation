@@ -63,8 +63,8 @@ else {
     $KeyVaultCertificate = Get-AzKeyVaultCertificate -VaultName $KeyVaultName -Name $CertificateName -Version $KeyVaultCertVersion
     if ($KeyVaultCertificate.Expires -ge (Get-Date) -and $KeyVaultCertificate.Expires -lt (Get-Date).AddDays(20)) {
         $VersionLessSecretId = $KeyVaultCertificate.SecretId -replace $KeyVaultCertificate.Id, ""
-        Write-Output "Certificate versionless secret id is $VersionLessSecretId"  
-        
+        Write-Output "Certificate versionless secret id is $VersionLessSecretId"
+
         Write-Output "App gateway ssl certificate is due to expired on $($KeyVaultCertificate.Expires), updating..."
         $UpdatedAg = Set-AzApplicationGatewaySslCertificate -ApplicationGateway $AppGateway -Name $CertificateName -KeyVaultSecretId $VersionLessSecretId
         Set-AzApplicationGateway -ApplicationGateway $UpdatedAg
