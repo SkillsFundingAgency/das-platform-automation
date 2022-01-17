@@ -17,6 +17,7 @@ Describe "Add-AppGatewayKubernetesIngressCert unit tests" -Tag "Unit" {
             Name = "das-foo-ag"
         }
     }
+    Mock Set-AzApplicationGatewaySslCertificate
     Mock Set-AzApplicationGateway
 
     $Params = @{
@@ -40,10 +41,18 @@ Describe "Add-AppGatewayKubernetesIngressCert unit tests" -Tag "Unit" {
             Assert-MockCalled -CommandName 'Set-AzApplicationGateway' -Times 1 -Scope It
         }
 
-        It "Should do nothing if the cert does exist in the app gateway" {
+        It "Should do nothing if the cert does exist in the app gateway and the expiry date is more that 20 days away" {
             Mock Get-AzApplicationGatewaySslCertificate -MockWith {
                 return @{
                     Name = "wildcard-foo-gov-uk"
+                    KeyVaultSecretId = "https://foo-bar-shared-kv.vault.azure.net:443/secrets/foo-bar-gov-uk/1234567890a1234567b1c1d12efg12h1"
+                }
+            }
+            Mock Get-AzKeyVaultCertificate -MockWith {
+                return @{
+                    SecretId = "https://foo-bar-shared-kv.vault.azure.net:443/secrets/foo-bar-gov-uk/1234567890a1234567b1c1d12efg12h1"
+                    Version = "1234567890a1234567b1c1d12efg12h1"
+                    Expires = (Get-Date).AddDays(100)
                 }
             }
 
@@ -53,8 +62,9 @@ Describe "Add-AppGatewayKubernetesIngressCert unit tests" -Tag "Unit" {
 
             Assert-MockCalled -CommandName 'Get-AzApplicationGateway' -Times 1 -Scope It
             Assert-MockCalled -CommandName 'Get-AzApplicationGatewaySslCertificate' -Times 1 -Scope It
-            Assert-MockCalled -CommandName 'Get-AzKeyVaultCertificate' -Times 0 -Scope It
+            Assert-MockCalled -CommandName 'Get-AzKeyVaultCertificate' -Times 1 -Scope It
             Assert-MockCalled -CommandName 'Add-AzApplicationGatewaySslCertificate' -Times 0 -Scope It
+            Assert-MockCalled -CommandName 'Set-AzApplicationGatewaySslCertificate' -Times 0 -Scope It
             Assert-MockCalled -CommandName 'Set-AzApplicationGateway' -Times 0 -Scope It
         }
     }
