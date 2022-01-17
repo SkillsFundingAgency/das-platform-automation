@@ -37,7 +37,7 @@ $IngressManifestContent = Get-Content -Path $IngressManifestPath
 foreach ($Line in $IngressManifestContent) {
     $Match = $Line -match "appgw.ingress.kubernetes.io/appgw-ssl-certificate: (.*)"
     if ($Match) {
-        Write-Verbose "Found certificate name in ingress manifest"
+        Write-Output "Found certificate name in ingress manifest"
         $CertificateName = $Matches[1]
         break
     }
@@ -52,9 +52,9 @@ $AppGatewayCert = Get-AzApplicationGatewaySslCertificate -Name $CertificateName 
 if (!$AppGatewayCert) {
     $KeyVaultCertificate = Get-AzKeyVaultCertificate -VaultName $KeyVaultName -Name $CertificateName
     $VersionLessSecretId = $KeyVaultCertificate.SecretId -replace $KeyVaultCertificate.Id, ""
-    Write-Verbose "Certificate versionless secret id is $VersionLessSecretId"
+    Write-Output "Certificate versionless secret id is $VersionLessSecretId"
 
-    Write-Verbose "Creating app gateway ssl certificate ..."
+    Write-Output "Creating app gateway ssl certificate ..."
     $UpdatedAg = Add-AzApplicationGatewaySslCertificate -ApplicationGateway $AppGateway -Name $CertificateName -KeyVaultSecretId $VersionLessSecretId
     Set-AzApplicationGateway -ApplicationGateway $UpdatedAg
 }
@@ -63,13 +63,13 @@ else {
     $KeyVaultCertificate = Get-AzKeyVaultCertificate -VaultName $KeyVaultName -Name $CertificateName -Version $KeyVaultCertVersion
     if ($KeyVaultCertificate.Expires -ge (Get-Date) -and $KeyVaultCertificate.Expires -lt (Get-Date).AddDays(20)) {
         $VersionLessSecretId = $KeyVaultCertificate.SecretId -replace $KeyVaultCertificate.Id, ""
-        Write-Verbose "Certificate versionless secret id is $VersionLessSecretId"  
+        Write-Output "Certificate versionless secret id is $VersionLessSecretId"  
         
-        Write-Verbose "App gateway ssl certificate is due to expired on $($KeyVaultCertificate.Expires), updating..."
+        Write-Output "App gateway ssl certificate is due to expired on $($KeyVaultCertificate.Expires), updating..."
         $UpdatedAg = Set-AzApplicationGatewaySslCertificate -ApplicationGateway $AppGateway -Name $CertificateName -KeyVaultSecretId $VersionLessSecretId
         Set-AzApplicationGateway -ApplicationGateway $UpdatedAg
     }
     else {
-        Write-Verbose "Certificate $CertficateName already exists and expires on $($KeyVaultCertificate.Expires), no action."
+        Write-Output "Certificate $CertficateName already exists and expires on $($KeyVaultCertificate.Expires), no action."
     }
 }
