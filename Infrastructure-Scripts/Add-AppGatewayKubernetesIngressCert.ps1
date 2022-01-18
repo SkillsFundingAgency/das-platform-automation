@@ -61,7 +61,7 @@ if (!$AppGatewayCert) {
 else {
     $KeyVaultCertVersion = ($AppGatewayCert.KeyVaultSecretId -split "/")[-1]
     $KeyVaultCertificate = Get-AzKeyVaultCertificate -VaultName $KeyVaultName -Name $CertificateName -Version $KeyVaultCertVersion
-    if ($KeyVaultCertificate.Expires -ge (Get-Date) -and $KeyVaultCertificate.Expires -lt (Get-Date).AddDays(20)) {
+    if ($KeyVaultCertificate.Expires -lt (Get-Date).AddDays(20)) {
         $VersionLessSecretId = $KeyVaultCertificate.SecretId -replace $KeyVaultCertificate.Id, ""
         Write-Output "Certificate versionless secret id is $VersionLessSecretId"
 
