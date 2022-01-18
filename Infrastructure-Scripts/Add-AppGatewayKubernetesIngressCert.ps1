@@ -51,7 +51,7 @@ $AppGateway = Get-AzApplicationGateway -Name $AppGatewayName -ResourceGroupName 
 $AppGatewayCert = Get-AzApplicationGatewaySslCertificate -Name $CertificateName -ApplicationGateway $AppGateway -ErrorAction SilentlyContinue
 if (!$AppGatewayCert) {
     $KeyVaultCertificate = Get-AzKeyVaultCertificate -VaultName $KeyVaultName -Name $CertificateName
-    $VersionLessSecretId = $KeyVaultCertificate.SecretId -replace $KeyVaultCertificate.Id, ""
+    $VersionLessSecretId = $KeyVaultCertificate.SecretId -replace $KeyVaultCertificate.Version, ""
     Write-Output "Certificate versionless secret id is $VersionLessSecretId"
 
     Write-Output "Creating app gateway ssl certificate ..."
@@ -62,7 +62,7 @@ else {
     $KeyVaultCertVersion = ($AppGatewayCert.KeyVaultSecretId -split "/")[-1]
     $KeyVaultCertificate = Get-AzKeyVaultCertificate -VaultName $KeyVaultName -Name $CertificateName -Version $KeyVaultCertVersion
     if ($KeyVaultCertificate.Expires -lt (Get-Date).AddDays(20)) {
-        $VersionLessSecretId = $KeyVaultCertificate.SecretId -replace $KeyVaultCertificate.Id, ""
+        $VersionLessSecretId = $KeyVaultCertificate.SecretId -replace $KeyVaultCertificate.Version, ""
         Write-Output "Certificate versionless secret id is $VersionLessSecretId"
 
         Write-Output "App gateway ssl certificate is due to expired on $($KeyVaultCertificate.Expires), updating..."
