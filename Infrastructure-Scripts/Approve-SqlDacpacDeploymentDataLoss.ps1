@@ -5,11 +5,19 @@
 
     .DESCRIPTION
     Ran as part of the sql-dacpac-deploy.yml step.
-    Checks whether the BlockOnPossibleDataLoss parameter has been overridden or not.
-    If the environment is PROD - Check to make sure approval has been received via built in variable.
-    Set variable SetBlockOnPossibleDataLossArgument to true if approval confimrmed and false if approval not confirmed then set to false.
+    Checks whether the OverrideBlockOnPossibleDataLoss parameter has been set to true, if it has perform the following checks:
+    If the environment is PROD - Check to make sure approval has been received via pipeline variable 'ApproveProdOverrideBlockOnPossibleDataLoss'
+    - If this variable has not been defined the script will throw an error.
+    - If approval has for PROD dataloss has been confirmed by setting 'ApproveProdOverrideBlockOnPossibleDataLoss' to true then set variable SetBlockOnPossibleDataLossArgument to true
+    - Otherwise set SetBlockOnPossibleDataLossArgument to false
     If environment is not PROD - no approval is required and the override can take place.
-    If environment is not PROD and override is not requested then no action is needed and override of BlockOnPossibleDataLoss does not take place.
+    If environment is not PROD and override is not requested then no action is needed and override of BlockOnPossibleDataLoss does not take place
+
+    To set the 'ApproveProdOverrideBlockOnPossibleDataLoss' pipeline variable:
+    1. Navigate to the pipeline in Azure DevOps
+    2. Click Edit > Variables > New Variable
+    3. Set the variable Name to 'ApproveProdOverrideBlockOnPossibleDataLoss' and the Value to 'false' (both without the single quotes)
+    4. Check the 'Let users override this value when running this pipeline' box and click OK the Save
 
     .PARAMETER Environment
     The name of the environtment that the deployment is being run on.
