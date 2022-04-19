@@ -7,7 +7,7 @@ Describe "Set-AppRoleAssignments Unit Tests" -Tags @("Unit") {
         It "The extracted environment from app service name is invalid, throw an error" {
 
             $AppServiceName = "das-poc-ui-as"
-            { ./Set-AppRoleAssignments -AppRegistrationConfigurationFilePath "$PSScriptRoot\..\Tests\Configuration\Set-AppRoleAssignments.Config.json" -ResourceName $AppServiceName -Tenant $Config.Tenant -DryRun $true} | Should Throw "Environment retrieved from app service name not valid"
+            { ./Set-AppRoleAssignments -AppRegistrationConfigurationFilePath "$PSScriptRoot\..\Tests\Configuration\Set-AppRoleAssignments.Config.json" -ResourceName $AppServiceName -Tenant $Config.Tenant -AADGroupName $Config.aadGroupName -DryRun $true} | Should Throw "Environment retrieved from app service name not valid"
 
         }
     }
@@ -16,7 +16,7 @@ Describe "Set-AppRoleAssignments Unit Tests" -Tags @("Unit") {
         It "No app registrations found to process, throw an error" {
 
             $AppServiceName = "das-test-foobar-as"
-            { ./Set-AppRoleAssignments -AppRegistrationConfigurationFilePath "$PSScriptRoot\..\Tests\Configuration\Set-AppRoleAssignments.Config.json" -ResourceName $AppServiceName -Tenant $Config.Tenant -DryRun $true } | Should Throw "No app registrations to process for app service name $AppServiceName"
+            { ./Set-AppRoleAssignments -AppRegistrationConfigurationFilePath "$PSScriptRoot\..\Tests\Configuration\Set-AppRoleAssignments.Config.json" -ResourceName $AppServiceName -Tenant $Config.Tenant -AADGroupName $Config.aadGroupName -DryRun $true } | Should Throw "No app registrations to process for app service name $AppServiceName"
 
         }
     }
@@ -27,7 +27,7 @@ Describe "Set-AppRoleAssignments Unit Tests" -Tags @("Unit") {
             Mock Get-ServicePrincipal -MockWith { return @("", "") }
             $AppServiceName = "das-test-ui-as"
 
-            { ./Set-AppRoleAssignments -AppRegistrationConfigurationFilePath "$PSScriptRoot\..\Tests\Configuration\Set-AppRoleAssignments.Config.json" -ResourceName $AppServiceName -Tenant $Config.Tenant -DryRun $true } | Should Throw
+            { ./Set-AppRoleAssignments -AppRegistrationConfigurationFilePath "$PSScriptRoot\..\Tests\Configuration\Set-AppRoleAssignments.Config.json" -ResourceName $AppServiceName -Tenant $Config.Tenant -AADGroupName $Config.aadGroupName -DryRun $true } | Should Throw
             Assert-MockCalled Get-ServicePrincipal -Times 1
 
         }
