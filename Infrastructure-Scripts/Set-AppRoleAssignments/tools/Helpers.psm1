@@ -58,9 +58,9 @@ function Set-AzureCLIAccess {
     $AppRegistrationObject = (az ad app show --id $IdentifierUri | ConvertFrom-Json)
     $MicrosoftGraphRequestParameters =
     "--method", "patch",
-    "--uri", "https://graph.microsoft.com/v1.0/applications/$($AppRegistrationObject.objectId)",
+    "--uri", "https://graph.microsoft.com/v1.0/applications/$($AppRegistrationObject.ObjectId)",
     "--headers", "Content-Type=application/json",
-    "--body", "{api:{preAuthorizedApplications:[{appId:'04b07795-8ddb-461a-bbee-02f9e1bf7b46',delegatedPermissionIds:['$($AppRegistrationObject.oauth2Permissions.id)']}]}}"
+    "--body", "{api:{preAuthorizedApplications:[{appId:'04b07795-8ddb-461a-bbee-02f9e1bf7b46',delegatedPermissionIds:['$($AppRegistrationObject.Oauth2Permissions.id)']}]}}"
     
     az rest @MicrosoftGraphRequestParameters
     
@@ -137,4 +137,14 @@ function New-AppRoleAssignment {
     "--body", "{'appRoleId': '$AppRoleId', 'principalId': '$ManagedIdentity', 'resourceId': '$ServicePrincipalId', 'principalType': '$PrincipalType'}"
 
     az rest @MicrosoftGraphRequestParameters --output none 2>$null
+}
+
+function Get-AadGroupObjectId {
+    Param(
+        [Parameter(Mandatory = $true)]
+        [String]$AADGroupName
+    )
+
+    $AadGroupObjectId = (az ad group show --group $AADGroupName | ConvertFrom-Json).ObjectId
+    return $AadGroupObjectId
 }
