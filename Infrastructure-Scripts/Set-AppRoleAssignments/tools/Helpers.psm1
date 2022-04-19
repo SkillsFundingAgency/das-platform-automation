@@ -61,7 +61,7 @@ function Set-AzureCLIAccess {
     "--uri", "https://graph.microsoft.com/v1.0/applications/$($AppRegistrationObject.ObjectId)",
     "--headers", "Content-Type=application/json",
     "--body", "{api:{preAuthorizedApplications:[{appId:'04b07795-8ddb-461a-bbee-02f9e1bf7b46',delegatedPermissionIds:['$($AppRegistrationObject.Oauth2Permissions.id)']}]}}"
-    
+
     az rest @MicrosoftGraphRequestParameters
 
     #Apply User Assignment required so only authorized users can acquire a token

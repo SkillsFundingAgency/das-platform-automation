@@ -38,7 +38,7 @@ Describe "Set-AppRoleAssignments Unit Tests" -Tags @("Unit") {
             Mock Write-Output {}
             $AppServiceName = "das-test-ui-as"
 
-            { ./Set-AppRoleAssignments -AppRegistrationConfigurationFilePath "$PSScriptRoot\..\Tests\Configuration\Set-AppRoleAssignments.Config.json" -ResourceName $AppServiceName -Tenant $Config.Tenant -DryRun $true } | Should Not Throw
+            { ./Set-AppRoleAssignments -AppRegistrationConfigurationFilePath "$PSScriptRoot\..\Tests\Configuration\Set-AppRoleAssignments.Config.json" -ResourceName $AppServiceName -Tenant $Config.Tenant -AADGroupName $Config.aadGroupName -DryRun $true } | Should Not Throw
             Assert-MockCalled Write-Output -Times 2 -Scope It -ParameterFilter { $InputObject -match "not found in AAD - Creating" }
         }
 
@@ -53,7 +53,7 @@ Describe "Set-AppRoleAssignments Unit Tests" -Tags @("Unit") {
             Mock Write-Output { }
             $AppServiceName = "das-test-ui-as"
 
-            { ./Set-AppRoleAssignments -AppRegistrationConfigurationFilePath "$PSScriptRoot\..\Tests\Configuration\Set-AppRoleAssignments.Config.json" -ResourceName $AppServiceName -Tenant $Config.Tenant -DryRun $true } | Should Not Throw
+            { ./Set-AppRoleAssignments -AppRegistrationConfigurationFilePath "$PSScriptRoot\..\Tests\Configuration\Set-AppRoleAssignments.Config.json" -ResourceName $AppServiceName -Tenant $Config.Tenant -AADGroupName $Config.aadGroupName -DryRun $true } | Should Not Throw
             Assert-MockCalled Write-Output -Times 2 -Scope It -ParameterFilter { $InputObject -match "-> Processing app registration" }
         }
 

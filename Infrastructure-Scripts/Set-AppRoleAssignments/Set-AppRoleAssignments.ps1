@@ -76,7 +76,7 @@ try {
                 New-AppRegistration -AppRegistrationName $AppRegistrationName -IdentifierUri $IdentifierUri
                 #Allow Azure CLI to acquire tokens
                 Set-AzureCLIAccess -IdentifierUri $IdentifierUri -ServicePrincipalObjectId $ServicePrincipal.objectId
-                
+
             }
 
             Write-Output "  -> Successfully created app registration - $AppRegistrationName"
