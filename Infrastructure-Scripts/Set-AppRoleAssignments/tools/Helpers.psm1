@@ -62,7 +62,7 @@ function Set-AzureCLIAccess {
 
     #Authorize Azure CLI to call app registration and acquire a token
     #https://docs.microsoft.com/en-us/graph/api/resources/preauthorizedapplication?view=graph-rest-1.0
-    
+
     $MicrosoftGraphRequestParameters =
     "--method", "patch",
     "--uri", "https://graph.microsoft.com/v1.0/applications/$AppRegistrationObjectId",
