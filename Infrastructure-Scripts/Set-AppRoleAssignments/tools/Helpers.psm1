@@ -79,9 +79,7 @@ function New-AppRegistrationAppRole {
         [Parameter(Mandatory = $true)]
         [String]$AppRoleName,
         [Parameter(Mandatory = $true)]
-        [String]$IdentifierUri,
-        [Parameter(Mandatory = $true)]
-        [String]$Environment
+        [String]$IdentifierUri
     )
 
     $Manifest = [System.Collections.ArrayList]::new()
