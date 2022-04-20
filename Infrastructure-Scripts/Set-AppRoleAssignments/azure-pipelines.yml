@@ -18,7 +18,7 @@ resources:
     branch: master
 
 stages:
-- stage: Apply Roles
+- stage: Apply_Roles
   dependsOn: []
   displayName: Apply roles to DEV
   variables:
