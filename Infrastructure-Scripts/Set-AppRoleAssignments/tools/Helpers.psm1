@@ -41,10 +41,9 @@ function New-AppRegistration {
         [String]$IdentifierUri
     )
 
-    az ad app create --display-name $AppRegistrationName --identifier-uris $IdentifierUri --output none 2>$null
+    $AppRegistration = az ad app create --display-name $AppRegistrationName --identifier-uris $IdentifierUri | ConvertFrom-Json
     az ad sp create --id $IdentifierUri --output none 2>$null
 
-    $AppRegistration = (az ad app show --id $IdentifierUri | ConvertFrom-Json)
     return $AppRegistration
 }
 
