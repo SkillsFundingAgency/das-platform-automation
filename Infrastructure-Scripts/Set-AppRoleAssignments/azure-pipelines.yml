@@ -18,9 +18,9 @@ resources:
     branch: master
 
 stages:
-- stage: Deploy_DEMO
+- stage: Apply Roles
   dependsOn: []
-  displayName: Apply roles to DEMO
+  displayName: Apply roles to DEV
   variables:
   - group: DevTest Management Resources
   jobs:
