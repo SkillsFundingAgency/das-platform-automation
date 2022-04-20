@@ -4,12 +4,12 @@ resources:
   - repository: das-platform-building-blocks
     type: github
     name: SkillsFundingAgency/das-platform-building-blocks
-    ref: refs/tags/0.4.34
+    ref: refs/heads/DASD-9869-app-role
     endpoint: SkillsFundingAgency
   - repository: das-platform-automation
     type: github
     name: SkillsFundingAgency/das-platform-automation
-    ref: refs/tags/4.5.14
+    ref: refs/heads/DASD-8969-app-role-automation
     endpoint: SkillsFundingAgency
   pipelines:
   - pipeline: das-employer-config
@@ -37,4 +37,5 @@ stages:
               ServiceConnection: das-app-role-assignments-CDS
               ResourceName: $(AppServiceName1)
               Tenant: $(Tenant)
+              AADGroupObjectIdArray: $(DevAADGroupObjectId)
               IsMultiRepoCheckout: false
