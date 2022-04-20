@@ -116,6 +116,7 @@ try {
                 }
 
                 try {
+                    #Assign app managed identities to app role
                     $AppRoleAssignments = Get-AppRoleAssignments -ServicePrincipalId $ServicePrincipal.ObjectId
                     $AppRoleAssignmentExists = $AppRoleAssignments.value | Where-Object { $_.appRoleId -eq $MatchedAppRole.id -and $_.principalId -eq $ManagedIdentity.ObjectId }
 
@@ -143,10 +144,12 @@ try {
                             Write-Output "      -> Processing new app role assignment for AAD Group with Object Id: $AadGroupObjectId"
 
                             if ($Environment -in @("at", "test", "test2", "demo", "pp")) {
-                                New-AppRoleAssignment -ServicePrincipalId $ServicePrincipal.ObjectId -AppRoleId $MatchedAppRole.id -ManagedIdentity $AadGroupObjectId -PrincipalType "Group"
+                                if (!$DryRun) {
+                                    New-AppRoleAssignment -ServicePrincipalId $ServicePrincipal.ObjectId -AppRoleId $MatchedAppRole.id -ManagedIdentity $AadGroupObjectId -PrincipalType "Group"
+                                }
                             }
 
-                            Write-Output "      -> Successfully created app role assignment"
+                            Write-Output "      -> Successfully created app role assignment for AAD Group"
                         }
 
                     }
