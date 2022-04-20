@@ -1,0 +1,41 @@
+resources:
+  repositories:
+  - repository: self
+  - repository: das-platform-building-blocks
+    type: github
+    name: SkillsFundingAgency/das-platform-building-blocks
+    ref: refs/tags/0.4.34
+    endpoint: SkillsFundingAgency
+  - repository: das-platform-automation
+    type: github
+    name: SkillsFundingAgency/das-platform-automation
+    ref: refs/tags/4.5.14
+    endpoint: SkillsFundingAgency
+  pipelines:
+  - pipeline: das-employer-config
+    project: Digital Apprenticeship Service
+    source: das-employer-config
+    branch: master
+
+stages:
+- stage: Deploy_AT
+  dependsOn: []
+  displayName: Deploy to AT
+  variables:
+  - group: DevTest Management Resources
+  - group: AT DevTest Shared Resources
+  jobs:
+  - deployment: ApplyAppRoles
+    pool:
+      name: DAS - Continuous Deployment Agents
+    environment: AT
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - template: azure-pipelines-templates/deploy/step/app-role-assignments.yml@das-platform-building-blocks
+            parameters:
+              ServiceConnection: das-app-role-assignments-CDS
+              ResourceName: $(AppServiceName1)
+              Tenant: $(Tenant)
+              IsMultiRepoCheckout: true
