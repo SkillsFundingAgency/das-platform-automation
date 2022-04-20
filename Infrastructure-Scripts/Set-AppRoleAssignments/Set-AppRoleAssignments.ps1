@@ -22,8 +22,8 @@
     Writes an output of the changes that would be made with no actual execution.
 
     .EXAMPLE
-    .\Set-AppRoleAssignments.ps1 -AppRegistrationConfigurationFilePath "C:\config.json" -ResourceName das-env-foobar-as -Tenant tenant.onmicrosoft.com -AADGroupName AAD Group -DryRun $true
-    .\Set-AppRoleAssignments.ps1 -AppRegistrationConfigurationFilePath "C:\config.json" -ResourceName das-env-foobar-apim -Tenant tenant.onmicrosoft.com -AADGroupName AAD Group -DryRun $true
+    .\Set-AppRoleAssignments.ps1 -AppRegistrationConfigurationFilePath "C:\config.json" -ResourceName das-env-foobar-as -Tenant tenant.onmicrosoft.com -AADGroupObjectIdArray guid -DryRun $true
+    .\Set-AppRoleAssignments.ps1 -AppRegistrationConfigurationFilePath "C:\config.json" -ResourceName das-env-foobar-apim -Tenant tenant.onmicrosoft.com -AADGroupObjectIdArray guid -DryRun $true
 #>
 
 [CmdletBinding()]
