@@ -138,13 +138,3 @@ function New-AppRoleAssignment {
 
     az rest @MicrosoftGraphRequestParameters --output none 2>$null
 }
-
-function Get-AadGroupObjectId {
-    Param(
-        [Parameter(Mandatory = $true)]
-        [String]$AADGroupName
-    )
-
-    $AadGroupObjectId = (az ad group show --group $AADGroupName | ConvertFrom-Json).ObjectId
-    return $AadGroupObjectId
-}

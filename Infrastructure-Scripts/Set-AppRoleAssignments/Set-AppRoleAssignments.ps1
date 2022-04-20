@@ -15,8 +15,8 @@
     .PARAMETER Tenant
     Azure Tenant the app service lives in
 
-    .PARAMETER AADGroupName
-    AAD Group to apply app roles. Only gets applied in at, test, test2, demo and pp environments.
+    .PARAMETER AADGroupObjectIdArray
+    Array of AAD Groups to apply app roles. Only gets applied in at, test, test2, demo and pp environments.
 
     .PARAMETER DryRun
     Writes an output of the changes that would be made with no actual execution.
@@ -35,7 +35,7 @@ Param(
     [Parameter(Mandatory = $true)]
     [String]$Tenant,
     [Parameter(Mandatory = $true)]
-    [String]$AADGroupName,
+    [String[]]$AADGroupObjectIdArray,
     [Parameter(Mandatory = $false)]
     [bool]$DryRun = $true
 )
@@ -76,7 +76,6 @@ try {
                 New-AppRegistration -AppRegistrationName $AppRegistrationName -IdentifierUri $IdentifierUri
                 #Allow Azure CLI to acquire tokens
                 Set-AzureCLIAccess -IdentifierUri $IdentifierUri -ServicePrincipalObjectId $ServicePrincipal.objectId
-
             }
 
             Write-Output "  -> Successfully created app registration - $AppRegistrationName"
@@ -122,24 +121,34 @@ try {
 
                     if ($AppRoleAssignmentExists) {
                         Write-Output "      -> App role assignment already exists"
-                        continue
                     }
                     else {
                         Write-Output "      -> Processing new app role assignment for $ResourceName with role: $($MatchedAppRole.value)"
 
                         if (!$DryRun) {
                             New-AppRoleAssignment -ServicePrincipalId $ServicePrincipal.ObjectId -AppRoleId $MatchedAppRole.id -ManagedIdentity $ManagedIdentity.ObjectId -PrincipalType "ServicePrincipal"
-                            #Assign AAD groups
-                            $AadGroupObjectId = Get-AadGroupObjectId -AADGroupName $AADGroupName
-                            if ($Environment -in @("at", "test", "test2", "demo")) {
-                                New-AppRoleAssignment -ServicePrincipalId $ServicePrincipal.ObjectId -AppRoleId $MatchedAppRole.id -ManagedIdentity $AadGroupObjectId -PrincipalType "Group"
-                            }
-                            elseif ($Environment -eq "pp") {
-                                New-AppRoleAssignment -ServicePrincipalId $ServicePrincipal.ObjectId -AppRoleId $MatchedAppRole.id -ManagedIdentity $AadGroupObjectId -PrincipalType "Group"
-                            }
                         }
 
                         Write-Output "      -> Successfully created app role assignment"
+                    }
+
+                    #Assign AAD groups to app role
+                    foreach ($AADGroupObjectId in $AADGroupObjectIdArray) {
+                        $AppRoleAADGroupAssignmentExists = $AppRoleAssignments.value | Where-Object { $_.appRoleId -eq $MatchedAppRole.id -and $_.principalId -eq $AadGroupObjectId }
+
+                        if ($AppRoleAADGroupAssignmentExists) {
+                            Write-Output "      -> App role assignment already exists for this AAD group"
+                        }
+                        else {
+                            Write-Output "      -> Processing new app role assignment for AAD Group with Object Id: $AadGroupObjectId"
+
+                            if ($Environment -in @("at", "test", "test2", "demo", "pp")) {
+                                New-AppRoleAssignment -ServicePrincipalId $ServicePrincipal.ObjectId -AppRoleId $MatchedAppRole.id -ManagedIdentity $AadGroupObjectId -PrincipalType "Group"
+                            }
+
+                            Write-Output "      -> Successfully created app role assignment"
+                        }
+
                     }
                 }
                 catch {
