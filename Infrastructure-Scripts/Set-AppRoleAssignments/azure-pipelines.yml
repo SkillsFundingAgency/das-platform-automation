@@ -18,17 +18,16 @@ resources:
     branch: master
 
 stages:
-- stage: Deploy_AT
+- stage: Deploy_DEMO
   dependsOn: []
-  displayName: Deploy to AT
+  displayName: Apply roles to DEMO
   variables:
   - group: DevTest Management Resources
-  - group: AT DevTest Shared Resources
   jobs:
   - deployment: ApplyAppRoles
     pool:
       name: DAS - Continuous Deployment Agents
-    environment: AT
+    environment: DEMO
     strategy:
       runOnce:
         deploy:
