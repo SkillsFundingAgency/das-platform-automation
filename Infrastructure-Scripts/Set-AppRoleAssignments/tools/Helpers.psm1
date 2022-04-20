@@ -43,6 +43,9 @@ function New-AppRegistration {
 
     az ad app create --display-name $AppRegistrationName --identifier-uris $IdentifierUri --output none 2>$null
     az ad sp create --id $IdentifierUri --output none 2>$null
+
+    $AppRegistration = (az ad app show --id $IdentifierUri | ConvertFrom-Json)
+    return $AppRegistration
 }
 
 function Set-AzureCLIAccess {
@@ -50,17 +53,21 @@ function Set-AzureCLIAccess {
         [Parameter(Mandatory = $true)]
         [String]$IdentifierUri,
         [Parameter(Mandatory = $true)]
-        [String]$ServicePrincipalObjectId
+        [String]$ServicePrincipalObjectId,
+        [Parameter(Mandatory = $true)]
+        [String]$AppRegistrationObjectId,
+        [Parameter(Mandatory = $true)]
+        [String]$AppRegistrationOauth2PermissionsId
     )
 
     #Authorize Azure CLI to call app registration and acquire a token
     #https://docs.microsoft.com/en-us/graph/api/resources/preauthorizedapplication?view=graph-rest-1.0
-    $AppRegistrationObject = (az ad app show --id $IdentifierUri | ConvertFrom-Json)
+    
     $MicrosoftGraphRequestParameters =
     "--method", "patch",
-    "--uri", "https://graph.microsoft.com/v1.0/applications/$($AppRegistrationObject.ObjectId)",
+    "--uri", "https://graph.microsoft.com/v1.0/applications/$AppRegistrationObjectId",
     "--headers", "Content-Type=application/json",
-    "--body", "{api:{preAuthorizedApplications:[{appId:'04b07795-8ddb-461a-bbee-02f9e1bf7b46',delegatedPermissionIds:['$($AppRegistrationObject.Oauth2Permissions.id)']}]}}"
+    "--body", "{api:{preAuthorizedApplications:[{appId:'04b07795-8ddb-461a-bbee-02f9e1bf7b46',delegatedPermissionIds:['$AppRegistrationOauth2PermissionsId']}]}}"
 
     az rest @MicrosoftGraphRequestParameters
 

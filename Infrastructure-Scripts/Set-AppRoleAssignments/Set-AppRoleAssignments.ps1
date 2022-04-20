@@ -73,10 +73,10 @@ try {
             Write-Output "-> App registration $AppRegistrationName not found in AAD - Creating"
 
             if (!$DryRun) {
-                New-AppRegistration -AppRegistrationName $AppRegistrationName -IdentifierUri $IdentifierUri
+                $AppRegistration = New-AppRegistration -AppRegistrationName $AppRegistrationName -IdentifierUri $IdentifierUri
                 #Allow Azure CLI to acquire tokens
                 $ServicePrincipal = Get-ServicePrincipal -DisplayName $AppRegistrationName
-                Set-AzureCLIAccess -IdentifierUri $IdentifierUri -ServicePrincipalObjectId $ServicePrincipal.objectId
+                Set-AzureCLIAccess -IdentifierUri $IdentifierUri -ServicePrincipalObjectId $ServicePrincipal.objectId -AppRegistrationObjectId $AppRegistration.objectId -AppRegistrationOauth2PermissionsId $AppRegistration.Oauth2Permissions.id
             }
 
             Write-Output "  -> Successfully created app registration - $AppRegistrationName"
