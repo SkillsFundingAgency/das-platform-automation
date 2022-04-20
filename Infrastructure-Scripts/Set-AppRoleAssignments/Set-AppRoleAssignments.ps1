@@ -75,11 +75,12 @@ try {
             if (!$DryRun) {
                 New-AppRegistration -AppRegistrationName $AppRegistrationName -IdentifierUri $IdentifierUri
                 #Allow Azure CLI to acquire tokens
+                $ServicePrincipal = Get-ServicePrincipal -DisplayName $AppRegistrationName
                 Set-AzureCLIAccess -IdentifierUri $IdentifierUri -ServicePrincipalObjectId $ServicePrincipal.objectId
             }
 
             Write-Output "  -> Successfully created app registration - $AppRegistrationName"
-            $ServicePrincipal = Get-ServicePrincipal -DisplayName $AppRegistrationName
+
         }
 
         foreach ($AppRole in $AppRegistration.appRoles) {
