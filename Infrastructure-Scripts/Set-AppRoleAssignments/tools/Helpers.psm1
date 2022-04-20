@@ -60,6 +60,16 @@ function Set-AzureCLIAccess {
         [String]$AppRegistrationOauth2PermissionsId
     )
 
+    #Apply User Assignment required so only authorized users can acquire a token
+    #https://docs.microsoft.com/en-us/graph/api/serviceprincipal-update?view=graph-rest-1.0&tabs=http
+    $MicrosoftGraphRequestParameters =
+    "--method", "patch",
+    "--uri", "https://graph.microsoft.com/v1.0/servicePrincipals/$ServicePrincipalObjectId",
+    "--headers", "Content-Type=application/json",
+    "--body", "{appRoleAssignmentRequired : true}"
+
+    az rest @MicrosoftGraphRequestParameters
+
     #Authorize Azure CLI to call app registration and acquire a token
     #https://docs.microsoft.com/en-us/graph/api/resources/preauthorizedapplication?view=graph-rest-1.0
 
@@ -69,15 +79,6 @@ function Set-AzureCLIAccess {
     "--headers", "Content-Type=application/json",
     "--body", "{api:{preAuthorizedApplications:[{appId:'04b07795-8ddb-461a-bbee-02f9e1bf7b46',delegatedPermissionIds:['$AppRegistrationOauth2PermissionsId']}]}}"
 
-    az rest @MicrosoftGraphRequestParameters
-
-    #Apply User Assignment required so only authorized users can acquire a token
-    #https://docs.microsoft.com/en-us/graph/api/serviceprincipal-update?view=graph-rest-1.0&tabs=http
-    $MicrosoftGraphRequestParameters =
-    "--method", "patch",
-    "--uri", "https://graph.microsoft.com/v1.0/servicePrincipals/$ServicePrincipalObjectId",
-    "--headers", "Content-Type=application/json",
-    "--body", "{appRoleAssignmentRequired : true}"
     az rest @MicrosoftGraphRequestParameters
 }
 
