@@ -37,5 +37,4 @@ stages:
               ServiceConnection: das-app-role-assignments-CDS
               ResourceName: $(AppServiceName1)
               Tenant: $(Tenant)
-              AADGroupObjectIdArray: $(DevAADGroupObjectId),$(AdminAADGroupObjectId)
               IsMultiRepoCheckout: false
