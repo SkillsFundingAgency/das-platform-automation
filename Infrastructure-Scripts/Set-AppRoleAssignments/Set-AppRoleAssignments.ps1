@@ -34,7 +34,7 @@ Param(
     [String]$ResourceName,
     [Parameter(Mandatory = $true)]
     [String]$Tenant,
-    [Parameter(Mandatory = $true)]
+    [Parameter(Mandatory = $false)]
     [String[]]$AADGroupObjectIdArray = [],
     [Parameter(Mandatory = $false)]
     [bool]$DryRun = $true
