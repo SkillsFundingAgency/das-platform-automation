@@ -1,9 +1,8 @@
 class AppRoleAssignment {
-    [string[]]$allowedMemberTypes = @("Application")
+    [string[]]$allowedMemberTypes = @("User", "Application")
     [string]$description = ""
     [string]$displayName = ""
     [bool]$isEnabled = $true
-    [string]$origin = "Application"
     [string]$value = ""
 }
 
@@ -42,8 +41,44 @@ function New-AppRegistration {
         [String]$IdentifierUri
     )
 
-    az ad app create --display-name $AppRegistrationName --identifier-uris $IdentifierUri --output none 2>$null
+    $AppRegistration = az ad app create --display-name $AppRegistrationName --identifier-uris $IdentifierUri | ConvertFrom-Json
     az ad sp create --id $IdentifierUri --output none 2>$null
+
+    return $AppRegistration
+}
+
+function Set-AzureCLIAccess {
+    Param(
+        [Parameter(Mandatory = $true)]
+        [String]$IdentifierUri,
+        [Parameter(Mandatory = $true)]
+        [String]$ServicePrincipalObjectId,
+        [Parameter(Mandatory = $true)]
+        [String]$AppRegistrationObjectId,
+        [Parameter(Mandatory = $true)]
+        [String]$AppRegistrationOauth2PermissionsId
+    )
+
+    #Apply User Assignment required so only authorized users can acquire a token
+    #https://docs.microsoft.com/en-us/graph/api/serviceprincipal-update?view=graph-rest-1.0&tabs=http
+    $MicrosoftGraphRequestParameters =
+    "--method", "patch",
+    "--uri", "https://graph.microsoft.com/v1.0/servicePrincipals/$ServicePrincipalObjectId",
+    "--headers", "Content-Type=application/json",
+    "--body", "{appRoleAssignmentRequired : true}"
+
+    az rest @MicrosoftGraphRequestParameters
+
+    #Authorize Azure CLI to call app registration and acquire a token
+    #https://docs.microsoft.com/en-us/graph/api/resources/preauthorizedapplication?view=graph-rest-1.0
+
+    $MicrosoftGraphRequestParameters =
+    "--method", "patch",
+    "--uri", "https://graph.microsoft.com/v1.0/applications/$AppRegistrationObjectId",
+    "--headers", "Content-Type=application/json",
+    "--body", "{api:{preAuthorizedApplications:[{appId:'04b07795-8ddb-461a-bbee-02f9e1bf7b46',delegatedPermissionIds:['$AppRegistrationOauth2PermissionsId']}]}}"
+
+    az rest @MicrosoftGraphRequestParameters
 }
 
 function New-AppRegistrationAppRole {
@@ -78,11 +113,12 @@ function Get-AppRoleAssignments {
         [String]$ServicePrincipalId
     )
 
-    $AppRoleRegistrationRequestParameters =
+    #https://docs.microsoft.com/en-us/graph/api/serviceprincipal-list-approleassignedto?view=graph-rest-1.0&tabs=http
+    $MicrosoftGraphRequestParameters =
     "--method", "get",
-    "--uri", "https://graph.microsoft.com/beta/servicePrincipals/$ServicePrincipalId/appRoleAssignedTo"
+    "--uri", "https://graph.microsoft.com/v1.0/servicePrincipals/$ServicePrincipalId/appRoleAssignedTo"
 
-    $AppRoleAssignments = az rest @AppRoleRegistrationRequestParameters | ConvertFrom-Json
+    $AppRoleAssignments = az rest @MicrosoftGraphRequestParameters | ConvertFrom-Json
     return $AppRoleAssignments
 }
 
@@ -93,13 +129,17 @@ function New-AppRoleAssignment {
         [Parameter(Mandatory = $true)]
         [String]$AppRoleId,
         [Parameter(Mandatory = $true)]
-        [String]$ManagedIdentity
+        [String]$ManagedIdentity,
+        [Parameter(Mandatory = $true)]
+        [ValidateSet("ServicePrincipal", "Group")]
+        [String]$PrincipalType
     )
 
-    $AppRoleRegistrationRequestParameters =
+    #https://docs.microsoft.com/en-us/graph/api/serviceprincipal-post-approleassignedto?view=graph-rest-1.0&tabs=http
+    $MicrosoftGraphRequestParameters =
     "--method", "post",
-    "--uri", "https://graph.microsoft.com/beta/servicePrincipals/$ServicePrincipalId/appRoleAssignedTo",
-    "--body", "{'appRoleId': '$AppRoleId', 'principalId': '$ManagedIdentity', 'resourceId': '$ServicePrincipalId', 'principalType': 'ServicePrincipal'}"
+    "--uri", "https://graph.microsoft.com/v1.0/servicePrincipals/$ServicePrincipalId/appRoleAssignedTo",
+    "--body", "{'appRoleId': '$AppRoleId', 'principalId': '$ManagedIdentity', 'resourceId': '$ServicePrincipalId', 'principalType': '$PrincipalType'}"
 
-    az rest @AppRoleRegistrationRequestParameters --output none 2>$null
+    az rest @MicrosoftGraphRequestParameters --output none 2>$null
 }

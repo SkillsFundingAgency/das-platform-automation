@@ -53,7 +53,7 @@ stages:
 
       - job: "Linux_PSCore_Build_DAS_Continuous_Integration"
         pool:
-          name: "DAS - Continuous Integration"
+          name: "DAS - Continuous Integration Agents"
           demands:
             - agent.OS -equals Linux
             - npm
