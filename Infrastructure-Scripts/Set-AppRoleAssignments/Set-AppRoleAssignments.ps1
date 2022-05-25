@@ -76,7 +76,7 @@ try {
                 $AppRegistrationObject = New-AppRegistration -AppRegistrationName $AppRegistrationName -IdentifierUri $IdentifierUri
                 #Allow Azure CLI to acquire tokens
                 $ServicePrincipal = Get-ServicePrincipal -DisplayName $AppRegistrationName
-                Set-AzureCLIAccess -IdentifierUri $IdentifierUri -ServicePrincipalObjectId $ServicePrincipal.objectId -AppRegistrationObjectId $AppRegistrationObject.objectId -AppRegistrationOauth2PermissionsId $AppRegistrationObject.Oauth2Permissions.id
+                Set-AzureCLIAccess -IdentifierUri $IdentifierUri -ServicePrincipalObjectId $ServicePrincipal.id -AppRegistrationObjectId $AppRegistrationObject.id -AppRegistrationOauth2PermissionsId $AppRegistrationObject.Oauth2Permissions.id
             }
 
             Write-Output "  -> Successfully created app registration - $AppRegistrationName"
@@ -118,8 +118,8 @@ try {
 
                 try {
                     #Assign app managed identities to app role
-                    $AppRoleAssignments = Get-AppRoleAssignments -ServicePrincipalId $ServicePrincipal.ObjectId
-                    $AppRoleAssignmentExists = $AppRoleAssignments.value | Where-Object { $_.appRoleId -eq $MatchedAppRole.id -and $_.principalId -eq $ManagedIdentity.ObjectId }
+                    $AppRoleAssignments = Get-AppRoleAssignments -ServicePrincipalId $ServicePrincipal.id
+                    $AppRoleAssignmentExists = $AppRoleAssignments.value | Where-Object { $_.appRoleId -eq $MatchedAppRole.id -and $_.principalId -eq $ManagedIdentity.id }
 
                     if ($AppRoleAssignmentExists) {
                         Write-Output "      -> App role assignment already exists"
@@ -128,7 +128,7 @@ try {
                         Write-Output "      -> Processing new app role assignment for $ResourceName with role: $($MatchedAppRole.value)"
 
                         if (!$DryRun) {
-                            New-AppRoleAssignment -ServicePrincipalId $ServicePrincipal.ObjectId -AppRoleId $MatchedAppRole.id -ManagedIdentity $ManagedIdentity.ObjectId -PrincipalType "ServicePrincipal"
+                            New-AppRoleAssignment -ServicePrincipalId $ServicePrincipal.id -AppRoleId $MatchedAppRole.id -ManagedIdentity $ManagedIdentity.id -PrincipalType "ServicePrincipal"
                         }
 
                         Write-Output "      -> Successfully created app role assignment"
@@ -146,7 +146,7 @@ try {
 
                             if ($Environment -in @("at", "test", "test2", "demo", "pp")) {
                                 if (!$DryRun) {
-                                    New-AppRoleAssignment -ServicePrincipalId $ServicePrincipal.ObjectId -AppRoleId $MatchedAppRole.id -ManagedIdentity $AadGroupObjectId -PrincipalType "Group"
+                                    New-AppRoleAssignment -ServicePrincipalId $ServicePrincipal.id -AppRoleId $MatchedAppRole.id -ManagedIdentity $AadGroupObjectId -PrincipalType "Group"
                                 }
                             }
 

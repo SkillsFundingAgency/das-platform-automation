@@ -46,7 +46,7 @@ Describe "Set-AppRoleAssignments Unit Tests" -Tags @("Unit") {
 
             Mock Get-ServicePrincipal -MockWith {
                 return @{
-                    ObjectId = $Config.resourceId
+                    Id = $Config.resourceId
                 }
             }
             Mock Get-AppRoleAssignments -MockWith { }
