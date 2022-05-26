@@ -50,13 +50,9 @@ function New-AppRegistration {
 function Set-AzureCLIAccess {
     Param(
         [Parameter(Mandatory = $true)]
-        [String]$IdentifierUri,
-        [Parameter(Mandatory = $true)]
         [String]$ServicePrincipalObjectId,
         [Parameter(Mandatory = $true)]
-        [String]$AppRegistrationObjectId,
-        [Parameter(Mandatory = $true)]
-        [String]$AppRegistrationOauth2PermissionsId
+        [String]$AppRegistrationObjectId
     )
 
     #Apply User Assignment required so only authorized users can acquire a token
@@ -69,14 +65,57 @@ function Set-AzureCLIAccess {
 
     az rest @MicrosoftGraphRequestParameters
 
-    #Authorize Azure CLI to call app registration and acquire a token
-    #https://docs.microsoft.com/en-us/graph/api/resources/preauthorizedapplication?view=graph-rest-1.0
+    #https://docs.microsoft.com/en-us/cli/azure/use-cli-effectively#use-quotation-marks-in-arguments
+
+    #Create a permission scope to allow applications to access the app registration
+    #https://docs.microsoft.com/en-us/graph/api/resources/permissionscope?view=graph-rest-1.0
+
+    $PermissionScopeGuid = (New-Guid).Guid
+    $Body = (@{
+        api = @{
+            oauth2PermissionScopes = @(
+                @{
+                    adminConsentDescription = "Allow the application to access this app registration on behalf of the signed-in user."
+                    adminConsentDisplayName = "Access to this app registration"
+                    id = $PermissionScopeGuid
+                    isEnabled = $true
+                    type = "User"
+                    userConsentDescription = "Allow the application to access this app registration on your behalf"
+                    userConsentDisplayName = "Access to this app registration"
+                    value = "user_impersonation"
+                }
+            )
+        }
+    } | ConvertTo-Json -Compress -depth 10).Replace("`"","'")
 
     $MicrosoftGraphRequestParameters =
     "--method", "patch",
     "--uri", "https://graph.microsoft.com/v1.0/applications/$AppRegistrationObjectId",
     "--headers", "Content-Type=application/json",
-    "--body", "{api:{preAuthorizedApplications:[{appId:'04b07795-8ddb-461a-bbee-02f9e1bf7b46',delegatedPermissionIds:['$AppRegistrationOauth2PermissionsId']}]}}"
+    "--body", $Body
+
+    az rest @MicrosoftGraphRequestParameters
+
+    #Authorize Azure CLI to call app registration and acquire a token
+    #https://docs.microsoft.com/en-us/graph/api/resources/preauthorizedapplication?view=graph-rest-1.0
+    $Body = (@{
+        api = @{
+            preAuthorizedApplications = @(
+                @{
+                    appId = "04b07795-8ddb-461a-bbee-02f9e1bf7b46"
+                    delegatedPermissionIds = @(
+                        $PermissionScopeGuid
+                    )
+                }
+            )
+        }
+    } | ConvertTo-Json -Compress -depth 10).Replace("`"","'")
+
+    $MicrosoftGraphRequestParameters =
+    "--method", "patch",
+    "--uri", "https://graph.microsoft.com/v1.0/applications/$AppRegistrationObjectId",
+    "--headers", "Content-Type=application/json",
+    "--body", $Body
 
     az rest @MicrosoftGraphRequestParameters
 }
