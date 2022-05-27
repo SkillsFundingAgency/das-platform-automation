@@ -71,7 +71,7 @@ function Set-AzureCLIAccess {
         [String]$ServicePrincipalObjectId,
         [Parameter(Mandatory = $true)]
         [String]$AppRegistrationObjectId
-    )    
+    )
 
     #Apply User Assignment required so only authorized users can acquire a token
     #https://docs.microsoft.com/en-us/graph/api/serviceprincipal-update?view=graph-rest-1.0&tabs=http
