@@ -78,7 +78,7 @@ function Set-AzureCLIAccess {
     az rest @MicrosoftGraphRequestParameters
 
     #Set apiApplication permissions
-    #  - Create a permission scope to allow applications to access the app registration 
+    #  - Create a permission scope to allow applications to access the app registration
     #  - Set requestedAccessTokenVersion to 1 so aud of JWT is set to the ID URI
     #https://docs.microsoft.com/en-us/graph/api/resources/permissionscope?view=graph-rest-1.0
 
