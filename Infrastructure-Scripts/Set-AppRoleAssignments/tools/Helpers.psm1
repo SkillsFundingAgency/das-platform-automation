@@ -41,7 +41,23 @@ function New-AppRegistration {
         [String]$IdentifierUri
     )
 
-    $AppRegistration = az ad app create --display-name $AppRegistrationName --identifier-uris $IdentifierUri | ConvertFrom-Json
+    $AppRegistration = az ad app create --display-name $AppRegistrationName --identifier-uris $IdentifierUri --sign-in-audience "AzureADMyOrg" | ConvertFrom-Json
+
+    #Set requestedAccessTokenVersion to 1 so aud of JWT is set to the Identifier URI
+    #https://docs.microsoft.com/en-us/azure/active-directory/develop/access-tokens#payload-claims
+    $Body = (@{
+        api = @{
+            requestedAccessTokenVersion = 1
+        }
+    } | ConvertTo-Json -Compress -depth 10).Replace("`"","'")
+    $MicrosoftGraphRequestParameters =
+    "--method", "patch",
+    "--uri", "https://graph.microsoft.com/v1.0/applications/$($AppRegistration.id)",
+    "--headers", "Content-Type=application/json",
+    "--body", $Body
+
+    az rest @MicrosoftGraphRequestParameters
+
     az ad sp create --id $IdentifierUri --output none 2>$null
 
     return $AppRegistration
@@ -66,20 +82,7 @@ function Set-AzureCLIAccess {
 
     az rest @MicrosoftGraphRequestParameters
 
-    #Set signInAudience to AzureADMyOrg to be able to use v1.0 tokens ie set requestedAccessTokenVersion to 1
-    #https://docs.microsoft.com/en-us/azure/active-directory/develop/access-tokens#payload-claims
-    #https://docs.microsoft.com/en-us/graph/api/application-update?view=graph-rest-1.0&tabs=http
-    $MicrosoftGraphRequestParameters =
-    "--method", "patch",
-    "--uri", "https://graph.microsoft.com/v1.0/applications/$AppRegistrationObjectId",
-    "--headers", "Content-Type=application/json",
-    "--body", "{'signInAudience' : 'AzureADMyOrg'}"
-
-    az rest @MicrosoftGraphRequestParameters
-
-    #Set apiApplication permissions
-    #  - Create a permission scope to allow applications to access the app registration
-    #  - Set requestedAccessTokenVersion to 1 so aud of JWT is set to the ID URI
+    #Set apiApplication permissions create a permission scope to allow applications to access the app registration
     #https://docs.microsoft.com/en-us/graph/api/resources/permissionscope?view=graph-rest-1.0
 
     $PermissionScopeGuid = (New-Guid).Guid
@@ -97,7 +100,6 @@ function Set-AzureCLIAccess {
                     value = "user_impersonation"
                 }
             )
-            requestedAccessTokenVersion = 1
         }
     } | ConvertTo-Json -Compress -depth 10).Replace("`"","'")
 
