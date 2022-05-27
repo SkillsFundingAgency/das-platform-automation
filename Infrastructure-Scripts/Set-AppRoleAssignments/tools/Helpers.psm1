@@ -54,6 +54,7 @@ function Set-AzureCLIAccess {
         [Parameter(Mandatory = $true)]
         [String]$AppRegistrationObjectId
     )
+    #https://docs.microsoft.com/en-us/cli/azure/use-cli-effectively#use-quotation-marks-in-arguments
 
     #Apply User Assignment required so only authorized users can acquire a token
     #https://docs.microsoft.com/en-us/graph/api/serviceprincipal-update?view=graph-rest-1.0&tabs=http
@@ -65,9 +66,20 @@ function Set-AzureCLIAccess {
 
     az rest @MicrosoftGraphRequestParameters
 
-    #https://docs.microsoft.com/en-us/cli/azure/use-cli-effectively#use-quotation-marks-in-arguments
+    #Set signInAudience to AzureADMyOrg to be able to use v1.0 tokens ie set requestedAccessTokenVersion to 1
+    #https://docs.microsoft.com/en-us/azure/active-directory/develop/access-tokens#payload-claims
+    #https://docs.microsoft.com/en-us/graph/api/application-update?view=graph-rest-1.0&tabs=http
+    $MicrosoftGraphRequestParameters =
+    "--method", "patch",
+    "--uri", "https://graph.microsoft.com/v1.0/applications/$AppRegistrationObjectId",
+    "--headers", "Content-Type=application/json",
+    "--body", "{'signInAudience' : 'AzureADMyOrg'}"
 
-    #Create a permission scope to allow applications to access the app registration
+    az rest @MicrosoftGraphRequestParameters
+
+    #Set apiApplication permissions
+    #  - Create a permission scope to allow applications to access the app registration 
+    #  - Set requestedAccessTokenVersion to 1 so aud of JWT is set to the ID URI
     #https://docs.microsoft.com/en-us/graph/api/resources/permissionscope?view=graph-rest-1.0
 
     $PermissionScopeGuid = (New-Guid).Guid
@@ -85,6 +97,7 @@ function Set-AzureCLIAccess {
                     value = "user_impersonation"
                 }
             )
+            requestedAccessTokenVersion = 1
         }
     } | ConvertTo-Json -Compress -depth 10).Replace("`"","'")
 
