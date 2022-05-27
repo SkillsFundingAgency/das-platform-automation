@@ -1,3 +1,5 @@
+#https://docs.microsoft.com/en-us/cli/azure/use-cli-effectively#use-quotation-marks-in-arguments
+
 class AppRoleAssignment {
     [string[]]$allowedMemberTypes = @("User", "Application")
     [string]$description = ""
@@ -69,8 +71,7 @@ function Set-AzureCLIAccess {
         [String]$ServicePrincipalObjectId,
         [Parameter(Mandatory = $true)]
         [String]$AppRegistrationObjectId
-    )
-    #https://docs.microsoft.com/en-us/cli/azure/use-cli-effectively#use-quotation-marks-in-arguments
+    )    
 
     #Apply User Assignment required so only authorized users can acquire a token
     #https://docs.microsoft.com/en-us/graph/api/serviceprincipal-update?view=graph-rest-1.0&tabs=http
