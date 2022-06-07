@@ -32,7 +32,9 @@ param(
     [Parameter(Mandatory=$true, ParameterSetName="SingleAppService")]
     [string]$AppServiceResourceGroup,
     [Parameter(Mandatory=$true, ParameterSetName="Subscription")]
-    [string]$AppServiceNamePrefix
+    [string]$AppServiceNamePrefix,
+    [Parameter(Mandatory=$false)]
+    [boolean]$Http2State = $true
 )
 
 Begin {
@@ -49,14 +51,14 @@ Process {
     foreach ($AppService in $AppServices) {
         $Resource = Get-AzResource -Name $AppService.Name -ResourceGroupName $AppService.ResourceGroup -ResourceType Microsoft.Web/sites
 
-        if ($Resource.Properties.siteConfig.http20Enabled) {
-            Write-Verbose "HTTP/2 is enabled for $($AppService.Name)"
+        if ($Resource.Properties.siteConfig.http20Enabled -eq $Http2State) {
+            Write-Verbose "HTTP/2 is $Http2State for $($AppService.Name)"
         }
         else {
-            Write-Verbose "HTTP/2 is not enabled for $($AppService.Name), enabling ..."
+            Write-Verbose "HTTP/2 is not $Http2State for $($AppService.Name), updating ..."
 
-            if ($PSCmdlet.ShouldProcess($Resource.Name, "Setting HTTP/2 to enabled")) {
-                $Resource.Properties.siteConfig.http20Enabled = $true
+            if ($PSCmdlet.ShouldProcess($Resource.Name, "Setting HTTP/2 to $Http2State")) {
+                $Resource.Properties.siteConfig.http20Enabled = $Http2State
                 $Resource | Set-AzResource -Force | Out-Null
             }
         }
