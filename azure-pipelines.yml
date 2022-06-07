@@ -51,32 +51,6 @@ stages:
             artifact: Infrastructure-Scripts
             displayName: "Publish Scripts"
 
-      - job: "Linux_PSCore_Build_DAS_Continuous_Integration"
-        pool:
-          name: "DAS - Continuous Integration Agents"
-          demands:
-            - agent.OS -equals Linux
-            - npm
-            - node.js
-        workspace:
-          clean: all
-        steps:
-          - script: |
-              npm install eclint
-              node $(npm root)/eclint/bin/eclint.js check $(System.DefaultWorkingDirectory)
-            displayName: "Validate editorconfig"
-            workingDirectory: $(System.DefaultWorkingDirectory)
-          - task: PowerShell@2
-            inputs:
-              filePath: "Tests/Invoke-Tests.ps1"
-              pwsh: true
-          - task: PublishTestResults@2
-            displayName: "Publish Test Results **/TEST-*.xml"
-            inputs:
-              testResultsFormat: NUnit
-              testResultsFiles: "**/TEST-*.xml"
-            condition: succeededOrFailed()
-
   - stage: Release
     dependsOn:
       - Versioning
