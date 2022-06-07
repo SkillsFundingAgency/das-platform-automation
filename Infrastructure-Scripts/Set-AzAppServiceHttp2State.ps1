@@ -15,6 +15,9 @@
     .PARAMETER AppServiceNamePrefix
     A filter to select a subset of the app services in a subscription
 
+    .PARAMETER Http2State
+    (optional) Set the HTTP/2 state to off, defaults to on
+
     .EXAMPLE
     To see whether a change would be made to a single app service
     Set-AzAppServiceHttp2State.ps1 -AppServiceName das-at-crsdelapi-as -AppServiceResourceGroup das-at-crsdel-rg -WhatIf
