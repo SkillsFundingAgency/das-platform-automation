@@ -24,6 +24,7 @@
     Set-AzAppServiceHttp2State.ps1 AppServiceNamePrefix "das-at-" -WhatIf
 #>
 
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSReviewUnusedParameter", "", Justification = "Known bug - https://github.com/PowerShell/PSScriptAnalyzer/issues/1472")]
 [CmdletBinding(DefaultParameterSetName =  "None", SupportsShouldProcess = $true)]
 param(
     [Parameter(Mandatory=$true, ParameterSetName="SingleAppService")]
