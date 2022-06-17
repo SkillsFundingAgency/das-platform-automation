@@ -59,8 +59,7 @@ if (!$AppGatewayCert) {
     Set-AzApplicationGateway -ApplicationGateway $UpdatedAg
 }
 else {
-    $KeyVaultCertVersion = ($AppGatewayCert.KeyVaultSecretId -split "/")[-1]
-    $KeyVaultCertificate = Get-AzKeyVaultCertificate -VaultName $KeyVaultName -Name $CertificateName -Version $KeyVaultCertVersion
+    $KeyVaultCertificate = Get-AzKeyVaultCertificate -VaultName $KeyVaultName -Name $CertificateName
     if ($KeyVaultCertificate.Expires -lt (Get-Date).AddDays(20)) {
         $VersionLessSecretId = $KeyVaultCertificate.SecretId -replace $KeyVaultCertificate.Version, ""
         Write-Output "Certificate versionless secret id is $VersionLessSecretId"
@@ -70,6 +69,6 @@ else {
         Set-AzApplicationGateway -ApplicationGateway $UpdatedAg
     }
     else {
-        Write-Output "Certificate $CertficateName already exists and expires on $($KeyVaultCertificate.Expires), no action."
+        Write-Output "Certificate $CertificateName already exists and expires on $($KeyVaultCertificate.Expires), no action."
     }
 }
