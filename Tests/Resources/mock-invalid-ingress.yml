@@ -1,4 +1,4 @@
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: das-foo-web
@@ -11,6 +11,9 @@ spec:
     http:
       paths:
       - path: /
+        pathType: Exact
         backend:
-          serviceName: das-foo-service-web
-          servicePort: 80
+          service:
+            name: das-foo-service-web
+            port:
+              number: 80
