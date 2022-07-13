@@ -43,14 +43,21 @@ foreach ($ParameterObject in $ParameterObjects) {
     $ParameterValue = (Get-Item -Path "env:$ParameterName" -ErrorAction SilentlyContinue).Value
 
     if (!$ParameterValue) {
-        Write-Verbose -Message "Environment variable for $ParameterName was not found, attempting default value"
+        Write-Information -Message "Environment variable for $ParameterName was not found, attempting UpperCase"
 
-        if ($null -eq $ParameterObject.Value.defaultValue) {
-            Write-Verbose -Message "Default value for $ParameterName was not found. Process will terminate"
-            throw "Could not find environment variable or default value for template parameter $ParameterName"
+        $ParameterValue = (Get-Item -Path "env:$($ParameterName.ToUpper())" -ErrorAction SilentlyContinue).Value
+        if (!$ParameterValue){
+            Write-Information -Message "Environment variable for $ParameterName was not found, attempting default value"
+            if ($null -eq $ParameterObject.Value.defaultValue) {
+                Write-Verbose -Message "Default value for $ParameterName was not found. Process will terminate"
+                throw "Could not find environment variable or default value for template parameter $ParameterName"
+            }
+            else {
+                Write-Verbose -Message "Parameter $ParameterName has a default value, skipping this parameter"
+                continue
+            }
         }
         else {
-            Write-Verbose -Message "Parameter $ParameterName has a default value, skipping this parameter"
             continue
         }
 
