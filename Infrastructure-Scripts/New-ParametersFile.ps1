@@ -44,22 +44,17 @@ foreach ($ParameterObject in $ParameterObjects) {
 
     if (!$ParameterValue) {
         Write-Host -Message "Environment variable for $ParameterName was not found, attempting UpperCase"
-
         $ParameterName = $ParameterObject.Name.ToUpper()
         $ParameterValue = (Get-Item -Path "env:$ParameterName" -ErrorAction SilentlyContinue).Value
         if (!$ParameterValue){
-            Write-Host -Message "Environment variable for $ParameterName was not found, attempting secret value"
-            $ParameterValue = (Get-Item -Path "env:SECRET_$ParameterName" -ErrorAction SilentlyContinue).Value
-            if (!$ParameterValue) {
-                Write-Host -Message "Environment variable for $ParameterName was not found, attempting default value"
-                if ($null -eq $ParameterObject.Value.defaultValue) {
-                    Write-Verbose -Message "Default value for $ParameterName was not found. Process will terminate"
-                    throw "Could not find environment variable or default value for template parameter $ParameterName"
-                }
-                else {
-                    Write-Verbose -Message "Parameter $ParameterName has a default value, skipping this parameter"
-                    continue
-                }
+            Write-Host -Message "Environment variable for $ParameterName was not found, attempting default value"
+            if ($null -eq $ParameterObject.Value.defaultValue) {
+                Write-Verbose -Message "Default value for $ParameterName was not found. Process will terminate"
+                throw "Could not find environment variable or default value for template parameter $ParameterName"
+            }
+            else {
+                Write-Verbose -Message "Parameter $ParameterName has a default value, skipping this parameter"
+                continue
             }
         }
 
@@ -109,6 +104,10 @@ foreach ($ParameterObject in $ParameterObjects) {
             break
         }
         'object' {
+            Write-Verbose -Message "($ParameterValue | ConvertFrom-Json | Get-Member)[0].TypeName"
+            if(($ParameterValue | ConvertFrom-Json | Get-Member)[0].TypeName -eq "System.String"){
+                Write-Verbose -Message "$ParameterName is object but value is a string"
+            }
             $ParameterValue = $ParameterValue | ConvertFrom-Json
             break
         }
