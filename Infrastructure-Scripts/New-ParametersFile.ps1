@@ -104,7 +104,7 @@ foreach ($ParameterObject in $ParameterObjects) {
             break
         }
         'object' {
-            Write-Verbose -Message "($ParameterValue | ConvertFrom-Json | Get-Member)[0].TypeName"
+            Write-Verbose -Message "$ParameterName type: $(($ParameterValue | ConvertFrom-Json | Get-Member)[0].TypeName)"
             if(($ParameterValue | ConvertFrom-Json | Get-Member)[0].TypeName -eq "System.String"){
                 Write-Verbose -Message "$ParameterName is object but value is a string"
             }
