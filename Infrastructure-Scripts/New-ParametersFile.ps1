@@ -104,11 +104,12 @@ foreach ($ParameterObject in $ParameterObjects) {
             break
         }
         'object' {
-            Write-Verbose -Message "$ParameterName type: $(($ParameterValue | ConvertFrom-Json | Get-Member)[0].TypeName)"
-            if(($ParameterValue | ConvertFrom-Json | Get-Member)[0].TypeName -eq "System.String"){
-                Write-Verbose -Message "$ParameterName is object but value is a string"
-            }
-            $ParameterValue = $ParameterValue | ConvertFrom-Json
+            # Write-Verbose -Message "$ParameterName type: $(($ParameterValue | ConvertFrom-Json | Get-Member)[0].TypeName)"
+            # if(($ParameterValue | ConvertFrom-Json | Get-Member)[0].TypeName -eq "System.String"){
+            #     Write-Verbose -Message "$ParameterName is object but value is a string"
+            #     if ($ParameterValue)
+            # }
+            $ParameterValue = ([Regex]::Unescape(($ParameterValue)) | ConvertFrom-Json -Depth 10)
             break
         }
     }
