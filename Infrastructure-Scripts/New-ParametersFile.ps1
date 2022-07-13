@@ -109,8 +109,7 @@ foreach ($ParameterObject in $ParameterObjects) {
             #     Write-Verbose -Message "$ParameterName is object but value is a string"
             #     if ($ParameterValue)
             # }
-            $ParameterValue = [Regex]::Unescape(($ParameterValue))
-            Write-Verbose "Value: $ParameterValue"
+            $ParameterValue = [Regex]::Unescape(($ParameterValue)) | ConvertFrom-Json -Depth 10
             break
         }
     }
