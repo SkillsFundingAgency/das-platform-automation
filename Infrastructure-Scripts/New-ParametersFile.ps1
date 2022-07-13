@@ -61,13 +61,6 @@ foreach ($ParameterObject in $ParameterObjects) {
                     continue
                 }
             }
-            else {
-                continue
-            }
-
-        }
-        else {
-            continue
         }
 
         if ($ParameterType -eq "object") {
