@@ -110,7 +110,7 @@ foreach ($ParameterObject in $ParameterObjects) {
             #     if ($ParameterValue)
             # }
             Write-Verbose "Value: $ParameterValue"
-            $ParameterValue = ([Regex]::Unescape(($ParameterValue)) | ConvertFrom-Json -Depth 10)
+            $ParameterValue = ([Regex]::Unescape((($ParameterValue.Trim('"')))) | ConvertFrom-Json -Depth 10)
             break
         }
     }
