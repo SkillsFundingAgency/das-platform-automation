@@ -37,16 +37,14 @@ $ParametersFile = [PSCustomObject]@{
 }
 $ParameterObjects = $TemplateParameters.PSObject.Members | Where-Object MemberType -eq NoteProperty
 
-Start-Sleep -Seconds 360
-
 foreach ($ParameterObject in $ParameterObjects) {
     $ParameterType = $ParameterObject.Value.Type
-    $ParameterName = $ParameterObject.Name.ToUpper()
+    $ParameterName = $ParameterObject.Name
     $ParameterValue = (Get-Item -Path "env:$ParameterName" -ErrorAction SilentlyContinue).Value
 
     if (!$ParameterValue) {
         Write-Verbose -Message "Environment variable for $ParameterName was not found, attempting default value"
-        if ($null -ne )
+
         if ($null -eq $ParameterObject.Value.defaultValue) {
             Write-Verbose -Message "Default value for $ParameterName was not found. Process will terminate"
             throw "Could not find environment variable or default value for template parameter $ParameterName"
