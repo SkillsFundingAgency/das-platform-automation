@@ -45,7 +45,8 @@ foreach ($ParameterObject in $ParameterObjects) {
     if (!$ParameterValue) {
         Write-Host -Message "Environment variable for $ParameterName was not found, attempting UpperCase"
 
-        $ParameterValue = (Get-Item -Path "env:$($ParameterName.ToUpper())" -ErrorAction SilentlyContinue).Value
+        $ParameterName = $ParameterObject.Name.ToUpper()
+        $ParameterValue = (Get-Item -Path "env:$ParameterName" -ErrorAction SilentlyContinue).Value
         if (!$ParameterValue){
             Write-Host -Message "Environment variable for $ParameterName was not found, attempting default value"
             if ($null -eq $ParameterObject.Value.defaultValue) {
