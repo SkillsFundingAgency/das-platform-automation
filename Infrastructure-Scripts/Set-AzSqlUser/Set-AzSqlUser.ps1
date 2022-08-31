@@ -46,6 +46,7 @@ Param(
     [Parameter(Mandatory = $true)]
     [String]$Username,
     [Parameter(Mandatory = $false)]
+    [ValidateSet('db_datawriter','db_datareader')]
     [String[]]$Roles,
     [Parameter(Mandatory = $false)]
     [String[]]$Grants,
