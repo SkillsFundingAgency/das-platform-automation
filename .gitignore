@@ -3,3 +3,4 @@ node_modules
 package-lock.json
 TEST*.xml
 Tests/Resources/mock.template.parameters.json
+Infrastructure-Scripts/New-ConfigurationTableEntry/packages

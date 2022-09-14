@@ -1,3 +1,27 @@
+# --- If we aren't in the context of a VSTS build task or are using the self-hosted AKS cluster, install the packages
+if (!$ENV:TF_BUILD -or $ENV:AGENT_NAME -like "azure-pipelines-*-agent*") {
+    Write-Host "Registering package sources"
+    Register-PackageSource -Name NuGet -Location https://www.nuget.org/api/v2 -ProviderName NuGet -Trusted -ErrorAction SilentlyContinue
+    $PackageConfig = [Xml](Get-Content -Path $PSScriptRoot\tools\packages.config -Raw)
+    foreach ($Package in $PackageConfig.packages.package) {
+        Write-Host "Installing package $($Package.Id)"
+        $PackageParameters = @{
+            Destination      = "$PSScriptRoot\packages"
+            Name             = $Package.id
+            RequiredVersion  = $Package.version
+            SkipDependencies = $True
+            ProviderName     = "Nuget"
+            Source           = "Nuget"
+        }
+
+        $null = Install-Package @PackageParameters -Verbose:$VerbosePreference -ForceBootstrap
+    }
+}
+
+# --- Load libraries
+Add-Type -Path "packages\Newtonsoft.Json.9.0.1\lib\netstandard1.0\Newtonsoft.Json.dll"
+Add-Type -Path "packages\Newtonsoft.Json.Schema.2.0.8\lib\netstandard1.3\Newtonsoft.Json.Schema.dll"
+
 $Script:EmojiDictionary = @{
     GreenCheck = [System.Text.Encoding]::UTF32.GetString(@(20, 39, 0, 0))
     StopWatch  = [System.Text.Encoding]::UTF32.GetString(@(241, 35, 0, 0))
