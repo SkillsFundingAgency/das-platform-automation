@@ -24,8 +24,6 @@ function New-ConfigurationTableEntry {
     )
 
     try {
-        Trace-VstsEnteringInvocation $MyInvocation
-
         # --- TODO: Test if source path is a directory
         if (!$SourcePath.EndsWith("/")) {
             $SourcePath = "$($SourcePath)/"
@@ -55,6 +53,5 @@ function New-ConfigurationTableEntry {
         throw Write-Error -Message "$_" -ErrorAction Stop
     }
     finally {
-        Trace-VstsLeavingInvocation $MyInvocation
     }
 }

@@ -9,8 +9,6 @@ function Build-ConfigurationEntity {
     )
 
     try {
-        Trace-VstsEnteringInvocation $MyInvocation
-
         Write-Host "Parsing schema: $(([System.IO.FileInfo]$SchemaDefinitionPath).Name) $($Script:EmojiDictionary.Lightning)"
         $SchemaDefinition = Get-Content -Path $SchemaDefinitionPath -Raw
         $SchemaObject = [Newtonsoft.Json.Schema.JSchema, Newtonsoft.Json.Schema, Version = 2.0.0.0, Culture = neutral, PublicKeyToken = 30ad4fe6b2a6aeed]::Parse($SchemaDefinition)
@@ -34,7 +32,6 @@ function Build-ConfigurationEntity {
         Write-Error -Message "$_" -ErrorAction Stop
     }
     finally {
-        Trace-VstsLeavingInvocation $MyInvocation
     }
 }
 
@@ -54,9 +51,6 @@ function New-ConfigurationEntity {
     )
 
     try {
-
-        Trace-VstsEnteringInvocation $MyInvocation
-
         Write-Verbose -Message "Building storage context"
         $StorageAccountKey = Get-StorageAccountKey -Name $StorageAccount
         $StorageContext = New-AzureStorageContext -StorageAccountName $StorageAccount -StorageAccountKey $StorageAccountKey
@@ -83,7 +77,6 @@ function New-ConfigurationEntity {
         Write-Error -Message "$_" -ErrorAction Stop
     }
     finally {
-        Trace-VstsLeavingInvocation $MyInvocation
     }
 }
 
@@ -99,8 +92,6 @@ function Test-ConfigurationEntity {
     )
 
     try {
-        Trace-VstsEnteringInvocation $MyInvocation
-
         Write-Host "Validating $($Script:EmojiDictionary.StopWatch)"
         $SchemaDefinition = Get-Content -Path $SchemaDefinitionPath -Raw
         $SchemaObject = [Newtonsoft.Json.Schema.JSchema, Newtonsoft.Json.Schema, Version = 2.0.0.0, Culture = neutral, PublicKeyToken = 30ad4fe6b2a6aeed]::Parse($SchemaDefinition)
@@ -114,7 +105,6 @@ function Test-ConfigurationEntity {
         Write-Error -Message "Validation failed: $_`n$($_.Exception.InnerException.Message)" -ErrorAction Stop
     }
     finally {
-        Trace-VstsLeavingInvocation $MyInvocation
     }
 }
 
@@ -127,9 +117,6 @@ function Expand-Schema {
     )
 
     try {
-
-        Trace-VstsEnteringInvocation $MyInvocation
-
         [Hashtable]$ProcessedProperties = @{ }
         foreach ($Key in $PropertyObject.Keys) {
 
@@ -188,7 +175,6 @@ function Expand-Schema {
         Write-Error -Message "Failed to expand schema property [$Key] $_" -ErrorAction Stop
     }
     finally {
-        Trace-VstsLeavingInvocation $MyInvocation
     }
 }
 
@@ -212,12 +198,10 @@ function Get-SchemaProperty {
     )
 
     try {
-
-        Trace-VstsEnteringInvocation $MyInvocation
-
         if ($PropertyObject.ExtensionData.ContainsKey("environmentVariable")) {
 
             $VariableName = $PropertyObject.ExtensionData.Item("environmentVariable").Value
+            ##TO DO: reconsider how values are aquired from pipeline variables
             $TaskVariable = Get-VstsTaskVariable -Name $VariableName
             if (![string]::IsNullOrEmpty($TaskVariable)) {
                 switch ($PSCmdlet.ParameterSetName) {
@@ -264,7 +248,6 @@ function Get-SchemaProperty {
         Write-Error -Message "Could not get property from object [ $VariableName ] : $_" -ErrorAction Stop
     }
     finally {
-        Trace-VstsLeavingInvocation $MyInvocation
     }
 }
 
@@ -279,8 +262,6 @@ function Get-StorageAccountKey {
     )
 
     try {
-        Trace-VstsEnteringInvocation $MyInvocation
-
         if ($Global:IsAz) {
             $StorageAccount = Get-AzureRmResource -Name $Name -ResourceType "Microsoft.Storage/storageAccounts" -ErrorAction Stop
         }
@@ -299,7 +280,6 @@ function Get-StorageAccountKey {
         Write-Error -Message "Failed to retrieve key from $($Name): $_" -ErrorAction Stop
     }
     finally {
-        Trace-VstsLeavingInvocation $MyInvocation
     }
 }
 
@@ -317,8 +297,6 @@ function Get-TableEntity {
     )
 
     try {
-        Trace-VstsEnteringInvocation $MyInvocation
-
         if ($Global:IsAz) {
             $TableOperation = [Microsoft.Azure.Cosmos.Table.TableOperation]::Retrieve($PartitionKey, $RowKey)
         }
@@ -337,7 +315,6 @@ function Get-TableEntity {
         Write-Error -Message "$_" -ErrorAction Stop
     }
     finally {
-        Trace-VstsLeavingInvocation $MyInvocation
     }
 }
 
@@ -353,8 +330,6 @@ function New-TableEntity {
     )
 
     try {
-        Trace-VstsEnteringInvocation $MyInvocation
-
         if ($Global:IsAz) {
             $Entity = [Microsoft.Azure.Cosmos.Table.DynamicTableEntity]::new($PartitionKey, $RowKey)
             $Entity.Properties.Add("Data", $Configuration)
@@ -373,7 +348,6 @@ function New-TableEntity {
         Write-Error -Message "$_" -ErrorAction Stop
     }
     finally {
-        Trace-VstsLeavingInvocation $MyInvocation
     }
 }
 
@@ -387,7 +361,6 @@ function Set-TableEntity {
     )
 
     try {
-        Trace-VstsEnteringInvocation $MyInvocation
         $Entity.Properties["Data"].StringValue = $Configuration
         if ($Global:IsAz) {
             $null = $StorageTable.CloudTable.Execute([Microsoft.Azure.Cosmos.Table.TableOperation]::InsertOrReplace($Entity))
@@ -404,6 +377,5 @@ function Set-TableEntity {
         Write-Error -Message "$_" -ErrorAction Stop
     }
     finally {
-        Trace-VstsLeavingInvocation $MyInvocation
     }
 }
