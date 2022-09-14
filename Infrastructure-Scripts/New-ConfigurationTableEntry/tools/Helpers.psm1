@@ -98,6 +98,7 @@ function Test-ConfigurationEntity {
         [Parameter(Mandatory = $true)]
         [String]$SchemaDefinitionPath
     )
+    ##TO DO: improve this, reports 1 failed property at a time, should report all failures
 
     Write-Host "Validating $($Script:EmojiDictionary.StopWatch)"
     $SchemaDefinition = Get-Content -Path $SchemaDefinitionPath -Raw
@@ -106,6 +107,7 @@ function Test-ConfigurationEntity {
     $ConfigurationObject = [Newtonsoft.Json.Linq.JObject, Newtonsoft.Json, Version = 9.0.0.0, Culture = neutral, PublicKeyToken = 30ad4fe6b2a6aeed]::Parse($Configuration)
     [Newtonsoft.Json.Schema.SchemaExtensions, Newtonsoft.Json.Schema, Version = 2.0.0.0, Culture = neutral, PublicKeyToken = 30ad4fe6b2a6aeed]::Validate($ConfigurationObject, $SchemaObject)
 
+    ##TO DO: fix this, writes success message on failure
     Write-Host "Configuration validated $($Script:EmojiDictionary.GreenCheck)"
 }
 
@@ -194,33 +196,32 @@ function Get-SchemaProperty {
     if ($PropertyObject.ExtensionData.ContainsKey("environmentVariable")) {
 
         $VariableName = $PropertyObject.ExtensionData.Item("environmentVariable").Value
-        ##TO DO: reconsider how values are aquired from pipeline variables
-        $TaskVariable = Get-VstsTaskVariable -Name $VariableName
+        $TaskVariable = Get-Variable -Name $VariableName
         if (![string]::IsNullOrEmpty($TaskVariable)) {
             switch ($PSCmdlet.ParameterSetName) {
 
                 'Standard' {
-                    $TaskVariable = "$($TaskVariable)"
+                    $TaskVariable = "$($TaskVariable.Value)"
                     break
                 }
 
                 'AsInt' {
-                    $TaskVariable = [int]$TaskVariable
+                    $TaskVariable = [int]$TaskVariable.Value
                     break
                 }
 
                 'AsNumber' {
-                    $TaskVariable = [Decimal]::Parse($TaskVariable)
+                    $TaskVariable = [Decimal]::Parse($TaskVariable.Value)
                     break
                 }
 
                 'AsArray' {
-                    $TaskVariable = @($TaskVariable | ConvertFrom-Json)
+                    $TaskVariable = @($TaskVariable.Value | ConvertFrom-Json)
                     break
                 }
 
                 'AsBool' {
-                    $TaskVariable = $TaskVariable.ToLower() -in '1', 'true'
+                    $TaskVariable = $TaskVariable.Value.ToLower() -in '1', 'true'
                     break
                 }
             }
