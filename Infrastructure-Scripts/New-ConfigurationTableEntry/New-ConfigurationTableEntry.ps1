@@ -1,6 +1,4 @@
 function New-ConfigurationTableEntry {
-    <#
-#>
     [CmdletBinding()]
     Param(
         [Parameter(Mandatory = $True)]
@@ -23,35 +21,28 @@ function New-ConfigurationTableEntry {
         [String]$Version = "1.0"
     )
 
-    try {
-        # --- TODO: Test if source path is a directory
-        if (!$SourcePath.EndsWith("/")) {
-            $SourcePath = "$($SourcePath)/"
-        }
-
-        $SchemaPath = "$($SourcePath)$($TargetFilename)"
-        $Schemas = Get-ChildItem -Path $SchemaPath -File -Recurse
-
-        foreach ($Schema in $Schemas) {
-
-            $Configuration = Build-ConfigurationEntity -SchemaDefinitionPath $Schema.FullName
-            Test-ConfigurationEntity -Configuration $Configuration -SchemaDefinitionPath $Schema.FullName
-
-            $NewEntityParameters = @{
-                StorageAccount = $StorageAccount
-                TableName      = $TableName
-                PartitionKey   = $EnvironmentName
-                RowKey         = "$($Schema.BaseName.Replace('.schema',''))_$($Version)"
-                Configuration  = $Configuration
-            }
-            New-ConfigurationEntity @NewEntityParameters
-
-            Write-Host "Configuration succesfully added to $PartitionKey/$RowKey $($Script:EmojiDictionary.GreenCheck)"
-        }
+    # --- TODO: Test if source path is a directory
+    if (!$SourcePath.EndsWith("/")) {
+        $SourcePath = "$($SourcePath)/"
     }
-    catch {
-        throw Write-Error -Message "$_" -ErrorAction Stop
-    }
-    finally {
+
+    $SchemaPath = "$($SourcePath)$($TargetFilename)"
+    $Schemas = Get-ChildItem -Path $SchemaPath -File -Recurse
+
+    foreach ($Schema in $Schemas) {
+
+        $Configuration = Build-ConfigurationEntity -SchemaDefinitionPath $Schema.FullName
+        Test-ConfigurationEntity -Configuration $Configuration -SchemaDefinitionPath $Schema.FullName
+
+        $NewEntityParameters = @{
+            StorageAccount = $StorageAccount
+            TableName      = $TableName
+            PartitionKey   = $EnvironmentName
+            RowKey         = "$($Schema.BaseName.Replace('.schema',''))_$($Version)"
+            Configuration  = $Configuration
+        }
+        New-ConfigurationEntity @NewEntityParameters
+
+        Write-Host "Configuration succesfully added to $PartitionKey/$RowKey $($Script:EmojiDictionary.GreenCheck)"
     }
 }
