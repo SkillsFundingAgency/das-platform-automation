@@ -85,17 +85,26 @@ function New-ConfigurationEntity {
     if ($Row) {
         Write-Host "Updating existing entity [$RowKey]"
         $Row.Data = $Configuration
-        $Row | Update-AzTableRow -Table $StorageTable
+        try {
+            $Row | Update-AzTableRow -Table $StorageTable -ErrorAction Stop
+        }
+        catch {
+            throw "Error calling Update-AzTableRow: $_"
+        }
     }
     else {
         Write-Host "Creating a new entity [$RowKey]"
         $Row = @{
             Data = $Configuration
         }
-        Add-AzTableRow -Table $StorageTable -partitionKey $PartitionKey -rowKey $RowKey -property $Row
+        try {
+            Add-AzTableRow -Table $StorageTable -partitionKey $PartitionKey -rowKey $RowKey -property $Row -ErrorAction Stop
+        }
+        catch {
+            throw "Error calling Add-AzTableRow: $_"
+        }
     }
 
-    ##TO DO: check that the AzTable cmdlets terminate on error so that this isn't written
     Write-Host "Configuration succesfully added to $PartitionKey/$RowKey $($Script:EmojiDictionary.GreenCheck)"
 }
 
