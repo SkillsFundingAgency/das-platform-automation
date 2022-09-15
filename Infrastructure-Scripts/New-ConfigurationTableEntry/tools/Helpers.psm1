@@ -146,7 +146,8 @@ function Expand-Schema {
 
             'Array' {
                 Write-Host "    -> [Array]$($Key)"
-                $PropertyValue = Get-SchemaProperty -PropertyObject $Property -AsArray
+                $PropertyValue = @()
+                $PropertyValue += Get-SchemaProperty -PropertyObject $Property -AsArray
                 break
             }
 
