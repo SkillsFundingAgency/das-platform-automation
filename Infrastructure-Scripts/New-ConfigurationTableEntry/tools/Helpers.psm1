@@ -94,6 +94,9 @@ function New-ConfigurationEntity {
         }
         Add-AzTableRow -Table $StorageTable -partitionKey $PartitionKey -rowKey $RowKey -property $Row
     }
+
+    ##TO DO: check that the AzTable cmdlets terminate on error so that this isn't written
+    Write-Host "Configuration succesfully added to $PartitionKey/$RowKey $($Script:EmojiDictionary.GreenCheck)"
 }
 
 function Test-ConfigurationEntity {
