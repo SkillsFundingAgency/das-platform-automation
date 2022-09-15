@@ -35,10 +35,10 @@ if (!$AppServiceResource) {
 $AppServiceWhitelist = Get-AzWebAppAccessRestrictionConfig -ResourceGroupName $AppServiceResource.ResourceGroupName -Name $ResourceName | Where-Object { $_.MainSiteAccessRestrictions.IpAddress -eq "$IPAddress/32" }
 
 if (!$AppServiceWhitelist) {
-    Write-Output " -> Could not find whitelisted $IPAddress to remove!"
+    Write-Output " -> Could not find whitelisted $IPAddress to remove on $ResourceName!"
 }
 else {
-    Write-Output "  -> Removing $IPAddress"
+    Write-Output "  -> Removing $IPAddress from $ResourceName"
     Remove-AzWebAppAccessRestrictionRule  -ResourceGroupName $AppServiceResource.ResourceGroupName -WebAppName $ResourceName -IpAddress "$IPAddress/32"
-    Write-Output "  -> $IPAddress, removed!"
+    Write-Output "  -> $IPAddress, removed from $ResourceName!"
 }
