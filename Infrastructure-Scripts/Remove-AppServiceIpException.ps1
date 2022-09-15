@@ -12,14 +12,14 @@
     The name of the app service
 
     .EXAMPLE
-    Remove-AppServiceIpException -IpAddress 192.168.0.1 -ResourceName das-foobar
+    Remove-AppServiceIpException -IPAddress 192.168.0.1 -ResourceName das-foobar
 #>
 
 [CmdletBinding()]
 Param (
     [Parameter(Mandatory = $true)]
     [ValidateNotNull()]
-    [IPAddress]$IpAddress,
+    [IPAddress]$IPAddress,
     [Parameter(Mandatory = $true)]
     [ValidateNotNull()]
     [String]$ResourceName
