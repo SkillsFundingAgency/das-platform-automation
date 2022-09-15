@@ -1,9 +1,9 @@
 <#
     .SYNOPSIS
-    Remove the access restriction rules from an app service
+    Removes an IP address access restriction rule from an app service
 
     .DESCRIPTION
-    Remove the access restriction rules from an app service given an IP
+    Removes an IP address access restriction rule from an app service
 
     .PARAMETER IpAddress
     An ip address to associate with the access restriction rule
@@ -12,7 +12,7 @@
     The name of the app service
 
     .EXAMPLE
-    Remove-AppServiceIpException -IpAddress 192.168.0.1 -ResourceName das-prd-sms-as
+    Remove-AppServiceIpException -IpAddress 192.168.0.1 -ResourceName das-foobar
 #>
 
 [CmdletBinding()]
