@@ -30,7 +30,7 @@ Describe "Remove-AppServiceIpException Unit Tests" -Tags @("Unit") {
             { ./Remove-AppServiceIpException @Params } | Should Not throw
             Assert-MockCalled -CommandName 'Get-AzResource' -Times 1 -Scope It
             Assert-MockCalled -CommandName 'Get-AzWebAppAccessRestrictionConfig' -Times 1 -Scope It
-            Assert-MockCalled -CommandName 'Write-Output' -Times 1 -Scope It -ParameterFilter { $InputObject -eq " -> Could not find whitelisted $($Config.ipAddress) to remove!" }
+            Assert-MockCalled -CommandName 'Write-Output' -Times 1 -Scope It -ParameterFilter { $InputObject -eq " -> Could not find whitelisted $($Config.ipAddress) to remove on $($Config.resourceName)!" }
         }
     }
 
@@ -57,8 +57,8 @@ Describe "Remove-AppServiceIpException Unit Tests" -Tags @("Unit") {
             Assert-MockCalled -CommandName 'Get-AzWebAppAccessRestrictionConfig' -Times 1 -Scope It
             Assert-MockCalled -CommandName 'Remove-AzWebAppAccessRestrictionRule' -Times 1 -Scope It
             Assert-MockCalled -CommandName 'Write-Output' -Times 2 -Scope It
-            Assert-MockCalled -CommandName 'Write-Output' -Times 1 -Scope It -ParameterFilter { $InputObject -eq "  -> Removing $($Config.ipAddress)" }
-            Assert-MockCalled -CommandName 'Write-Output' -Times 1 -Scope It -ParameterFilter { $InputObject -eq "  -> $($Config.ipAddress), removed!" }
+            Assert-MockCalled -CommandName 'Write-Output' -Times 1 -Scope It -ParameterFilter { $InputObject -eq "  -> Removing $($Config.ipAddress) from $($Config.resourceName)" }
+            Assert-MockCalled -CommandName 'Write-Output' -Times 1 -Scope It -ParameterFilter { $InputObject -eq "  -> $($Config.ipAddress), removed from $($Config.resourceName)!" }
         }
     }
 
