@@ -39,6 +39,6 @@ if (!$AppServiceWhitelist) {
 }
 else {
     Write-Output "  -> Removing $IPAddress"
-    Remove-AzWebAppAccessRestrictionRule  -ResourceGroupName $AppServiceResource.ResourceGroupName -WebAppName $ResourceName -IpAddress "$IPAddress/32"
+    Remove-AzWebAppAccessRestrictionRule -ResourceGroupName $AppServiceResource.ResourceGroupName -WebAppName $ResourceName -IpAddress "$IPAddress/32"
     Write-Output "  -> $IPAddress, removed!"
 }
