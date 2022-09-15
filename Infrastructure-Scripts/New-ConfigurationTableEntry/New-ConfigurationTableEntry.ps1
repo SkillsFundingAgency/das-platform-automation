@@ -9,7 +9,10 @@ function New-ConfigurationTableEntry {
         [String]$TargetFilename,
         [Parameter(Mandatory = $True)]
         [ValidateNotNullOrEmpty()]
-        [String]$StorageAccount,
+        [String]$StorageAccountName,
+        [Parameter(Mandatory = $True)]
+        [ValidateNotNullOrEmpty()]
+        [String]$StorageAccountResourceGroup,
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [String]$EnvironmentName,
@@ -20,6 +23,8 @@ function New-ConfigurationTableEntry {
         [ValidateNotNullOrEmpty()]
         [String]$Version = "1.0"
     )
+
+    Import-Module $PSScriptRoot/tools/Helpers.psm1 -Force
 
     # --- TODO: Test if source path is a directory
     if (!$SourcePath.EndsWith("/")) {
@@ -35,7 +40,8 @@ function New-ConfigurationTableEntry {
         Test-ConfigurationEntity -Configuration $Configuration -SchemaDefinitionPath $Schema.FullName
 
         $NewEntityParameters = @{
-            StorageAccount = $StorageAccount
+            StorageAccountName = $StorageAccountName
+            StorageAccountResourceGroup = $StorageAccountResourceGroup
             TableName      = $TableName
             PartitionKey   = $EnvironmentName
             RowKey         = "$($Schema.BaseName.Replace('.schema',''))_$($Version)"

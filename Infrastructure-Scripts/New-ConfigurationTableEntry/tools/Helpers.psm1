@@ -56,7 +56,9 @@ function New-ConfigurationEntity {
     [CmdletBinding()]
     Param(
         [Parameter(Mandatory = $true)]
-        [String]$StorageAccount,
+        [String]$StorageAccountName,
+        [Parameter(Mandatory = $true)]
+        [String]$StorageAccountResourceGroup,
         [Parameter(Mandatory = $true)]
         [String]$TableName,
         [Parameter(Mandatory = $true)]
@@ -68,25 +70,29 @@ function New-ConfigurationEntity {
     )
 
     Write-Verbose -Message "Building storage context"
-    $StorageAccountKey = Get-StorageAccountKey -Name $StorageAccount
-    $StorageContext = New-AzureStorageContext -StorageAccountName $StorageAccount -StorageAccountKey $StorageAccountKey
+    $StorageAccountKey = Get-StorageAccountKey -StorageAccount $StorageAccountName -ResourceGroup $StorageAccountResourceGroup
+    $StorageContext = New-AzStorageContext -StorageAccountName $StorageAccountName -StorageAccountKey $StorageAccountKey
 
     Write-Verbose -Message "Searching for storage table $TableName"
-    $StorageTable = Get-AzureStorageTable -Context $StorageContext -Name $TableName -ErrorAction SilentlyContinue
+    $StorageTable = (Get-AzStorageTable -Context $StorageContext -Name $TableName -ErrorAction SilentlyContinue).CloudTable
     if (!$StorageTable) {
         Write-Verbose -Message "Creating a new storage table $TableName"
-        $StorageTable = New-AzureStorageTable -Context $StorageContext -Name $TableName
+        $StorageTable = (New-AzStorageTable -Context $StorageContext -Name $TableName).CloudTable
     }
 
-    $Entity = Get-TableEntity -StorageTable $StorageTable -PartitionKey $PartitionKey -RowKey $RowKey
+    $Row = Get-AzTableRow -Table $StorageTable -partitionKey $PartitionKey -rowKey $RowKey
 
-    if ($Entity) {
+    if ($Row) {
         Write-Host "Updating existing entity [$RowKey]"
-        Set-TableEntity -Configuration $Configuration -Entity $Entity
+        $Row.Data = $Configuration
+        $Row | Update-AzTableRow -Table $StorageTable
     }
     else {
         Write-Host "Creating a new entity [$RowKey]"
-        New-TableEntity -Configuration $Configuration -PartitionKey $PartitionKey -RowKey $RowKey
+        $Row = @{
+            Data = $Configuration
+        }
+        Add-AzTableRow -Table $StorageTable -partitionKey $PartitionKey -rowKey $RowKey -property $Row
     }
 }
 
@@ -244,92 +250,27 @@ function Get-StorageAccountKey {
     Param(
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String]$Name
+        [String]$ResourceGroup,
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [String]$StorageAccountName
     )
 
-    if ($Global:IsAz) {
-        $StorageAccount = Get-AzureRmResource -Name $Name -ResourceType "Microsoft.Storage/storageAccounts" -ErrorAction Stop
-    }
-    elseif ($Global:IsAzureRm) {
-        $StorageAccount = Find-AzureRmResource -Name $Name -ResourceType "Microsoft.Storage/storageAccounts" -ErrorAction Stop
+    ##TO DO this duplicates Infrastructure-Scripts\Get-StorageAccountConnectionString.ps1, can it be refactored?
+
+    # --- Check if the Resource Group exists in the subscription.
+    $ResourceGroupExists = Get-AzResourceGroup $ResourceGroup
+    if (!$ResourceGroupExists) {
+        throw "Resource Group $ResourceGroup does not exist."
     }
 
-    if (!$StorageAccount) {
-        Write-Error -Message "Could not find storage account resource." -ErrorAction Stop
+    # --- Check if Storage Account exists in the subscription.
+    $StorageAccountExists = Get-AzStorageAccount -ResourceGroupName $ResourceGroup -Name $StorageAccountName -ErrorAction SilentlyContinue
+    if (!$StorageAccountExists) {
+        throw "Storage Account $StorageAccountName does not exist."
     }
 
-    $StorageAccountKey = (Get-AzureRmStorageAccountKey -ResourceGroupName $StorageAccount.ResourceGroupName -Name $Name)[0].Value
-    Write-Output $StorageAccountKey
-}
-
-function Get-TableEntity {
-    [CmdletBinding()]
-    Param(
-        [Parameter(Mandatory = $true)]
-        [PSObject]$StorageTable,
-        [Parameter(Mandatory = $true)]
-        [String]$PartitionKey,
-        [Parameter(Mandatory = $true)]
-        [String]$RowKey
-    )
-
-    if ($Global:IsAz) {
-        $TableOperation = [Microsoft.Azure.Cosmos.Table.TableOperation]::Retrieve($PartitionKey, $RowKey)
-    }
-    elseif ($Global:IsAzureRm) {
-        $TableOperation = [Microsoft.WindowsAzure.Storage.Table.TableOperation]::Retrieve($PartitionKey, $RowKey)
-    }
-    else {
-        throw "Couldn't find Global Azure module setting $($MyInvocation.ScriptLineNumber) $($MyInvocation.ScriptName)"
-    }
-    $Entity = $StorageTable.CloudTable.Execute($TableOperation, $null, $null)
-
-    Write-Output $Entity.Result
-}
-
-function New-TableEntity {
-    [CmdletBinding()]
-    Param(
-        [Parameter(Mandatory = $true)]
-        [String]$Configuration,
-        [Parameter(Mandatory = $true)]
-        [String]$PartitionKey,
-        [Parameter(Mandatory = $true)]
-        [String]$RowKey
-    )
-
-    if ($Global:IsAz) {
-        $Entity = [Microsoft.Azure.Cosmos.Table.DynamicTableEntity]::new($PartitionKey, $RowKey)
-        $Entity.Properties.Add("Data", $Configuration)
-        $null = $StorageTable.CloudTable.Execute([Microsoft.Azure.Cosmos.Table.TableOperation]::Insert($Entity))
-    }
-    elseif ($Global:IsAzureRm) {
-        $Entity = [Microsoft.WindowsAzure.Storage.Table.DynamicTableEntity]::new($PartitionKey, $RowKey)
-        $Entity.Properties.Add("Data", $Configuration)
-        $null = $StorageTable.CloudTable.Execute([Microsoft.WindowsAzure.Storage.Table.TableOperation]::Insert($Entity))
-    }
-    else {
-        throw "Couldn't find Global Azure module setting $($MyInvocation.ScriptLineNumber) $($MyInvocation.ScriptName)"
-    }
-}
-
-function Set-TableEntity {
-    [CmdletBinding()]
-    Param(
-        [Parameter(Mandatory = $true)]
-        [String]$Configuration,
-        [Parameter(Mandatory = $true)]
-        [PSObject]$Entity
-    )
-
-    $Entity.Properties["Data"].StringValue = $Configuration
-    if ($Global:IsAz) {
-        $null = $StorageTable.CloudTable.Execute([Microsoft.Azure.Cosmos.Table.TableOperation]::InsertOrReplace($Entity))
-    }
-    elseif ($Global:IsAzureRm) {
-        $null = $StorageTable.CloudTable.Execute([Microsoft.WindowsAzure.Storage.Table.TableOperation]::InsertOrReplace($Entity))
-    }
-    else {
-        throw "Couldn't find Global Azure module setting $($MyInvocation.ScriptLineNumber) $($MyInvocation.ScriptName)"
-    }
+    ##TO DO: consider changing error action, failure to get a key doesn't throw error
+    $Key = (Get-AzStorageAccountKey -ResourceGroupName $ResourceGroup -Name $StorageAccountName)[0].Value
+    Write-Output $Key
 }
