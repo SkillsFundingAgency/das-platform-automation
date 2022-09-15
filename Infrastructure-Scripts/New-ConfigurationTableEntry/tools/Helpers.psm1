@@ -205,7 +205,14 @@ function Get-SchemaProperty {
     if ($PropertyObject.ExtensionData.ContainsKey("environmentVariable")) {
 
         $VariableName = $PropertyObject.ExtensionData.Item("environmentVariable").Value
-        $TaskVariable = Get-Variable -Name $VariableName
+        ##TO DO: is there a cleaner way to do this?
+        try {
+            $TaskVariable = Get-Variable -Name $VariableName -ErrorAction Stop
+        }
+        catch {
+            $TaskVariable = Get-Item -Path Env:$VariableName
+        }
+
         if (![string]::IsNullOrEmpty($TaskVariable)) {
             switch ($PSCmdlet.ParameterSetName) {
 
