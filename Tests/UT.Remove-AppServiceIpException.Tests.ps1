@@ -17,7 +17,7 @@ Describe "Remove-AppServiceIpException Unit Tests" -Tags @("Unit") {
     }
 
     Context "Resources exists and app service ip exception doesn't exist" {
-        It "Should output existing access restrction with given IP does not exist" {
+        It "Should output existing access restriction with given IP does not exist" {
 
             Mock Get-AzResource -MockWith {
                 return @{
@@ -34,7 +34,7 @@ Describe "Remove-AppServiceIpException Unit Tests" -Tags @("Unit") {
         }
     }
 
-    Context "Resources exists and app service ip exception exists" {
+    Context "Resource exists and app service ip access restriction rule exists" {
         It "Should remove the ip access restriction to the found resources" {
 
             Mock Get-AzResource -MockWith {
