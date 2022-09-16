@@ -1,0 +1,88 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Mock DAS Application Configuration",
+  "description": "A mock configuration schema",
+  "type": "object",
+  "properties": {
+
+    "MockArray":{
+      "type":"array",
+      "environmentVariable": "MockConfigurationArray"
+    },
+    "MockBool":{
+      "type": "boolean",
+      "environmentVariable": "MockConfigurationBool"
+    },
+    "MockInt":{
+      "type": "integer",
+      "environmentVariable": "MockConfigurationInt"
+    },
+    "MockNumber":{
+      "type": "number",
+      "environmentVariable": "MockConfigurationNumber"
+    },
+    "MockObject": {
+      "description": "Mock Configuration Object, contains other mocked properties",
+      "type": "object",
+      "properties": {
+        "MockObjectBool": {
+          "type": "boolean",
+          "environmentVariable": "MockConfigurationObjectBool"
+        },
+        "MockObjectInt": {
+          "type": "integer",
+          "environmentVariable": "MockConfigurationObjectInt"
+        },
+        "MockObjectNumber": {
+          "type": "number",
+          "environmentVariable": "MockConfigurationObjectNumber"
+        },
+        "MockObjectString": {
+          "type": "string",
+          "environmentVariable": "MockConfigurationObjectString"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "MockObjectBool",
+        "MockObjectInt",
+        "MockObjectNumber",
+        "MockObjectString"
+      ]
+    },
+    "MockParentObject":{
+      "description": "Mock Configuration Object containing a child object",
+      "type": "object",
+      "properties": {
+        "MockChildObject":{
+          "description": "Mock Configuration Object child object",
+          "type": "object",
+          "properties": {
+            "MockChildString":{
+              "type": "string",
+              "environmentVariable": "MockConfigurationChildObjectString"
+            }
+          },
+          "required": [
+            "MockChildString"
+          ]
+        }
+      },
+      "required":[
+        "MockChildObject"
+      ]
+    },
+    "MockString":{
+      "type": "string",
+      "environmentVariable": "MockConfigurationString"
+    }
+  },
+  "required": [
+    "MockBool",
+    "MockInt",
+    "MockNumber",
+    "MockObject",
+    "MockParentObject",
+    "MockString"
+  ]
+}

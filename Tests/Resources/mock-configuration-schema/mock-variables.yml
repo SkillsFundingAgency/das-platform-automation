@@ -1,0 +1,11 @@
+variables:
+  MockConfigurationArray: '["foo", "bar"]'
+  MockConfigurationBool: "false" #boolean values are expected to be stored as strings in Azure DevOps
+  MockConfigurationInt: "2"
+  MockConfigurationNumber: "3.4"
+  MockConfigurationChildObjectString: "barbar"
+  MockConfigurationObjectBool: "true"
+  MockConfigurationObjectInt: "1"
+  MockConfigurationObjectNumber: "2.3"
+  MockConfigurationObjectString: "FooBar"
+  MockConfigurationString: "BarFoo"

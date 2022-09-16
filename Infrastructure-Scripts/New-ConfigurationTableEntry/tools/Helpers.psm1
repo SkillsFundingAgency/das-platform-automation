@@ -224,7 +224,7 @@ function Get-SchemaProperty {
             $TaskVariable = Get-Variable -Name $VariableName -ErrorAction Stop
         }
         catch {
-            $TaskVariable = Get-Item -Path Env:$VariableName
+            $TaskVariable = Get-Item -Path Env:$VariableName -ErrorAction SilentlyContinue
         }
 
         if (![string]::IsNullOrEmpty($TaskVariable)) {

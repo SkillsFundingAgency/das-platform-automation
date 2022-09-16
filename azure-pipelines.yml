@@ -21,6 +21,8 @@ stages:
               configFilePath: GitVersion.yml
   - stage: Test
     dependsOn: []
+    variables:
+    - template: Tests/Resources/mock-configuration-schema/mock-variables.yml
     jobs:
       - job: "Windows_PSCore_Build_DAS_Continuous_Integration"
         pool:
