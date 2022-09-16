@@ -74,4 +74,40 @@ Describe "New-ConfigurationTableEntry New-ConfigurationEntity Helper Unit Tests"
             Assert-MockCalled -CommandName Write-Host -ModuleName Helpers -ParameterFilter { $Object -match "^Configuration succesfully added to.*"} -Exactly -Times 0
         }
     }
+
+Describe "New-ConfigurationTableEntry Get-StorageAccountKey Helper Unit Tests" -Tags @("Unit") {
+    Context "Passed a valid storage account name and resource group" {
+        Mock Get-AzResourceGroup -ModuleName Helpers -MockWith {
+            return @{
+                Name = "foo-bar-rg"
+            }
+        }
+
+        Mock Get-AzStorageAccount -ModuleName Helpers -MockWith {
+            return @{
+                Name = "foobarstr"
+            }
+        }
+
+        Mock Get-AzStorageAccountKey -ModuleName Helpers -MockWith {
+            return @(
+                @{
+                    Value = "not-a-real-account-key"
+                },
+                @{
+                    Value = "not-a-real-secondary-key"
+                }
+            )
+        }
+
+        $Params = @{
+            ResourceGroup = "foo-bar-rg"
+            StorageAccountName = "foobarstr"
+        }
+
+        It "Should return an account key" {
+            $Result = Get-StorageAccountKey @Params
+            $Result | Should -Be "not-a-real-account-key"
+        }
+    }
 }
