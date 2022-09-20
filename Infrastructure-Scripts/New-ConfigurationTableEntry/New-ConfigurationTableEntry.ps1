@@ -67,11 +67,15 @@ Param(
 
 Import-Module $PSScriptRoot/tools/Helpers.psm1 -Force
 
-# --- TODO: Test if source path is a directory
-if (!$SourcePath.EndsWith("/")) {
-    $SourcePath = "$($SourcePath)/"
+$SourcePathItem = Get-Item -Path $SourcePath
+if ($SourcePathItem.PSIsContainer) {
+    $SourcePath = $SourcePathItem.FullName
+}
+else {
+    throw "SourcePath is not a directory"
 }
 
+##TO DO: examine how this works in practice, it's a weird approach.  Why construct a fully qualified path then try to recurse it?
 $SchemaPath = "$($SourcePath)$($TargetFilename)"
 $Schemas = Get-ChildItem -Path $SchemaPath -File -Recurse
 
