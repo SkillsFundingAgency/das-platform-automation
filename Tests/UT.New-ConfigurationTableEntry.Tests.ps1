@@ -1,5 +1,3 @@
-
-
 Describe "New-ConfigurationTableEntry Unit Tests" -Tags @("Unit") {
 
     BeforeAll {
