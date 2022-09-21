@@ -75,9 +75,10 @@ else {
     throw "SourcePath is not a directory"
 }
 
-##TO DO: examine how this works in practice, it's a weird approach.  Why construct a fully qualified path then try to recurse it?
-$SchemaPath = "$($SourcePath)$($TargetFilename)"
-$Schemas = Get-ChildItem -Path $SchemaPath -File -Recurse
+$Schemas = Get-ChildItem -Path $SourcePath -File -Recurse | Where-Object { $_.Name -like $TargetFilename }
+if (!$Schemas) {
+    throw "No schemas retrieved from $SourcePath matching pattern $TargetFilename retrieved"
+}
 
 foreach ($Schema in $Schemas) {
 
