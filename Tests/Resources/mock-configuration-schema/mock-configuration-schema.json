@@ -4,20 +4,19 @@
   "description": "A mock configuration schema",
   "type": "object",
   "properties": {
-
-    "MockArray":{
-      "type":"array",
+    "MockArray": {
+      "type": "array",
       "environmentVariable": "MockConfigurationArray"
     },
-    "MockBool":{
+    "MockBool": {
       "type": "boolean",
       "environmentVariable": "MockConfigurationBool"
     },
-    "MockInt":{
+    "MockInt": {
       "type": "integer",
       "environmentVariable": "MockConfigurationInt"
     },
-    "MockNumber":{
+    "MockNumber": {
       "type": "number",
       "environmentVariable": "MockConfigurationNumber"
     },
@@ -50,15 +49,15 @@
         "MockObjectString"
       ]
     },
-    "MockParentObject":{
+    "MockParentObject": {
       "description": "Mock Configuration Object containing a child object",
       "type": "object",
       "properties": {
-        "MockChildObject":{
+        "MockChildObject": {
           "description": "Mock Configuration Object child object",
           "type": "object",
           "properties": {
-            "MockChildString":{
+            "MockChildString": {
               "type": "string",
               "environmentVariable": "MockConfigurationChildObjectString"
             }
@@ -68,11 +67,15 @@
           ]
         }
       },
-      "required":[
+      "required": [
         "MockChildObject"
       ]
     },
-    "MockString":{
+    "MockSecretString": {
+      "type": "string",
+      "environmentVariable": "MockConfigurationSecretString"
+    },
+    "MockString": {
       "type": "string",
       "environmentVariable": "MockConfigurationString"
     }

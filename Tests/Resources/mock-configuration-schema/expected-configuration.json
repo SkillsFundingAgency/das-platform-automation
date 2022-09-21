@@ -17,5 +17,6 @@
             "MockChildString": "barbar"
         }
     },
+    "MockSecretString": "SecretFoo",
     "MockString": "BarFoo"
 }

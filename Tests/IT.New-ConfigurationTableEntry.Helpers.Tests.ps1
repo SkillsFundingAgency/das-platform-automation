@@ -12,6 +12,8 @@ Describe "New-ConfigurationTableEntry.Helper Integration Tests" -Tags @("Integra
             foreach ($Key in $EnvironmentVariables.variables.keys) {
                 New-Variable -Name $Key -Value $EnvironmentVariables.variables[$Key] -Scope Global -Force
             }
+
+            New-Item -Path Env:\MockConfigurationSecretString -Value SecretFoo
         }
 
         $Params = @{
