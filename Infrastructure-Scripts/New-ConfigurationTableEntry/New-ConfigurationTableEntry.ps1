@@ -42,25 +42,25 @@
 #>
 [CmdletBinding()]
 Param(
-    [Parameter(Mandatory = $True)]
+    [Parameter(Mandatory = $true)]
     [ValidateNotNullOrEmpty()]
     [String]$SourcePath,
-    [Parameter(Mandatory = $True)]
+    [Parameter(Mandatory = $true)]
     [ValidateNotNullOrEmpty()]
     [String]$TargetFilename,
-    [Parameter(Mandatory = $True)]
+    [Parameter(Mandatory = $true)]
     [ValidateNotNullOrEmpty()]
     [String]$StorageAccountName,
-    [Parameter(Mandatory = $True)]
+    [Parameter(Mandatory = $true)]
     [ValidateNotNullOrEmpty()]
     [String]$StorageAccountResourceGroup,
     [Parameter(Mandatory = $true)]
     [ValidateNotNullOrEmpty()]
     [String]$EnvironmentName,
-    [Parameter(Mandatory = $False)]
+    [Parameter(Mandatory = $true)]
     [ValidateNotNullOrEmpty()]
-    [String]$TableName = "configuration",
-    [Parameter(Mandatory = $False)]
+    [String]$TableName,
+    [Parameter(Mandatory = $false)]
     [ValidateNotNullOrEmpty()]
     [String]$Version = "1.0"
 )

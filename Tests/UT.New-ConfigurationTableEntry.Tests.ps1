@@ -30,6 +30,7 @@ Describe "New-ConfigurationTableEntry Unit Tests" -Tags @("Unit") {
         StorageAccountName = "fooconfigstr"
         StorageAccountResourceGroup = "foo-config-rg"
         EnvironmentName   = "BAR"
+        TableName = "FakeConfiguration"
     }
 
     Context "Passed valid SourcePath and TargetFilename that contains a single schema and valid Storage Account details" {
