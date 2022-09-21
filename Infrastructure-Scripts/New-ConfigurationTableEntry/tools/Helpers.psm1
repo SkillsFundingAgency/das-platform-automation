@@ -116,7 +116,6 @@ function Test-ConfigurationEntity {
         [Parameter(Mandatory = $true)]
         [String]$SchemaDefinitionPath
     )
-    ##TO DO: improve this, reports 1 failed property at a time, should report all failures
 
     Write-Host "Validating $($Script:EmojiDictionary.StopWatch)"
     $SchemaDefinition = Get-Content -Path $SchemaDefinitionPath -Raw
@@ -219,7 +218,6 @@ function Get-SchemaProperty {
     if ($PropertyObject.ExtensionData.ContainsKey("environmentVariable")) {
 
         $VariableName = $PropertyObject.ExtensionData.Item("environmentVariable").Value
-        ##TO DO: is there a cleaner way to do this?
         try {
             $TaskVariable = Get-Variable -Name $VariableName -ErrorAction Stop
         }
@@ -280,8 +278,6 @@ function Get-StorageAccountKey {
         [String]$StorageAccountName
     )
 
-    ##TO DO this duplicates Infrastructure-Scripts\Get-StorageAccountConnectionString.ps1, can it be refactored?
-
     # --- Check if the Resource Group exists in the subscription.
     $ResourceGroupExists = Get-AzResourceGroup $ResourceGroup
     if (!$ResourceGroupExists) {
@@ -294,7 +290,6 @@ function Get-StorageAccountKey {
         throw "Storage Account $StorageAccountName does not exist."
     }
 
-    ##TO DO: consider changing error action, failure to get a key doesn't throw error
     $Key = (Get-AzStorageAccountKey -ResourceGroupName $ResourceGroup -Name $StorageAccountName)[0].Value
     Write-Output $Key
 }
