@@ -1,13 +1,5 @@
-Describe "New-ConfigurationTableEntry Build-ConfigurationEntity Helper Unit Tests" -Tags @("Unit") {
-
-    BeforeAll {
-        Set-Location $PSScriptRoot/../Infrastructure-Scripts/New-ConfigurationTableEntry/
-        #Import-Module ./tools/Helpers.psm1 -Force
-    }
-
-    ##TO DO: it's probably not possible to unit test this as mocking will be difficult / impossible in Pester.
-    ## integration or functional tests might be the way to go using dummy schema
-}
+# note: helper functions that directly rely on Newtonsoft.Json.Schema library are tested in integration tests
+# helper functions that indirectly rely on Newtonsoft.Json.Schema (ie those that consume it's results) are not directly tested but they are called during integration testing
 
 Describe "New-ConfigurationTableEntry New-ConfigurationEntity Helper Unit Tests" -Tags @("Unit") {
 
