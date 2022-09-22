@@ -25,7 +25,7 @@
     The environment the configuration is being created in, used as the Partition Key in the Storage Table.
 
     .PARAMETER TableName
-    The table name, defaults to Configuration.
+    The table name.
 
     .PARAMETER Version
     The configuration version, used as part of the row name.  Defaults to '1.0'.
