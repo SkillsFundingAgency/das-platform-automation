@@ -7,6 +7,7 @@ Describe "New-ConfigurationTableEntry.Helper Integration Tests" -Tags @("Integra
 
     Context "A valid schema and complete set of environment variables exists" {
         if (!$ENV:TF_BUILD) {
+            # this module will need to be installed on first run: Install-Module powershell-yaml
             Import-Module powershell-yaml
             $EnvironmentVariables = Get-Content ../../Tests/Resources/mock-configuration-schema/mock-variables.yml | ConvertFrom-Yaml
             foreach ($Key in $EnvironmentVariables.variables.keys) {
