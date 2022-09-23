@@ -21,6 +21,8 @@ stages:
               configFilePath: GitVersion.yml
   - stage: Test
     dependsOn: []
+    variables:
+    - template: Tests/Resources/mock-configuration-schema/mock-variables.yml
     jobs:
       - job: "Windows_PSCore_Build_DAS_Continuous_Integration"
         pool:
@@ -38,9 +40,16 @@ stages:
             displayName: "Validate editorconfig"
             workingDirectory: $(System.DefaultWorkingDirectory)
           - task: PowerShell@2
+            displayName: "Set up variable for integration tests"
+            inputs:
+              targetType: inline
+              script: Write-Output "##vso[task.setvariable variable=MockConfigurationSecretString;issecret=true]SecretFoo"
+          - task: PowerShell@2
             inputs:
               filePath: "Tests/Invoke-Tests.ps1"
               pwsh: true
+            env:
+              MockConfigurationSecretString: $(MockConfigurationSecretString)
           - task: PublishTestResults@2
             displayName: "Publish Test Results **/TEST-*.xml"
             inputs:

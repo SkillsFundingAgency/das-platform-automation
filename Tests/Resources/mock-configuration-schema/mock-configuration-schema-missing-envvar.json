@@ -1,0 +1,37 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Mock DAS Application Configuration",
+  "description": "A mock configuration schema",
+  "type": "object",
+  "properties": {
+    "MockObject": {
+      "description": "Mock Configuration Object, contains other mocked properties",
+      "type": "object",
+      "properties": {
+        "MockBool": {
+          "type": "boolean",
+          "environmentVariable": "MockConfigurationBool"
+        },
+        "MockInt": {
+          "type": "integer",
+          "environmentVariable": "MockConfigurationInt"
+        },
+        "MockNumber": {
+          "type": "number",
+          "environmentVariable": "MockConfigurationNumber"
+        },
+        "MockString": {
+          "type": "string",
+          "environmentVariable": "MockMissingVariable"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "MockBool",
+        "MockInt",
+        "MockNumber",
+        "MockString"
+      ]
+    }
+  }
+}

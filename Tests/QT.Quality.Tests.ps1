@@ -1,4 +1,4 @@
-$Scripts = Get-ChildItem -Path $PSScriptRoot/../Infrastructure-Scripts/*.ps1 -Recurse -File
+$Scripts = Get-ChildItem -Path $PSScriptRoot/../Infrastructure-Scripts/*.ps1 -Recurse -File | Where-Object { $_.FullName -notmatch ".+[\/\\]packages[\/\\]" }
 
 Describe "Script documentation tests" -Tags @("Quality") {
 

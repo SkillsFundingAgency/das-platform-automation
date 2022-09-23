@@ -1,0 +1,22 @@
+{
+    "MockArray": [
+        "foo",
+        "bar"
+    ],
+    "MockBool": false,
+    "MockInt": 2,
+    "MockNumber": 3.4,
+    "MockObject": {
+        "MockObjectInt": 1,
+        "MockObjectBool": true,
+        "MockObjectNumber": 2.3,
+        "MockObjectString": "FooBar"
+    },
+    "MockParentObject": {
+        "MockChildObject": {
+            "MockChildString": "barbar"
+        }
+    },
+    "MockSecretString": "SecretFoo",
+    "MockString": "BarFoo"
+}
