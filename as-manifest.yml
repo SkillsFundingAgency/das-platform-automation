@@ -1,0 +1,11 @@
+schema: https://github.com/SkillsFundingAgency/das-technical-guidance/blob/master/collections/_development_standards/as-manifest.schema.yaml
+
+team: DASD
+
+businessApplication: Platform Tooling
+
+features:
+- Infrastructure Scripts
+
+kind:
+- tooling
