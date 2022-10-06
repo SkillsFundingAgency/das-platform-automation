@@ -38,19 +38,26 @@ Param (
     }
 
     $AppServiceResourceConfig = Get-AzWebAppAccessRestrictionConfig -ResourceGroupName $AppServiceResource.ResourceGroupName -Name $ResourceName
+    Write-Output "Processing app service: $ResourceName ..."
 
-    Write-Output "Processing app service: $ResourceName and Creating rule $RuleName"
+    if (($AppServiceResourceConfig.MainSiteAccessRestrictions.Count) -gt 1){
+        Write-Output "Creating rule: $RuleName"
 
-    # --- Workout next priority number
-    $StartPriority = 100
-    $ExistingPriority = ($AppServiceResourceConfig.MainSiteAccessRestrictions.priority | Where-Object { ($_ -ge $StartPriority) -and $_ -lt [int32]::MaxValue } | Measure-Object -Maximum).Maximum
+        # --- Workout next priority number
+        $StartPriority = 100
+        $ExistingPriority = ($AppServiceResourceConfig.MainSiteAccessRestrictions.priority | Where-Object { ($_ -ge $StartPriority) -and $_ -lt [int32]::MaxValue } | Measure-Object -Maximum).Maximum
 
-    if (!$ExistingPriority) {
-        $NewPriority = $StartPriority
+        if (!$ExistingPriority) {
+            $NewPriority = $StartPriority
+        }
+        else {
+            $NewPriority = $ExistingPriority + 1
+        }
+
+        Write-Output "  -> Rule priority set to $NewPriority"
+        Add-AzWebAppAccessRestrictionRule -ResourceGroupName $AppServiceResource.ResourceGroupName -WebAppName $ResourceName -Name $RuleName -Priority $NewPriority -Action "Allow" -IpAddress "$IpAddress/32"
     }
-    else {
-        $NewPriority = $ExistingPriority + 1
+    else{
+        Write-Output "There are no existing access restrictions on $ResourceName. Whitelist is not required."
     }
 
-    Write-Output "  -> Rule priority set to $NewPriority"
-    Add-AzWebAppAccessRestrictionRule -ResourceGroupName $AppServiceResource.ResourceGroupName -WebAppName $ResourceName -Name $RuleName -Priority $NewPriority -Action "Allow" -IpAddress "$IpAddress/32"
