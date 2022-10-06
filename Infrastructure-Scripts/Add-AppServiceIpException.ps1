@@ -30,7 +30,13 @@ Param (
     [ValidateNotNull()]
     [String]$RuleName
 )
-    $RuleName = $RuleName.Replace(' ', '')
+    if ($RuleName.Length -le 32) {
+        $RuleName = $RuleName.Replace(' ', '')
+    }
+    else {
+        $RuleName = "TEMPORARY_WHITELIST"
+    }
+
     $AppServiceResource = Get-AzResource -Name $ResourceName -ResourceType "Microsoft.Web/sites"
 
     if (!$AppServiceResource) {
@@ -41,7 +47,7 @@ Param (
     Write-Output "Processing app service: $ResourceName ..."
 
     if (($AppServiceResourceConfig.MainSiteAccessRestrictions.Count) -gt 1){
-        Write-Output "Creating rule: $RuleName"
+        Write-Output "  -> Creating rule: $RuleName"
 
         # --- Workout next priority number
         $StartPriority = 100
@@ -56,8 +62,8 @@ Param (
 
         Write-Output "  -> Rule priority set to $NewPriority"
         Add-AzWebAppAccessRestrictionRule -ResourceGroupName $AppServiceResource.ResourceGroupName -WebAppName $ResourceName -Name $RuleName -Priority $NewPriority -Action "Allow" -IpAddress "$IpAddress/32"
+        Write-Output "  -> Rule created successfully."
     }
     else{
-        Write-Output "There are no existing access restrictions on $ResourceName. Whitelist is not required."
+        Write-Output "  -> There are no existing access restrictions on $ResourceName. Whitelist is not required."
     }
-
