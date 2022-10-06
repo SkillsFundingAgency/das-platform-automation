@@ -11,8 +11,8 @@
     .PARAMETER ResourceName
     The name of the app service
 
-    .PARAMETER UpdateReleaseName
-    Update the release name on the AzureDevops release pipeline
+    .PARAMETER RuleName
+    The name of the rule being created
 
     .EXAMPLE
     Add-AppServiceIpException -IpAddress 192.168.0.1 -ResourceName das-foobar
@@ -26,17 +26,11 @@ Param (
     [Parameter(Mandatory = $true)]
     [ValidateNotNull()]
     [String]$ResourceName,
-    [Parameter(Mandatory = $false)]
-    [Switch]$UpdateReleaseName
+    [Parameter(Mandatory = $true)]
+    [ValidateNotNull()]
+    [String]$RuleName
 )
-
-try {
-    if ($UpdateReleaseName.IsPresent) {
-        $ReleaseName = $env:Release_ReleaseName.Replace("Name", "$env:Release_RequestedFor")
-        Write-Output "##vso[release.updatereleasename]$ReleaseName"
-    }
-
-    $Name = $env:Release_RequestedFor.Replace(' ', '')
+    $RuleName = $RuleName.Replace(' ', '')
     $AppServiceResource = Get-AzResource -Name $ResourceName -ResourceType "Microsoft.Web/sites"
 
     if (!$AppServiceResource) {
@@ -45,7 +39,7 @@ try {
 
     $AppServiceResourceConfig = Get-AzWebAppAccessRestrictionConfig -ResourceGroupName $AppServiceResource.ResourceGroupName -Name $ResourceName
 
-    Write-Output "Processing app service: $ResourceName and Creating rule $Name"
+    Write-Output "Processing app service: $ResourceName and Creating rule $RuleName"
 
     # --- Workout next priority number
     $StartPriority = 100
@@ -59,8 +53,4 @@ try {
     }
 
     Write-Output "  -> Rule priority set to $NewPriority"
-    Add-AzWebAppAccessRestrictionRule -ResourceGroupName $AppServiceResource.ResourceGroupName -WebAppName $ResourceName -Name $Name -Priority $NewPriority -Action "Allow" -IpAddress "$IpAddress/32"
-}
-catch {
-    throw "$_"
-}
+    Add-AzWebAppAccessRestrictionRule -ResourceGroupName $AppServiceResource.ResourceGroupName -WebAppName $ResourceName -Name $RuleName -Priority $NewPriority -Action "Allow" -IpAddress "$IpAddress/32"
