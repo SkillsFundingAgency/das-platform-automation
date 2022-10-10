@@ -22,23 +22,25 @@ Param (
     [IPAddress]$IPAddress,
     [Parameter(Mandatory = $true)]
     [ValidateNotNull()]
-    [String]$ResourceName
+    [String[]]$ResourceName
 )
 
+foreach ($Resource in $ResourceName){
 
-$AppServiceResource = Get-AzResource -Name $ResourceName -ResourceType "Microsoft.Web/sites"
+    $AppServiceResource = Get-AzResource -Name $Resource -ResourceType "Microsoft.Web/sites"
 
-if (!$AppServiceResource) {
-    throw "Could not find a resource matching $ResourceName in the subscription"
-}
+    if (!$AppServiceResource) {
+        throw "Could not find a resource matching $Resource in the subscription"
+    }
 
-$AppServiceWhitelist = Get-AzWebAppAccessRestrictionConfig -ResourceGroupName $AppServiceResource.ResourceGroupName -Name $ResourceName | Where-Object { $_.MainSiteAccessRestrictions.IpAddress -eq "$IPAddress/32" }
+    $AppServiceWhitelist = Get-AzWebAppAccessRestrictionConfig -ResourceGroupName $AppServiceResource.ResourceGroupName -Name $Resource | Where-Object { $_.MainSiteAccessRestrictions.IpAddress -eq "$IPAddress/32" }
 
-if (!$AppServiceWhitelist) {
-    Write-Output " -> Could not find whitelisted $IPAddress to remove on $ResourceName!"
-}
-else {
-    Write-Output "  -> Removing $IPAddress from $ResourceName"
-    Remove-AzWebAppAccessRestrictionRule  -ResourceGroupName $AppServiceResource.ResourceGroupName -WebAppName $ResourceName -IpAddress "$IPAddress/32"
-    Write-Output "  -> $IPAddress, removed from $ResourceName!"
+    if (!$AppServiceWhitelist) {
+        Write-Output " -> Could not find whitelisted $IPAddress to remove on $Resource!"
+    }
+    else {
+        Write-Output "  -> Removing $IPAddress from $Resource"
+        Remove-AzWebAppAccessRestrictionRule  -ResourceGroupName $AppServiceResource.ResourceGroupName -WebAppName $Resource -IpAddress "$IPAddress/32"
+        Write-Output "  -> $IPAddress, removed from $Resource!"
+    }
 }
