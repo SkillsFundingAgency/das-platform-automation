@@ -15,7 +15,8 @@
     The name of the rule being created
 
     .EXAMPLE
-    Add-AppServiceIpException -IpAddress 192.168.0.1 -ResourceNames das-foobar -RuleName foobar
+    Add-AppServiceIpException -IpAddress 192.168.0.1 -ResourceNames "das-foobar" -RuleName foobar
+    Add-AppServiceIpException -IpAddress 192.168.0.1 -ResourceNames "das-foobar", "das-barfoo" -RuleName foobar
 #>
 
 [CmdletBinding()]
