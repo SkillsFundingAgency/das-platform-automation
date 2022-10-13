@@ -8,14 +8,14 @@
     .PARAMETER IpAddress
     An ip address to associate with the access restriction rule
 
-    .PARAMETER ResourceName
+    .PARAMETER ResourceNames
     The name of the app service
 
     .PARAMETER RuleName
     The name of the rule being created
 
     .EXAMPLE
-    Add-AppServiceIpException -IpAddress 192.168.0.1 -ResourceName das-foobar
+    Add-AppServiceIpException -IpAddress 192.168.0.1 -ResourceNames das-foobar -RuleName foobar
 #>
 
 [CmdletBinding()]
@@ -25,14 +25,14 @@ Param (
     [IPAddress]$IpAddress,
     [Parameter(Mandatory = $true)]
     [ValidateNotNull()]
-    [String[]]$ResourceName,
+    [String[]]$ResourceNames,
     [Parameter(Mandatory = $true)]
     [ValidateNotNull()]
     [ValidateLength(1,32)]
     [String]$RuleName
 )
 
-foreach ($Resource in $ResourceName){
+foreach ($Resource in $ResourceNames){
 
     $AppServiceResource = Get-AzResource -Name $Resource -ResourceType "Microsoft.Web/sites"
 
