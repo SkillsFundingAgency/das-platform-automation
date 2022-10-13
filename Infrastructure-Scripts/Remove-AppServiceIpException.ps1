@@ -1,9 +1,9 @@
 <#
     .SYNOPSIS
-    Removes an IP address access restriction rule from an app service
+    Removes an IP address access restriction rule from an app service or multiple app services.
 
     .DESCRIPTION
-    Removes an IP address access restriction rule from an app service
+    Removes an IP address access restriction rule from an app service or multiple app services.
 
     .PARAMETER IpAddress
     An ip address to associate with the access restriction rule
