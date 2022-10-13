@@ -9,7 +9,7 @@
     An ip address to associate with the access restriction rule
 
     .PARAMETER ResourceNames
-    The name of the app service
+    The names of the app services required to be looped through. This can be a singular or multiple app services.
 
     .EXAMPLE
     Remove-AppServiceIpException -IPAddress 192.168.0.1 -ResourceNames das-foobar
