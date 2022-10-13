@@ -1,9 +1,9 @@
 <#
     .SYNOPSIS
-    Update the access restriction rules for an app service
+    Update the access restriction rules for a singular or multiple app services.
 
     .DESCRIPTION
-    Update the access restriction rules for an app service
+    Update the access restriction rules for a singular or multiple app services.
 
     .PARAMETER IpAddress
     An ip address to associate with the access restriction rule
