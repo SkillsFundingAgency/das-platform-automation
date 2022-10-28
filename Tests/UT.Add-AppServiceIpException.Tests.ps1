@@ -53,7 +53,10 @@ Describe "Add-AppServiceIpException Unit Tests" -Tags @("Unit") {
                     "Name"              = $Config.whitelistResourceName
                 }
             }
-            Mock Get-AzWebAppAccessRestrictionConfig -MockWith { return $null }
+            Mock Get-AzWebAppAccessRestrictionConfig -MockWith { return @{
+                "MainSiteAccessRestrictions" = @("allow")
+                }
+            }
             Mock Add-AzWebAppAccessRestrictionRule -MockWith { return $null }
             { ./Add-AppServiceIpException -IpAddress $Config.ipAddress -ResourceName $Config.whitelistResourceName -RuleName $Config.ruleName } | Should Not throw
             Assert-MockCalled -CommandName 'Get-AzResource' -Times 1 -Scope It
