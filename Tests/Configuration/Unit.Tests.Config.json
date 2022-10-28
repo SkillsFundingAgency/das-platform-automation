@@ -60,5 +60,5 @@
   "guid": "8bb58c80-06f9-4007-ba54-1f7e919c16d7",
   "aadGroupObjectIdArray": "['a','b','c']",
   "whitelistResourceName": ["AResource","BResource"],
-  "whitelistResourceNameSingle": ["AResource"]
+  "whitelistResourceNameSingle": "AResource"
 }
