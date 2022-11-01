@@ -34,10 +34,10 @@ function Build-ConfigurationEntity {
 
     Write-Host "Parsing schema: $(([System.IO.FileInfo]$SchemaDefinitionPath).Name) $($Script:EmojiDictionary.Lightning)"
     $SchemaDefinition = Get-Content -Path $SchemaDefinitionPath -Raw
-    $SchemaObject = [Newtonsoft.Json.Schema.JSchema, Newtonsoft.Json.Schema, Version = 2.0.0.0, Culture = neutral, PublicKeyToken = 30ad4fe6b2a6aeed]::Parse($SchemaDefinition)
+    $SchemaObject = [Newtonsoft.Json.Schema.JSchema, Newtonsoft.Json.Schema, Version = 3.0.0.0, Culture = neutral, PublicKeyToken = 30ad4fe6b2a6aeed]::Parse($SchemaDefinition)
 
     Write-Host "Processing properties"
-    $Settings = [Newtonsoft.Json.JsonSerializerSettings, Newtonsoft.Json, Version = 9.0.0.0, Culture = neutral, PublicKeyToken = 30ad4fe6b2a6aeed]::new()
+    $Settings = [Newtonsoft.Json.JsonSerializerSettings, Newtonsoft.Json, Version = 13.0.0.0, Culture = neutral, PublicKeyToken = 30ad4fe6b2a6aeed]::new()
     $Settings.MaxDepth = 100
     $Schema = Expand-Schema -PropertyObject $SchemaObject.Properties
     $Configuration = ($Schema | ConvertTo-Json -Depth 10 -Compress)
@@ -119,11 +119,11 @@ function Test-ConfigurationEntity {
 
     Write-Host "Validating $($Script:EmojiDictionary.StopWatch)"
     $SchemaDefinition = Get-Content -Path $SchemaDefinitionPath -Raw
-    $SchemaObject = [Newtonsoft.Json.Schema.JSchema, Newtonsoft.Json.Schema, Version = 2.0.0.0, Culture = neutral, PublicKeyToken = 30ad4fe6b2a6aeed]::Parse($SchemaDefinition)
+    $SchemaObject = [Newtonsoft.Json.Schema.JSchema, Newtonsoft.Json.Schema, Version = 3.0.0.0, Culture = neutral, PublicKeyToken = 30ad4fe6b2a6aeed]::Parse($SchemaDefinition)
 
-    $ConfigurationObject = [Newtonsoft.Json.Linq.JObject, Newtonsoft.Json, Version = 9.0.0.0, Culture = neutral, PublicKeyToken = 30ad4fe6b2a6aeed]::Parse($Configuration)
+    $ConfigurationObject = [Newtonsoft.Json.Linq.JObject, Newtonsoft.Json, Version = 13.0.0.0, Culture = neutral, PublicKeyToken = 30ad4fe6b2a6aeed]::Parse($Configuration)
     try {
-        [Newtonsoft.Json.Schema.SchemaExtensions, Newtonsoft.Json.Schema, Version = 2.0.0.0, Culture = neutral, PublicKeyToken = 30ad4fe6b2a6aeed]::Validate($ConfigurationObject, $SchemaObject)
+        [Newtonsoft.Json.Schema.SchemaExtensions, Newtonsoft.Json.Schema, Version = 3.0.0.0, Culture = neutral, PublicKeyToken = 30ad4fe6b2a6aeed]::Validate($ConfigurationObject, $SchemaObject)
     }
     catch {
         throw $_
