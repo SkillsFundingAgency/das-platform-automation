@@ -64,4 +64,23 @@ Describe "Add-AppServiceIpException Unit Tests" -Tags @("Unit") {
             Assert-MockCalled -CommandName 'Add-AzWebAppAccessRestrictionRule' -Times 0 -Scope It
         }
     }
+
+    Context "Resource exists and has a deny all rule present in it's access restrictions" {
+        It "The specified Resource Config was identified to have a deny all network restriction, whitelist will be added at a lesser priority to the DenyAll rule" {
+            Mock Get-AzResource -MockWith { return @{
+                    "ResourceGroupName" = $Config.resourceGroupName
+                    "Name"              = $Config.whitelistResourceName
+                }
+            }
+            Mock Get-AzWebAppAccessRestrictionConfig -MockWith { return @{
+                "MainSiteAccessRestrictions" = @("Deny")
+                }
+            }
+            Mock Add-AzWebAppAccessRestrictionRule -MockWith { return $null }
+            { ./Add-AppServiceIpException -IpAddress $Config.ipAddress -ResourceName $Config.whitelistResourceName -RuleName $Config.ruleName } | Should Not throw
+            Assert-MockCalled -CommandName 'Get-AzResource' -Times 1 -Scope It
+            Assert-MockCalled -CommandName 'Get-AzWebAppAccessRestrictionConfig' -Times 1 -Scope It
+            Assert-MockCalled -CommandName 'Add-AzWebAppAccessRestrictionRule' -Times 0 -Scope It
+        }
+    }
 }

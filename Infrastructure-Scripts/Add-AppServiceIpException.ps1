@@ -62,7 +62,7 @@ foreach ($Resource in $ResourceNames){
         Add-AzWebAppAccessRestrictionRule -ResourceGroupName $AppServiceResource.ResourceGroupName -WebAppName $Resource -Name $RuleName -Priority $NewPriority -Action "Allow" -IpAddress "$IpAddress/32"
         Write-Output "  -> Rule created successfully."
     }
-    if (($AppServiceResourceConfig.MainSiteAccessRestrictions[0].Action) -eq 'Deny'){
+    elseif (($AppServiceResourceConfig.MainSiteAccessRestrictions[0].Action) -eq 'Deny'){
         Write-Output "  -> Creating rule: $RuleName"
 
         # --- Workout next priority number
