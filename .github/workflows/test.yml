@@ -1,0 +1,31 @@
+name: Test
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Validate editorconfig
+        working-directory: .
+        run: |
+          npm install eclint
+          node ./node_modules/eclint/bin/eclint.js check
+      - name: "Install PowerShell modules"
+        run: |
+          Install-Module -Name Pester -RequiredVersion 4.10.1 -Force
+          Install-Module -Name powershell-yaml -Force
+          ## Below modules can be removed once all Az/AzTable cmdlets are defined as empty functions and mocked within Pester tests
+          Install-Module -Name Az -AllowClobber -Force
+          Install-Module -Name AzTable -AllowClobber -Force
+        shell: pwsh
+      - name: Invoke Tests
+        run: ./Tests/Invoke-Tests.ps1
+        shell: pwsh
+      - name: Publish Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: always()
+        with:
+          nunit_files: "**/TEST-*.xml"
