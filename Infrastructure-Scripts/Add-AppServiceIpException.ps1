@@ -44,7 +44,7 @@ foreach ($Resource in $ResourceNames){
     $AppServiceResourceConfig = Get-AzWebAppAccessRestrictionConfig -ResourceGroupName $AppServiceResource.ResourceGroupName -Name $Resource
     Write-Output "Processing app service: $Resource ..."
 
-    if (($AppServiceResourceConfig.MainSiteAccessRestrictions.Count) -gt 1){
+    if ((($AppServiceResourceConfig.MainSiteAccessRestrictions.Count) -gt 1) -and (($AppServiceResourceConfig.MainSiteAccessRestrictions[0].Action) -ne 'Deny')){
         Write-Output "  -> Creating rule: $RuleName"
 
         # --- Workout next priority number
@@ -56,6 +56,24 @@ foreach ($Resource in $ResourceNames){
         }
         else {
             $NewPriority = $ExistingPriority + 1
+        }
+
+        Write-Output "  -> Rule priority set to $NewPriority"
+        Add-AzWebAppAccessRestrictionRule -ResourceGroupName $AppServiceResource.ResourceGroupName -WebAppName $Resource -Name $RuleName -Priority $NewPriority -Action "Allow" -IpAddress "$IpAddress/32"
+        Write-Output "  -> Rule created successfully."
+    }
+    elseif (($AppServiceResourceConfig.MainSiteAccessRestrictions[0].Action) -eq 'Deny'){
+        Write-Output "  -> Creating rule: $RuleName"
+
+        # --- Workout next priority number
+        $StartPriority = $AppServiceResourceConfig.MainSiteAccessRestrictions[0].Priority
+        $ExistingPriority = ($AppServiceResourceConfig.MainSiteAccessRestrictions.priority | Where-Object { ($_ -ge $StartPriority) -and $_ -lt [int32]::MaxValue } | Measure-Object -Maximum).Maximum
+
+        if (!$ExistingPriority) {
+            $NewPriority = $StartPriority
+        }
+        else {
+            $NewPriority = $ExistingPriority - 1
         }
 
         Write-Output "  -> Rule priority set to $NewPriority"
