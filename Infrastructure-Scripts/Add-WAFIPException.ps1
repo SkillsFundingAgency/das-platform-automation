@@ -19,6 +19,9 @@
 Param (
     [Parameter(Mandatory = $true)]
     [ValidateNotNull()]
+    [String]$resourceGroupName,
+    [Parameter(Mandatory = $true)]
+    [ValidateNotNull()]
     [IPAddress]$IPAddress,
     [Parameter(Mandatory = $true)]
     [ValidateNotNull()]
@@ -30,7 +33,7 @@ Param (
 
 # Get the WAF policy
 $policyName = @('dasppsharedfewp', 'dasppsharedbewp')
-$wafPolicy = Get-AzApplicationGatewayFirewallPolicy -Name $policyName -ResourceGroupName "das-pp-firewall-rg"
+$wafPolicy = Get-AzApplicationGatewayFirewallPolicy -Name $policyName -ResourceGroupName $resourceGroupName
 
 # Check if the IP address already exists in the WAF whitelist
 $IPExists = $wafPolicy.CustomRules | Where-Object { $_.MatchCondition.MatchValues -contains $IPAddress }
