@@ -33,7 +33,7 @@ $policyName = @('dasppsharedfewp', 'dasppsharedbewp')
 $wafPolicy = Get-AzApplicationGatewayFirewallPolicy -Name $policyName -ResourceGroupName "das-pp-firewall-rg"
 
 # Check if the IP address already exists in the WAF whitelist
-$IPExists = $wafpolicy.CustomRules | Where-Object { $_.MatchCondition.MatchValues -contains $IPAddress }
+$IPExists = $wafPolicy.CustomRules | Where-Object { $_.MatchCondition.MatchValues -contains $IPAddress }
 
 # Creates a match variable for firewall condition and a match condition for custom rule
 $matchVariable = Get-AzApplicationGatewayFirewallMatchVariable -VariableName "RemoteAddr"
