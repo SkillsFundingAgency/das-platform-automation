@@ -1,58 +1,69 @@
-    <#
-        .SYNOPSIS
-        Add a custom rule to whitelist an IP address on the WAF
-        
-        .DESCRIPTION
-        Add a custom rule to whitelist an IP address on the WAF
+<#
+    .SYNOPSIS
+    Add a custom rule to whitelist an IP address on the WAF
+    
+    .DESCRIPTION
+    Add a custom rule to whitelist an IP address on the WAF
 
-        .PARAMETER IPAddress
-        An IP address to add to the ip range filter
+    .PARAMETER ResourceGroupName
+    Name of the resource group
 
-        .PARAMETER Name
-        Name of the firewall rule
+    .PARAMETER PolicyName
+    Name of the Web Application Firewall policy
 
-        .PARAMETER Priority
-        Priority of the rule
-    #>
+    .PARAMETER IPAddress
+    An IP address to add to the ip range filter
 
-    [CmdletBinding()]
-    Param (
-        [Parameter(Mandatory = $true)]
-        [ValidateNotNull()]
-        [String]$policyName,
-        [Parameter(Mandatory = $true)]
-        [ValidateNotNull()]
-        [String]$resourceGroupName,
-        [Parameter(Mandatory = $true)]
-        [ValidateNotNull()]
-        [IPAddress]$IPAddress,
-        [Parameter(Mandatory = $true)]
-        [ValidateNotNull()]
-        [String]$Name,
-        [Parameter(Mandatory = $true)]
-        [ValidateNotNull()]
-        [String]$Priority
-    )
+    .PARAMETER Name
+    Name of the user who will whitelist their IP
+#>
 
-    # Get the WAF policy
-    $wafPolicy = Get-AzApplicationGatewayFirewallPolicy -Name $policyName -ResourceGroupName $resourceGroupName
+[CmdletBinding()]
+Param (
+    [Parameter(Mandatory = $true)]
+    [ValidateNotNull()]
+    [String]$ResourceGroupName,
+    [Parameter(Mandatory = $true)]
+    [ValidateNotNull()]
+    [String]$PolicyName,
+    [Parameter(Mandatory = $true)]
+    [ValidateNotNull()]
+    [IPAddress]$IPAddress,
+    [Parameter(Mandatory = $true)]
+    [ValidateNotNull()]
+    [String]$Name
+)
 
-    # Check if the IP address already exists in the WAF whitelist
-    $IPExists = $wafPolicy.CustomRules | Where-Object { $_.MatchCondition.MatchValues -contains $IPAddress }
+# Get the WAF policy
+$WafPolicy = Get-AzApplicationGatewayFirewallPolicy -Name $PolicyName -ResourceGroupName $ResourceGroupName
 
-    # Creates a match variable for firewall condition and a match condition for custom rule
-    $matchVariable = New-AzApplicationGatewayFirewallMatchVariable -VariableName "RemoteAddr"
+# Creates a match variable for firewall condition and a match condition for custom rule
+$MatchVariable = New-AzApplicationGatewayFirewallMatchVariable -VariableName "RemoteAddr"
 
-    $matchCondition = New-AzApplicationGatewayFirewallCondition -MatchVariable $matchVariable -Operator IPMatch -MatchValue $IPAddress
+$MatchCondition = New-AzApplicationGatewayFirewallCondition -MatchVariable $MatchVariable -Operator IPMatch -MatchValue $IPAddress
 
-    # Create a new custom rule with the match condition set above and allow action
-    $customRule = New-AzApplicationGatewayFirewallCustomRule -Name $Name -Priority $Priority -RuleType MatchRule -MatchCondition $matchCondition -Action Allow
+# Check if the IP address already exists in the WAF whitelist
+$IPExists = $WafPolicy.CustomRules | Where-Object { $_.MatchCondition.MatchValues -contains $IPAddress }
 
-    # Add the IP address to the WAF whitelist if it doesn't already exist
-    if (!$IPExists) {
-        $wafPolicy.CustomRules.Add($customRule)
-        Set-AzApplicationGatewayFirewallPolicy -InputObject $wafPolicy
-        Write-Host "The IP address $IPAddress has been added to the WAF whitelist."
-    } else {
-        Write-Host "The IP address $IPAddress is already in the WAF whitelist."
-    }
+# Workout which priority the custom rule should be
+$StartPriority = 1
+$CurrentHighestPriority = ($WafPolicy.CustomRules | Measure-Object -Property Priority -Maximum).Maximum
+
+if (!$WafPolicy.CustomRules) {
+    $NewPriority = $StartPriority
+}
+else {
+    $NewPriority = $CurrentHighestPriority + 1
+}
+
+# Create a new custom rule with the match condition set above and allow action
+$CustomRule = New-AzApplicationGatewayFirewallCustomRule -Name $Name -Priority $NewPriority -RuleType MatchRule -MatchCondition $MatchCondition -Action Allow
+
+# Add the IP address to the WAF whitelist if it doesn't already exist
+if (!$IPExists) {
+    $WafPolicy.CustomRules.Add($CustomRule)
+    Set-AzApplicationGatewayFirewallPolicy -InputObject $WafPolicy
+    Write-Host "The IP address $IPAddress has been added to the WAF whitelist."
+} else {
+    Write-Host "The IP address $IPAddress is already in the WAF whitelist."
+}
