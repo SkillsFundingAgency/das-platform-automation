@@ -9,7 +9,7 @@ Describe "Add IP address to WAF whitelist" {
             Mock Get-AzApplicationGatewayFirewallPolicy -MockWith { return $Policy }
 
             $WafPolicy = Get-AzApplicationGatewayFirewallPolicy
-        
+
             $WafPolicy | Should Not Be $null
         }
     }
@@ -26,14 +26,14 @@ Describe "Add IP address to WAF whitelist" {
             $IPAddress = '10.0.0.1'
 
             $IPExists = $WafPolicy.CustomRules | Where-Object { $_.MatchCondition.MatchValues -contains $IPAddress }
-            
+
             $IPExists | Should Be $true
         }
         It "does not exist" {
             $IPAddress = $null
 
             $IPExists = $WafPolicy.CustomRules | Where-Object { $_.MatchCondition.MatchValues -contains $IPAddress }
-            
+
             $IPExists | Should Not Be $true
         }
     }
@@ -71,7 +71,7 @@ Describe "Add IP address to WAF whitelist" {
 
         It 'should create a custom rule' {
             $CustomRule = Get-AzApplicationGatewayFirewallPolicy
-        
+
             $CustomRule | Should Not Be $null
         }
         It 'should add a new custom rule' {

@@ -1,7 +1,7 @@
 <#
     .SYNOPSIS
     Add a custom rule to whitelist an IP address on the WAF
-    
+
     .DESCRIPTION
     Add a custom rule to whitelist an IP address on the WAF
 
