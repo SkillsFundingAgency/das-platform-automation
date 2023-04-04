@@ -16,22 +16,25 @@
 
     .PARAMETER Name
     Name of the user who will whitelist their IP
+
+    .EXAMPLE
+    Add-WAFIPException -Name JoeBlogs -IPAddress 192.168.0.1 -PolicyName daspolicy -ResourceGroupName rgname
 #>
 
 [CmdletBinding()]
 Param (
     [Parameter(Mandatory = $true)]
     [ValidateNotNull()]
-    [String]$ResourceGroupName,
-    [Parameter(Mandatory = $true)]
-    [ValidateNotNull()]
-    [String]$PolicyName,
+    [String]$Name,
     [Parameter(Mandatory = $true)]
     [ValidateNotNull()]
     [IPAddress]$IPAddress,
     [Parameter(Mandatory = $true)]
     [ValidateNotNull()]
-    [String]$Name
+    [String]$PolicyName,
+    [Parameter(Mandatory = $true)]
+    [ValidateNotNull()]
+    [String]$ResourceGroupName
 )
 
 # Get the WAF policy
