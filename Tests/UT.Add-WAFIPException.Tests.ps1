@@ -30,7 +30,7 @@ Describe "Add IP address to WAF whitelist" {
             $IPExists | Should Be $true
         }
         It "does not exist" {
-            $IPAddress = '192.158.0.1'
+            $IPAddress = $null
 
             $IPExists = $WafPolicy.CustomRules | Where-Object { $_.MatchCondition.MatchValues -contains $IPAddress }
             
