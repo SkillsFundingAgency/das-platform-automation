@@ -15,15 +15,14 @@ Describe "Add IP address to WAF whitelist" {
     }
 
     Context "Check for users IP address" {
-        It "does exist" {
-            $WafPolicy = [PSCustomObject]@{
-                CustomRules = [PSCustomObject]@{
-                    MatchCondition = [PSCustomObject]@{
-                        MatchValues = @('192.168.0.10', '10.0.0.1')
-                    }
+        $WafPolicy = [PSCustomObject]@{
+            CustomRules = [PSCustomObject]@{
+                MatchCondition = [PSCustomObject]@{
+                    MatchValues = @('192.168.0.10', '10.0.0.1')
                 }
             }
-            
+        }
+        It "does exist" {
             $IPAddress = '10.0.0.1'
 
             $IPExists = $WafPolicy.CustomRules | Where-Object { $_.MatchCondition.MatchValues -contains $IPAddress }
@@ -31,14 +30,6 @@ Describe "Add IP address to WAF whitelist" {
             $IPExists | Should Be $true
         }
         It "does not exist" {
-            $WafPolicy = [PSCustomObject]@{
-                CustomRules = [PSCustomObject]@{
-                    MatchCondition = [PSCustomObject]@{
-                        MatchValues = @('192.168.0.10', '10.0.0.1')
-                    }
-                }
-            }
-            
             $IPAddress = '192.158.0.1'
 
             $IPExists = $WafPolicy.CustomRules | Where-Object { $_.MatchCondition.MatchValues -contains $IPAddress }
