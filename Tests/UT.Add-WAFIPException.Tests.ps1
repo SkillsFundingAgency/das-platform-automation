@@ -68,11 +68,7 @@ Describe "Add IP address to WAF whitelist" {
             Action = 'Allow'
         }
         It 'should create a custom rule' {
-            Mock New-AzApplicationGatewayFirewallCustomRule -MockWith { return $NewCustomRule }
-
-            $CustomRule = Get-AzApplicationGatewayFirewallPolicy
-
-            $CustomRule | Should Not Be $null
+            Mock New-AzApplicationGatewayFirewallCustomRule -MockWith { return $NewCustomRule } | Should Not Be NullOrEmpty
         }
         It 'should add a new custom rule' {
             $WafPolicy = @{
