@@ -75,8 +75,8 @@ Describe "Add IP address to WAF whitelist" {
             $CustomRule | Should Not Be $null
         }
         It 'should add a new custom rule' {
-            $WafPolicy = @{ 
-                CustomRules = @() 
+            $WafPolicy = @{
+                CustomRules = @()
             }
             $IPExists = $null
             $CustomRuleCreated = if ($IPExists) {
@@ -85,8 +85,8 @@ Describe "Add IP address to WAF whitelist" {
             $CustomRuleCreated | Should Not Be NullOrEmpty
         }
         It 'should not add a new custom rule' {
-            $WafPolicy = @{ 
-                CustomRules = @() 
+            $WafPolicy = @{
+                CustomRules = @()
             }
             $IPExists = $null
             $CustomRuleCreated = if (!$IPExists) {
