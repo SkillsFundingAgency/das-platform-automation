@@ -34,13 +34,14 @@ Describe "Add IP address to WAF whitelist" {
     }
 
     context "Check which priority custom rule should be set as" {
-        $StartPriority = 1
         it "sets the new priority as the starting priority" {
-            $WafPolicy = $null
-            $NewPriority = if (!$WafPolicy.CustomRules) {
-            $StartPriority
+            $WafPolicy = @{
+                CustomRules = @()
             }
-
+            $StartPriority = 1
+            if ($WafPolicy.CustomRules.Count -eq 0) {
+                $NewPriority = $StartPriority
+            }
             $NewPriority | Should Be 1
         }
         it "sets the new priority as the next highest priority" {
@@ -52,8 +53,8 @@ Describe "Add IP address to WAF whitelist" {
             }
 
             $CurrentHighestPriority = ($WafPolicy.CustomRules | Measure-Object -Property Priority -Maximum).Maximum
-            $NewPriority = if ($WafPolicy.CustomRules) {
-                $CurrentHighestPriority + 1
+            if ($WafPolicy.CustomRules) {
+                $NewPriority = $CurrentHighestPriority + 1
             }
             $NewPriority | Should Be 3
         }
