@@ -44,8 +44,11 @@ Describe "Add IP address to WAF whitelist" {
             $NewPriority | Should Be 1
         }
         it "sets the new priority as the next highest priority" {
-            $WafPolicy = [pscustomobject]@{
-                CustomRules = @([pscustomobject]@{ Priority = 1},[pscustomobject]@{ Priority = 2})
+            $WafPolicy = @{
+                CustomRules = @(
+                    @{ Priority = 1},
+                    @{ Priority = 2}
+                )
             }
 
             $CurrentHighestPriority = ($WafPolicy.CustomRules | Measure-Object -Property Priority -Maximum).Maximum
