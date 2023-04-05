@@ -10,9 +10,9 @@ Describe "Add IP address to WAF whitelist" {
     }
 
     Context "Check for users IP address" {
-        $WafPolicy = [PSCustomObject]@{
-            CustomRules = [PSCustomObject]@{
-                MatchCondition = [PSCustomObject]@{
+        $WafPolicy = @{
+            CustomRules = @{
+                MatchCondition = @{
                     MatchValues = @('192.168.0.10', '10.0.0.1')
                 }
             }
