@@ -8,6 +8,7 @@ Describe "Add IP address to WAF whitelist" {
             Mock Get-AzApplicationGatewayFirewallPolicy -MockWith { return $Policy } | Should Not Be NullOrEmpty
         }
     }
+
     Context "Check for users IP address" {
         $WafPolicy = [PSCustomObject]@{
             CustomRules = [PSCustomObject]@{
@@ -31,6 +32,7 @@ Describe "Add IP address to WAF whitelist" {
             $IPExists | Should Not Be $true
         }
     }
+
     context "Check which priority custom rule should be set as" {
         $StartPriority = 1
         it "sets the new priority as the starting priority" {
@@ -53,6 +55,7 @@ Describe "Add IP address to WAF whitelist" {
             $NewPriority | Should Be 3
         }
     }
+
     Context "Creation of custom rule" {
         $NewCustomRule = @{
             Name = 'test'
