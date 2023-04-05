@@ -67,24 +67,28 @@ Describe "Add IP address to WAF whitelist" {
             MatchCondition = 'MatchCondition'
             Action = 'Allow'
         }
+        It 'should create a custom rule' {
             Mock New-AzApplicationGatewayFirewallCustomRule -MockWith { return $NewCustomRule }
 
-        It 'should create a custom rule' {
             $CustomRule = Get-AzApplicationGatewayFirewallPolicy
 
             $CustomRule | Should Not Be $null
         }
         It 'should add a new custom rule' {
+            $WafPolicy = @{ 
+                CustomRules = @() 
+            }
             $IPExists = $null
-            $WafPolicy.CustomRules = $null
             $CustomRuleCreated = if ($IPExists) {
-            $WafPolicy.CustomRules += New-AzApplicationGatewayFirewallCustomRule
+            $WafPolicy.CustomRules += $NewCustomRule
             }
             $CustomRuleCreated | Should Not Be NullOrEmpty
         }
         It 'should not add a new custom rule' {
+            $WafPolicy = @{ 
+                CustomRules = @() 
+            }
             $IPExists = $null
-            $WafPolicy.CustomRules = $null
             $CustomRuleCreated = if (!$IPExists) {
             $WafPolicy.CustomRules
             }
