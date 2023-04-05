@@ -5,11 +5,9 @@ Describe "Add IP address to WAF whitelist" {
                 ResourceGroupName = 'myResourceGroup'
                 PolicyName = 'myPolicy'
             }
-
             Mock Get-AzApplicationGatewayFirewallPolicy -MockWith { return $Policy } | Should Not Be NullOrEmpty
         }
     }
-
     Context "Check for users IP address" {
         $WafPolicy = [PSCustomObject]@{
             CustomRules = [PSCustomObject]@{
