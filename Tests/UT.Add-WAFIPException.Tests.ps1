@@ -6,11 +6,7 @@ Describe "Add IP address to WAF whitelist" {
                 PolicyName = 'myPolicy'
             }
 
-            Mock Get-AzApplicationGatewayFirewallPolicy -MockWith { return $Policy }
-
-            $WafPolicy = Get-AzApplicationGatewayFirewallPolicy
-
-            $WafPolicy | Should Not Be $null
+            Mock Get-AzApplicationGatewayFirewallPolicy -MockWith { return $Policy } | Should Not Be NullOrEmpty
         }
     }
 
