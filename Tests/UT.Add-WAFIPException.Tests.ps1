@@ -91,7 +91,7 @@ Describe "Add-WAFIPException Unit Tests" -Tags @("Unit") {
             Action = 'Allow'
         }
         It 'should create a custom rule' {
-            Mock New-AzApplicationGatewayFirewallCustomRule -MockWith { 
+            Mock New-AzApplicationGatewayFirewallCustomRule -MockWith {
                 return @{
                     Name = 'test'
                     Priority = '3'
