@@ -1,5 +1,5 @@
 $Config = Get-Content $PSScriptRoot\..\Tests\Configuration\Unit.Tests.Config.json -Raw | ConvertFrom-Json
-Set-Location C:\Users\rdebr\OneDrive\Desktop\Repo\das-platform-automation\Infrastructure-Scripts
+Set-Location $PSScriptRoot\..\Infrastructure-Scripts\
 
 Describe "Add-WAFIPException Unit Tests" -Tags @("Unit") {
 
