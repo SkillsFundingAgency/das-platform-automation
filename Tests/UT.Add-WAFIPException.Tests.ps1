@@ -55,8 +55,8 @@ Describe "Add-WAFIPException Unit Tests" -Tags @("Unit") {
         }
     }
 
-    context "Check which priority custom rule should be set as" {
-        it "sets the new priority as the starting priority" {
+    Context "Check which priority custom rule should be set as" {
+        It "sets the new priority as the starting priority" {
             $WafPolicy = @{
                 CustomRules = @()
             }
@@ -66,7 +66,7 @@ Describe "Add-WAFIPException Unit Tests" -Tags @("Unit") {
             }
             $NewPriority | Should Be 1
         }
-        it "sets the new priority as the next highest priority" {
+        It "sets the new priority as the next highest priority" {
             $WafPolicy = @{
                 CustomRules = @(
                     @{ Priority = 1},
