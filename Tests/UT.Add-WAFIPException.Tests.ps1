@@ -44,7 +44,7 @@ Describe "Add-WAFIPException Unit Tests" -Tags @("Unit") {
 
             $IPExists = $WafPolicy.CustomRules | Where-Object { $_.MatchCondition.MatchValues -contains $IPAddress }
 
-            $IPExists | Should Be $true
+            $IPExists | Should -Be $true
         }
         It "does not exist" {
             $IPAddress = ""
@@ -64,7 +64,7 @@ Describe "Add-WAFIPException Unit Tests" -Tags @("Unit") {
             if ($WafPolicy.CustomRules.Count -eq 0) {
                 $NewPriority = $StartPriority
             }
-            $NewPriority | Should Be 1
+            $NewPriority | Should -Be 1
         }
         It "sets the new priority as the next highest priority" {
             $WafPolicy = @{
@@ -78,7 +78,7 @@ Describe "Add-WAFIPException Unit Tests" -Tags @("Unit") {
             if ($WafPolicy.CustomRules) {
                 $NewPriority = $CurrentHighestPriority + 1
             }
-            $NewPriority | Should Be 3
+            $NewPriority | Should -Be 3
         }
     }
 
