@@ -68,6 +68,7 @@ else {
 
 # Create a new custom rule with the match condition set above and allow action
 $CustomRule = New-AzApplicationGatewayFirewallCustomRule -Name $Name -Priority $NewPriority -RuleType MatchRule -MatchCondition $MatchCondition -Action Allow
+
 try {
     # Add the IP address to the WAF whitelist if it doesn't already exist
     if ($IPExists) {
