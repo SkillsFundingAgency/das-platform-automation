@@ -46,7 +46,14 @@ $MatchVariable = New-AzApplicationGatewayFirewallMatchVariable -VariableName "Re
 $MatchCondition = New-AzApplicationGatewayFirewallCondition -MatchVariable $MatchVariable -Operator IPMatch -MatchValue $IPAddress
 
 # Check if the IP address already exists in the WAF whitelist
-$IPExists = $WafPolicy.CustomRules | Where-Object { $_.MatchCondition.MatchValues -contains $IPAddress }
+foreach ($Value in $Wafpolicy.CustomRules.MatchConditions.MatchValues) {
+    if ($Value -contains $IPAddress) {
+        $IPExists = $true
+    }
+    else {
+        $IPExists = $false
+    }
+}
 
 # Workout which priority the custom rule should be
 $StartPriority = 1
@@ -63,10 +70,10 @@ else {
 $CustomRule = New-AzApplicationGatewayFirewallCustomRule -Name $Name -Priority $NewPriority -RuleType MatchRule -MatchCondition $MatchCondition -Action Allow
 
 # Add the IP address to the WAF whitelist if it doesn't already exist
-if (!$IPExists) {
+if ($IPExists) {
+    Write-Host "The IP address $IPAddress is already in the WAF whitelist."
+} else {
     $WafPolicy.CustomRules.Add($CustomRule)
     Set-AzApplicationGatewayFirewallPolicy -InputObject $WafPolicy
     Write-Host "The IP address $IPAddress has been added to the WAF whitelist."
-} else {
-    Write-Host "The IP address $IPAddress is already in the WAF whitelist."
 }
