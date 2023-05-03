@@ -72,7 +72,7 @@ try {
     # Add the IP address to the WAF whitelist if it doesn't already exist
     if ($IPExists) {
         Write-Host "The IP address $IPAddress is already in the WAF whitelist."
-    } 
+    }
     else {
         $WafPolicy.CustomRules.Add($CustomRule)
         Set-AzApplicationGatewayFirewallPolicy -InputObject $WafPolicy
