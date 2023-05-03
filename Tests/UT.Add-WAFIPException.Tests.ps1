@@ -42,14 +42,24 @@ Describe "Add-WAFIPException Unit Tests" -Tags @("Unit") {
         It "does exist" {
             $IPAddress = "10.0.0.1"
 
-            $IPExists = $WafPolicy.CustomRules | Where-Object { $_.MatchCondition.MatchValues -contains $IPAddress }
+            if ($WafPolicy.CustomRules.MatchCondition.MatchValues -contains $IPAddress) {
+                $IPExists = $true
+            }
+            else {
+                $IPExists = $false
+            }
 
             $IPExists | Should -Be $true
         }
         It "does not exist" {
             $IPAddress = ""
 
-            $IPExists = $WafPolicy.CustomRules | Where-Object { $_.MatchCondition.MatchValues -contains $IPAddress }
+            if ($WafPolicy.CustomRules.MatchCondition.MatchValues -contains $IPAddress) {
+                $IPExists = $true
+            }
+            else {
+                $IPExists = $false
+            }
 
             $IPExists | Should -Not -Be $true
         }

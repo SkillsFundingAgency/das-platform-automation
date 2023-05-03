@@ -46,7 +46,7 @@ $MatchVariable = New-AzApplicationGatewayFirewallMatchVariable -VariableName "Re
 $MatchCondition = New-AzApplicationGatewayFirewallCondition -MatchVariable $MatchVariable -Operator IPMatch -MatchValue $IPAddress
 
 # Check if the IP address already exists in the WAF whitelist
-foreach ($IP in $Wafpolicy.CustomRules.MatchConditions.MatchValues) {
+foreach ($IP in $WafPolicy.CustomRules.MatchConditions.MatchValues) {
     if ($IP -contains $IPAddress) {
         $IPExists = $true
     }
