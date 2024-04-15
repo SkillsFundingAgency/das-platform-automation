@@ -35,6 +35,9 @@
     .PARAMETER ImportRetries
     (optional) The number of times to retry importing the API definition, defaults to 3
 
+    .PARAMETER AddXForwardedAuthorization
+    (optional) The boolean for adding a new header called X-Forwarded-Authorization that is set to be the original inbound Authorization value
+
     .EXAMPLE
     Import-ApimSwaggerApiDefinition -ApimResourceGroup das-at-foobar-rg -InstanceName das-at-foobar-apim -AppServiceResourceGroup das-at-foobar-rg -ApiVersionSetName foobar-api -ApiBaseUrl "https://at-foobar-api.apprenticeships.education.gov.uk" -ApiPath "foo-bar" -ApplicationIdentifierUri "https://<tenant>.onmicrosoft.com/das-at-foobar-as-ar" -ProductId ProductId
 #>
@@ -61,7 +64,9 @@ Param(
     [Parameter(Mandatory = $false)]
     [bool]$SandboxEnabled = $false,
     [Parameter(Mandatory = $false)]
-    [int]$ImportRetries = 3
+    [int]$ImportRetries = 3,
+    [Parameter(Mandatory = $false)]
+    [bool]$AddXForwardedAuthorization = $false
 )
 
 function Invoke-RetryWebRequest ($ApiUrl) {
@@ -207,7 +212,12 @@ function Import-Api {
 
 $SwaggerSpecificationFilePath = "./swagger-specification.json"
 
-$PolicyString = "<policies><inbound><base/><authentication-managed-identity resource=`"$ApplicationIdentifierUri`"/></inbound><backend><base/></backend><outbound><base/></outbound><on-error><base/></on-error></policies>"
+if ($AddXForwardedAuthorization) {
+    Write-Verbose "Setting new inbound policy to add new header X-Forwarded-Authorization"
+    $XForwardedAuthorizationHeaderPolicy = '<set-header name="X-Forwarded-Authorization" exists-action="override"><value>@(context.Request.Headers.FirstOrDefault(x=>x.Key=="Authorization").Value?.FirstOrDefault())</value></set-header>'
+}
+
+$PolicyString = "<policies><inbound><base/>$XForwardedAuthorizationHeaderPolicy<authentication-managed-identity resource=`"$ApplicationIdentifierUri`"/></inbound><backend><base/></backend><outbound><base/></outbound><on-error><base/></on-error></policies>"
 
 $ApimInstanceExists = Get-AzApiManagement -ResourceGroupName $ApimResourceGroup -Name $InstanceName
 if (!$ApimInstanceExists) {
