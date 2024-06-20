@@ -4,7 +4,7 @@
 
     .DESCRIPTION
     Gets payload from Azure DevOps RestAPI (https://docs.microsoft.com/en-us/rest/api/azure/devops/distributedtask/environmentdeployment-records/list?view=azure-devops-rest-6.0) and filters it to produce the build ID of the newest running build. Then compares to its own build ID, if equal to it then run and if not sleep and redo.
-    Relies on System.AccessToken when running in a pipeline, ensure this is mapped as described here - https://docs.microsoft.com/en-us/azure/devops/pipelines/build/variables?view=azure-devops&tabs=yaml#systemaccesstoken
+    Relies on System.AccessToken when running in a pipeline, ensure this is mapped as described here - https://docs.microsoft.com/en-us/azure/devops/pipelines/build/variables?view=azure-devops&tabs=yaml#systemaccesstoken. Also ensure Project Collection Build Service (sfa-gov-uk) has permission on the environment planning to be used within the API call.
 
     .PARAMETER AzureDevOpsOrganisationUri
     The URI of the Azure DevOps organisation the pipeline is running in, typically passed in using the predefined variable System.CollectionUri (https://docs.microsoft.com/en-us/azure/devops/pipelines/build/variables?view=azure-devops&tabs=yaml#system-variables-devops-services)
