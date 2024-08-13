@@ -18,6 +18,9 @@
     .PARAMETER AADGroupObjectIdArray
     Array of AAD Groups to apply app roles. Only gets applied in at, test, test2, demo and pp environments.
 
+    .PARAMETER TargetEnvironment
+    The name of the environment of the app registrations. This is to cater for NAS migrated APIM instances RE: DASD-10990
+
     .PARAMETER DryRun
     Writes an output of the changes that would be made with no actual execution.
 
@@ -37,6 +40,8 @@ Param(
     [Parameter(Mandatory = $false)]
     [String[]]$AADGroupObjectIdArray = @(),
     [Parameter(Mandatory = $false)]
+    [String]$TargetEnvironment,
+    [Parameter(Mandatory = $false)]
     [bool]$DryRun = $true
 )
 
@@ -53,7 +58,9 @@ try {
     $ResourceNamePrefix = "das-$Environment"
     $ResourceNameSuffix = $ResourceName.Replace($ResourceNamePrefix, "")
     $AppRegistrationsToProcess = $AppRegistrationConfiguration.configuration | Where-Object { $_.appRoles.resourceNameSuffix -match $ResourceNameSuffix }
-
+    if ($TargetEnvironment -ne $null -and $TargetEnvironment -ne '') {
+        $ResourceNamePrefix = "das-$TargetEnvironment"
+    }
     if (!$AppRegistrationsToProcess) {
         throw "No app registrations to process for app service name $ResourceName. Check app service name or update configuration."
     }
