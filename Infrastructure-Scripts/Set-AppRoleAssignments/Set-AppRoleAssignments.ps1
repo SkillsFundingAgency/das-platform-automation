@@ -58,7 +58,7 @@ try {
     $ResourceNamePrefix = "das-$Environment"
     $ResourceNameSuffix = $ResourceName.Replace($ResourceNamePrefix, "")
     $AppRegistrationsToProcess = $AppRegistrationConfiguration.configuration | Where-Object { $_.appRoles.resourceNameSuffix -match $ResourceNameSuffix }
-    if ($TargetEnvironment -ne $null -and $TargetEnvironment -ne '') {
+    if ($TargetEnvironment) {
         $ResourceNamePrefix = "das-$TargetEnvironment"
     }
     if (!$AppRegistrationsToProcess) {
