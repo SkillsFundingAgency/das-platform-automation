@@ -231,7 +231,7 @@ $AppServiceName = Get-AppServiceName -ApiBaseUrl $ApiBaseUrl -AppServiceResource
 
 Add-AppServiceWhitelist -AppServiceResourceGroup $AppServiceResourceGroup -AppServiceName $AppServiceName
 
-$IndexHtml = Invoke-RetryWebRequest "$($ApiBaseUrl)/index.html"
+$IndexHtml = Invoke-RetryWebRequest "$($ApiBaseUrl)/index.js"
 $SwaggerPaths = Get-SwaggerFilePath -IndexHtml $IndexHtml
 
 Write-Verbose "Loop through each versioned Swagger definition and import to APIM"
