@@ -92,9 +92,9 @@ function Invoke-RetryWebRequest ($ApiUrl) {
     $Response
 }
 
-function Get-SwaggerFilePath ($IndexHtml) {
+function Get-SwaggerFilePath ($IndexJs) {
     $Paths = @()
-    $MatchedStrings = Select-String '/swagger/v\d/swagger.json' -input $IndexHtml -AllMatches
+    $MatchedStrings = Select-String '/swagger/v\d/swagger.json' -input $IndexJs -AllMatches
     foreach ($MatchedString in $MatchedStrings) {
         $Paths += $MatchedString.matches -split ' '
     }
