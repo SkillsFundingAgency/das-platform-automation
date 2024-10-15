@@ -92,9 +92,9 @@ function Invoke-RetryWebRequest ($ApiUrl) {
     $Response
 }
 
-function Get-SwaggerFilePath ($IndexHtml) {
+function Get-SwaggerFilePath ($IndexJs) {
     $Paths = @()
-    $MatchedStrings = Select-String '/swagger/v\d/swagger.json' -input $IndexHtml -AllMatches
+    $MatchedStrings = Select-String '/swagger/v\d/swagger.json' -input $IndexJs -AllMatches
     foreach ($MatchedString in $MatchedStrings) {
         $Paths += $MatchedString.matches -split ' '
     }
@@ -231,8 +231,8 @@ $AppServiceName = Get-AppServiceName -ApiBaseUrl $ApiBaseUrl -AppServiceResource
 
 Add-AppServiceWhitelist -AppServiceResourceGroup $AppServiceResourceGroup -AppServiceName $AppServiceName
 
-$IndexHtml = Invoke-RetryWebRequest "$($ApiBaseUrl)/index.js"
-$SwaggerPaths = Get-SwaggerFilePath -IndexHtml $IndexHtml
+$IndexJs = Invoke-RetryWebRequest "$($ApiBaseUrl)/index.js"
+$SwaggerPaths = Get-SwaggerFilePath -IndexJs $IndexJs
 
 Write-Verbose "Loop through each versioned Swagger definition and import to APIM"
 foreach ($SwaggerPath in $SwaggerPaths) {
