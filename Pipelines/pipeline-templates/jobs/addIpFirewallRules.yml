@@ -1,0 +1,16 @@
+parameters:
+  ServiceConnection:
+
+jobs:
+- job: AddIpToSearchServiceFirewallRules
+  variables:
+    DefaultResourceNamePattern: 'das-'
+  steps:
+  - task: AzurePowerShell@5
+    displayName: Execute Firewall IP Whitelist Script
+    inputs:
+      azureSubscription: ${{ parameters.ServiceConnection }}
+      ScriptPath: './Infrastructure-Scripts/Add-SearchServiceIpException.ps1'
+      ScriptArguments: '-IPAddress $(IPAddress) -ResourceNamePattern $(DefaultResourceNamePattern)'
+      azurePowerShellVersion: LatestVersion
+      pwsh: true
