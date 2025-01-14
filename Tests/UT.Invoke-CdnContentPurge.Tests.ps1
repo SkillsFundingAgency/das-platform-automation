@@ -10,7 +10,7 @@ Describe "Invoke-CdnContentPurge Unit Tests" -Tags @("Unit") {
     }
 
     Context "Resource Group or CDN Profile does not exist" {
-        It "The specified Resource Group or CDN Profile was not found in the subscription, throw an error" {
+        It "Should throw an expection to warn that the the specified Resource Group or CDN Profile was not found in the subscription" {
             Mock Get-AzCdnEndpoint -MockWith { Return $null }
             { ./Invoke-CdnContentPurge -CDNProfileResourceGroup $Config.resourceGroupName -CDNProfileName $Config.CdnProfileName -CDNEndPointName $Config.CDNEndPointName -PurgeContent $Config.purgeContent } | Should throw "CDN Endpoint does not exist"
             Assert-MockCalled -CommandName 'Get-AzCdnEndpoint'  -Times 1 -Scope It
