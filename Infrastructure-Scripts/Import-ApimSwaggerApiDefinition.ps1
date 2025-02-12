@@ -41,6 +41,12 @@
     .PARAMETER CheckClientCert
     (optional) The boolean to add a policy which checks the client certificate used to authenticate matches that in keyvault
 
+    .PARAMETER ApimKeyVaultUri
+    (optional) The keyvault client certificate uri
+
+    .PARAMETER ApimKeyVaultClientCertName
+    (optional) The keyvault client certificate uri
+
     .EXAMPLE
     Import-ApimSwaggerApiDefinition -ApimResourceGroup das-at-foobar-rg -InstanceName das-at-foobar-apim -AppServiceResourceGroup das-at-foobar-rg -ApiVersionSetName foobar-api -ApiBaseUrl "https://at-foobar-api.apprenticeships.education.gov.uk" -ApiPath "foo-bar" -ApplicationIdentifierUri "https://<tenant>.onmicrosoft.com/das-at-foobar-as-ar" -ProductId ProductId
 #>
@@ -71,7 +77,11 @@ Param(
     [Parameter(Mandatory = $false)]
     [bool]$AddXForwardedAuthorization = $false,
     [Parameter(Mandatory = $false)]
-    [bool]$CheckClientCert = $false
+    [bool]$CheckClientCert = $false,
+    [Parameter(Mandatory = $false)]
+    [string]$ApimKeyVaultUri,
+    [Parameter(Mandatory = $false)]
+    [string]$ApimKeyVaultClientCertName
 )
 
 function Invoke-RetryWebRequest ($ApiUrl) {
@@ -212,7 +222,7 @@ function Import-Api {
 
     Add-AzApiManagementApiToProduct -Context $Context -ProductId $ProductId -ApiId $ApiId
 
-    Set-AzApiManagementPolicy -Context $Context -ApiId $ApiId -Policy $PolicyString
+    Set-AzApiManagementPolicy -Context $Context -ApiId $ApiId -Policy $PolicyString -Format "application/vnd.ms-azure-apim.policy.raw+xml"
 }
 
 $SwaggerSpecificationFilePath = "./swagger-specification.json"
@@ -224,10 +234,12 @@ if ($AddXForwardedAuthorization) {
 
 if ($CheckClientCert){
     Write-Verbose "Setting new inbound policy to check for client certificate"
-    $CheckClientCertPolicy = '<include-fragment fragment-id="checkClientCert"/>'
+    $PolicyString = "<policies><inbound><set-variable name=`"ValidateThumbprint`" value=`"@{return context.Request.Headers.GetValueOrDefault(`"Host`", `"Unknown`").ToLower().Contains(`"secure-gateway.apprenticeships`");}`" /> <set-variable name=`"ApplicationIdentifierUri`" value=`"$ApplicationIdentifierUri`" /> <set-variable name=`"ApimKeyVaultUri`" value=`"$ApimKeyVaultUri`" /> <set-variable name=`"ApimKeyVaultClientCertName`" value=`"$ApimKeyVaultClientCertName`" /> <include-fragment fragment-id=`"checkClientCert`"/><base/>$XForwardedAuthorizationHeaderPolicy</inbound><backend><base/></backend><outbound><base/></outbound><on-error><base/></on-error></policies>"
+    Write-Output $PolicyString
+} else {
+    Write-Verbose "Setting default policy"
+    $PolicyString = "<policies><inbound>$CheckClientCertPolicy<base/>$XForwardedAuthorizationHeaderPolicy<authentication-managed-identity resource=`"$ApplicationIdentifierUri`"/></inbound><backend><base/></backend><outbound><base/></outbound><on-error><base/></on-error></policies>"
 }
-
-$PolicyString = "<policies><inbound>$CheckClientCertPolicy<base/>$XForwardedAuthorizationHeaderPolicy<authentication-managed-identity resource=`"$ApplicationIdentifierUri`"/></inbound><backend><base/></backend><outbound><base/></outbound><on-error><base/></on-error></policies>"
 
 $ApimInstanceExists = Get-AzApiManagement -ResourceGroupName $ApimResourceGroup -Name $InstanceName
 if (!$ApimInstanceExists) {
