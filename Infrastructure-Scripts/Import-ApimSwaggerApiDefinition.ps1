@@ -38,6 +38,9 @@
     .PARAMETER AddXForwardedAuthorization
     (optional) The boolean for adding a new header called X-Forwarded-Authorization that is set to be the original inbound Authorization value
 
+    .PARAMETER CheckClientCert
+    (optional) The boolean to add a policy which checks the client certificate used to authenticate matches that in keyvault
+
     .EXAMPLE
     Import-ApimSwaggerApiDefinition -ApimResourceGroup das-at-foobar-rg -InstanceName das-at-foobar-apim -AppServiceResourceGroup das-at-foobar-rg -ApiVersionSetName foobar-api -ApiBaseUrl "https://at-foobar-api.apprenticeships.education.gov.uk" -ApiPath "foo-bar" -ApplicationIdentifierUri "https://<tenant>.onmicrosoft.com/das-at-foobar-as-ar" -ProductId ProductId
 #>
@@ -66,7 +69,9 @@ Param(
     [Parameter(Mandatory = $false)]
     [int]$ImportRetries = 3,
     [Parameter(Mandatory = $false)]
-    [bool]$AddXForwardedAuthorization = $false
+    [bool]$AddXForwardedAuthorization = $false,
+    [Parameter(Mandatory = $false)]
+    [bool]$CheckClientCert = $false
 )
 
 function Invoke-RetryWebRequest ($ApiUrl) {
@@ -217,7 +222,12 @@ if ($AddXForwardedAuthorization) {
     $XForwardedAuthorizationHeaderPolicy = '<set-header name="X-Forwarded-Authorization" exists-action="override"><value>@(context.Request.Headers.FirstOrDefault(x=>x.Key=="Authorization").Value?.FirstOrDefault())</value></set-header>'
 }
 
-$PolicyString = "<policies><inbound><base/>$XForwardedAuthorizationHeaderPolicy<authentication-managed-identity resource=`"$ApplicationIdentifierUri`"/></inbound><backend><base/></backend><outbound><base/></outbound><on-error><base/></on-error></policies>"
+if ($CheckClientCert){
+    Write-Verbose "Setting new inbound policy to check for client certificate"
+    $CheckClientCertPolicy = '<include-fragment fragment-id="checkClientCert"/>'
+}
+
+$PolicyString = "<policies><inbound>$CheckClientCertPolicy<base/>$XForwardedAuthorizationHeaderPolicy<authentication-managed-identity resource=`"$ApplicationIdentifierUri`"/></inbound><backend><base/></backend><outbound><base/></outbound><on-error><base/></on-error></policies>"
 
 $ApimInstanceExists = Get-AzApiManagement -ResourceGroupName $ApimResourceGroup -Name $InstanceName
 if (!$ApimInstanceExists) {
