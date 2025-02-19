@@ -65,7 +65,7 @@ Write-Output "AccessToken received successfully."
 $contentType = "application/json"
 $headers = @{ Authorization = "Bearer $AccessToken" }
 $rawRequest = @{
-    daysValid = 365 * 2
+    daysValid = 365
     definitionId = $DefinitionId
     ownerId = $OwnerId
     protectPipeline = $false
