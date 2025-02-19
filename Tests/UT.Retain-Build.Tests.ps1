@@ -21,7 +21,7 @@ Describe "Retain Build Unit Tests" -Tags @("Unit") {
 
     Context "Missing Required Parameters" {
         $InvalidParams = $Params.Clone()
-        $InvalidParams.Remove("RunId")
+        $InvalidParams["RunId"] = $null
 
         It "Should throw an error when RunId is missing" {
             { ./Retain-Build.ps1 @InvalidParams } | Should throw
