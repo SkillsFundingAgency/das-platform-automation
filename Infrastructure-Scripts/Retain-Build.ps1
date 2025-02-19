@@ -1,3 +1,37 @@
+<#
+    .SYNOPSIS
+    Retains a build in Azure DevOps by setting a retention lease.
+
+    .DESCRIPTION
+    This script sends a request to the Azure DevOps REST API to retain a build.
+    Retaining a build prevents it from being deleted by automatic retention policies.
+    It requires authentication via `System.AccessToken`, which must be passed as a parameter.
+
+    .PARAMETER DefinitionId
+    The ID of the build pipeline definition.
+
+    .PARAMETER RunId
+    The ID of the build run to be retained.
+
+    .PARAMETER OwnerId
+    The owner of the retention lease, typically the user who triggered the build.
+
+    .PARAMETER CollectionUri
+    The URI of the Azure DevOps collection.
+
+    .PARAMETER TeamProject
+    The name of the Azure DevOps team project.
+
+    .PARAMETER AccessToken
+    The system access token required for authentication to the Azure DevOps REST API.
+
+    .EXAMPLE
+    # Example usage
+    .\Retain-Build.ps1 -DefinitionId 3223 -RunId 896262 -OwnerId "User:ea697f47-8ede-489e-a18c-afb8f4ba1495" -CollectionUri "https://dev.azure.com/sfa-gov-uk/" -TeamProject "Digital Apprenticeship Service" -AccessToken "xyz123"
+
+    This command retains a build with ID 896262 in the Azure DevOps project "Digital Apprenticeship Service".
+#>
+
 [CmdletBinding()]
 Param (
     [Parameter(Mandatory = $true)]
