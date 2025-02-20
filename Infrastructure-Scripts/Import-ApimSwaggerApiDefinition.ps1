@@ -39,7 +39,10 @@
     (optional) The boolean for adding a new header called X-Forwarded-Authorization that is set to be the original inbound Authorization value
 
     .PARAMETER CheckClientCert
-    (optional) The boolean to add a policy which checks the client certificate used to authenticate matches that in keyvault
+    (optional) The boolean to add a policy which checks the client certificate used to authenticate requests, requests can still be sent via non-secure gateway and client cert not checked
+
+    .PARAMETER MandateCheckClientCert
+    (optional) The boolean to add a policy which mandates the client certificate used to authenticate request via the secure-gateway.
 
     .PARAMETER ApimKeyVaultUri
     (optional) The keyvault client certificate uri
@@ -78,6 +81,8 @@ Param(
     [bool]$AddXForwardedAuthorization = $false,
     [Parameter(Mandatory = $false)]
     [bool]$CheckClientCert = $false,
+    [Parameter(Mandatory = $false)]
+    [bool]$MandateCheckClientCert = $false,
     [Parameter(Mandatory = $false)]
     [string]$ApimKeyVaultUri,
     [Parameter(Mandatory = $false)]
@@ -231,8 +236,12 @@ if ($AddXForwardedAuthorization) {
     Write-Verbose "Setting new inbound policy to add new header X-Forwarded-Authorization"
     $XForwardedAuthorizationHeaderPolicy = '<set-header name="X-Forwarded-Authorization" exists-action="override"><value>@(context.Request.Headers.FirstOrDefault(x=>x.Key=="Authorization").Value?.FirstOrDefault())</value></set-header>'
 }
-
-if ($CheckClientCert){
+if ($MandateCheckClientCert){
+    Write-Verbose "Setting new inbound policy to mandate the checking of client certificate"
+    $PolicyString = "<policies><inbound><set-variable name=`"ValidateThumbprint`" value=`"@{return true;}`" /> <set-variable name=`"ApplicationIdentifierUri`" value=`"$ApplicationIdentifierUri`" /> <set-variable name=`"ApimKeyVaultUri`" value=`"$ApimKeyVaultUri`" /> <set-variable name=`"ApimKeyVaultClientCertName`" value=`"$ApimKeyVaultClientCertName`" /> <include-fragment fragment-id=`"checkClientCert`"/><base/>$XForwardedAuthorizationHeaderPolicy</inbound><backend><base/></backend><outbound><base/></outbound><on-error><base/></on-error></policies>"
+    Write-Output $PolicyString
+}
+elseif ($CheckClientCert){
     Write-Verbose "Setting new inbound policy to check for client certificate"
     $PolicyString = "<policies><inbound><set-variable name=`"ValidateThumbprint`" value=`"@{return context.Request.Headers.GetValueOrDefault(`"Host`", `"Unknown`").ToLower().Contains(`"secure-gateway.apprenticeships`");}`" /> <set-variable name=`"ApplicationIdentifierUri`" value=`"$ApplicationIdentifierUri`" /> <set-variable name=`"ApimKeyVaultUri`" value=`"$ApimKeyVaultUri`" /> <set-variable name=`"ApimKeyVaultClientCertName`" value=`"$ApimKeyVaultClientCertName`" /> <include-fragment fragment-id=`"checkClientCert`"/><base/>$XForwardedAuthorizationHeaderPolicy</inbound><backend><base/></backend><outbound><base/></outbound><on-error><base/></on-error></policies>"
     Write-Output $PolicyString
