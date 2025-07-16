@@ -18,6 +18,9 @@
     .PARAMETER AADGroupObjectIdArray
     Array of AAD Groups to apply app roles. Only gets applied in at, test, test2, demo and pp environments.
 
+    .PARAMETER AppOwnerObjectIdArray
+    Array of AAD user object-IDs to add as owners of newly created app registrations.
+
     .PARAMETER TargetEnvironment
     The name of the environment of the app registrations. This is to cater for NAS migrated APIM instances RE: DASD-10990
 
@@ -25,8 +28,7 @@
     Writes an output of the changes that would be made with no actual execution.
 
     .EXAMPLE
-    .\Set-AppRoleAssignments.ps1 -AppRegistrationConfigurationFilePath "C:\config.json" -ResourceName das-env-foobar-as -Tenant tenant.onmicrosoft.com -AADGroupObjectIdArray guid -DryRun $true
-    .\Set-AppRoleAssignments.ps1 -AppRegistrationConfigurationFilePath "C:\config.json" -ResourceName das-env-foobar-apim -Tenant tenant.onmicrosoft.com -AADGroupObjectIdArray guid -DryRun $true
+    .\Set-AppRoleAssignments.ps1 -AppRegistrationConfigurationFilePath "C:\config.json" -ResourceName das-env-foobar-as -Tenant tenant.onmicrosoft.com -AADGroupObjectIdArray guid -AppOwnerObjectIdArray userGuid1,userGuid2 -DryRun $true
 #>
 
 [CmdletBinding()]
@@ -40,6 +42,8 @@ Param(
     [Parameter(Mandatory = $false)]
     [String[]]$AADGroupObjectIdArray = @(),
     [Parameter(Mandatory = $false)]
+    [String[]]$AppOwnerObjectIdArray = @(),
+    [Parameter(Mandatory = $false)]
     [String]$TargetEnvironment,
     [Parameter(Mandatory = $false)]
     [bool]$DryRun = $true
@@ -47,6 +51,7 @@ Param(
 
 $ErrorActionPreference = "Stop"
 Import-Module "$PSScriptRoot\tools\Helpers.psm1" -Force
+Import-Module AzureAD -ErrorAction Stop
 
 If ($DryRun) {
     Write-Warning "Processing Dry Run"
@@ -84,6 +89,13 @@ try {
                 #Allow Azure CLI to acquire tokens
                 $ServicePrincipal = Get-ServicePrincipal -DisplayName $AppRegistrationName
                 Set-AzureCLIAccess -ServicePrincipalObjectId $ServicePrincipal.id -AppRegistrationObjectId $AppRegistrationObject.id
+
+                # Add specified users as owners
+                foreach ($ownerId in $AppOwnerObjectIdArray) {
+                    Write-Output "  -> Adding owner $ownerId to $AppRegistrationName"
+                    Add-AzureADApplicationOwner -ObjectId $AppRegistrationObject.id -RefObjectId $ownerId
+                }
+                $ServicePrincipal = Get-ServicePrincipal -DisplayName $AppRegistrationName
             }
 
             Write-Output "  -> Successfully created app registration - $AppRegistrationName"
