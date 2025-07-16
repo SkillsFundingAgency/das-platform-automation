@@ -52,7 +52,6 @@ Param(
 
 $ErrorActionPreference = "Stop"
 Import-Module "$PSScriptRoot\tools\Helpers.psm1" -Force
-Import-Module AzureAD -ErrorAction Stop
 
 If ($DryRun) {
     Write-Warning "Processing Dry Run"
