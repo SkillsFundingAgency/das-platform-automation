@@ -29,6 +29,7 @@
 
     .EXAMPLE
     .\Set-AppRoleAssignments.ps1 -AppRegistrationConfigurationFilePath "C:\config.json" -ResourceName das-env-foobar-as -Tenant tenant.onmicrosoft.com -AADGroupObjectIdArray guid -AppOwnerObjectIdArray userGuid1,userGuid2 -DryRun $true
+    .\Set-AppRoleAssignments.ps1 -AppRegistrationConfigurationFilePath "C:\config.json" -ResourceName das-env-foobar-apim -Tenant tenant.onmicrosoft.com -AADGroupObjectIdArray guid -AppOwnerObjectIdArray userGuid1,userGuid2 -DryRun $true
 #>
 
 [CmdletBinding()]
