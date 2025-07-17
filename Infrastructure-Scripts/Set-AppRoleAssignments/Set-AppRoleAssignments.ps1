@@ -97,7 +97,7 @@ try {
         if (!$DryRun -and $AppOwnerObjectIdArray.Count -gt 0) {
             foreach ($ownerId in $AppOwnerObjectIdArray) {
                 Write-Output "  -> Ensuring $ownerId is an owner of $AppRegistrationName"
-                Add-AzureADApplicationOwner -ObjectId $ServicePrincipal.id -RefObjectId $ownerId
+                Add-AzureADApplicationOwner -ObjectId $AppRegistrationObject.id -RefObjectId $ownerId
             }
         }
 
