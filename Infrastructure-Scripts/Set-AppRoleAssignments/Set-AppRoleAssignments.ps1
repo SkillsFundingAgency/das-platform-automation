@@ -89,17 +89,16 @@ try {
                 #Allow Azure CLI to acquire tokens
                 $ServicePrincipal = Get-ServicePrincipal -DisplayName $AppRegistrationName
                 Set-AzureCLIAccess -ServicePrincipalObjectId $ServicePrincipal.id -AppRegistrationObjectId $AppRegistrationObject.id
-
-                # Add specified users as owners
-                foreach ($ownerId in $AppOwnerObjectIdArray) {
-                    Write-Output "  -> Adding owner $ownerId to $AppRegistrationName"
-                    Add-AzureADApplicationOwner -ObjectId $AppRegistrationObject.id -RefObjectId $ownerId
-                }
-                $ServicePrincipal = Get-ServicePrincipal -DisplayName $AppRegistrationName
             }
 
             Write-Output "  -> Successfully created app registration - $AppRegistrationName"
-
+        }
+        
+        if (!$DryRun -and $AppOwnerObjectIdArray.Count -gt 0) {
+            foreach ($ownerId in $AppOwnerObjectIdArray) {
+                Write-Output "  -> Ensuring $ownerId is an owner of $AppRegistrationName"
+                Add-AzureADApplicationOwner -ObjectId $ServicePrincipal.id -RefObjectId $ownerId
+            }
         }
 
         foreach ($AppRole in $AppRegistration.appRoles) {
