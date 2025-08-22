@@ -14,7 +14,7 @@ function Get-Environment {
         [String]$ResourceName
     )
 
-    $ValidEnvironments = @("at", "test", "test2", "demo", "pp", "prd", "mo")
+    $ValidEnvironments = @("dev", "at", "test", "test2", "demo", "pp", "prd", "mo")
     $Environment = $ResourceName.Split('-')[1]
 
     if ($Environment -in $ValidEnvironments) {
