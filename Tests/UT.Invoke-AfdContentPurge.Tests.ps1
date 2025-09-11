@@ -20,7 +20,7 @@ Describe "Invoke-AfdContentPurge Unit Tests" -Tags @("Unit") {
     Context "Parameters are ok" {
         It "Should call Clear-AzFrontDoorCdnEndpointContent" {
             Mock Get-AzFrontDoorCdnEndpoint -MockWith {
-                $cdnEndpointExists = [Microsoft.Azure.PowerShell.Cmdlets.Cdn.Models.Api20240201.Endpoint]::new()
+                $cdnEndpointExists = [Microsoft.Azure.PowerShell.Cmdlets.Cdn.Models.Endpoint]::new()
                 return $cdnEndpointExists
             }
             Mock Clear-AzFrontDoorCdnEndpointContent -MockWith { Return $null }
