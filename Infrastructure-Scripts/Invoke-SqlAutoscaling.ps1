@@ -40,7 +40,6 @@ function Test-SustainedMetric {
     $startTime = $endTime.AddMinutes(-1 * $DurationMinutes)
 
     try {
-        # Ensure minimum time range (at least 1 minute)
         if ($DurationMinutes -lt 1) {
             $DurationMinutes = 1
             $startTime = $endTime.AddMinutes(-1)
