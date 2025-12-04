@@ -375,11 +375,17 @@ Describe "Invoke-SqlAutoscaling Unit Tests" -Tags @("Unit") {
                     }
                 }
             }
+            Mock Get-AzSqlDatabase -MockWith {
+                return @{
+                    CurrentServiceObjectiveName = "S2"
+                }
+            }
             Mock Get-AzMetric -MockWith {
                 return $null
-            }
+            } -Verifiable
 
             { ./Invoke-SqlAutoscaling.ps1 @Params } | Should Not throw
+            Assert-MockCalled -CommandName 'Get-AzMetric' -Times 1 -Scope It
             Assert-MockCalled -CommandName 'Set-AzSqlDatabase' -Times 0 -Scope It
         }
 
@@ -392,13 +398,19 @@ Describe "Invoke-SqlAutoscaling Unit Tests" -Tags @("Unit") {
                     }
                 }
             }
+            Mock Get-AzSqlDatabase -MockWith {
+                return @{
+                    CurrentServiceObjectiveName = "S2"
+                }
+            }
             Mock Get-AzMetric -MockWith {
                 return @{
                     Data = @()
                 }
-            }
+            } -Verifiable
 
             { ./Invoke-SqlAutoscaling.ps1 @Params } | Should Not throw
+            Assert-MockCalled -CommandName 'Get-AzMetric' -Times 1 -Scope It
             Assert-MockCalled -CommandName 'Set-AzSqlDatabase' -Times 0 -Scope It
         }
     }
@@ -413,17 +425,23 @@ Describe "Invoke-SqlAutoscaling Unit Tests" -Tags @("Unit") {
                     }
                 }
             }
+            Mock Get-AzSqlDatabase -MockWith {
+                return @{
+                    CurrentServiceObjectiveName = "S2"
+                }
+            }
             Mock Get-AzMetric -MockWith {
                 throw "Metric query failed"
-            }
+            } -Verifiable
 
             { ./Invoke-SqlAutoscaling.ps1 @Params } | Should Not throw
+            Assert-MockCalled -CommandName 'Get-AzMetric' -Times 1 -Scope It
             Assert-MockCalled -CommandName 'Set-AzSqlDatabase' -Times 0 -Scope It
         }
     }
 
     Context "Sustained metric with zero duration" {
-        It "Should return true immediately when duration is zero or less" {
+        It "Should return true immediately when duration is zero or less without calling Get-AzMetric" {
             Mock Get-AzServiceBusQueue -MockWith {
                 return @{
                     Id = "/subscriptions/test/resourceGroups/test/providers/Microsoft.ServiceBus/namespaces/test/queues/test"
@@ -432,11 +450,17 @@ Describe "Invoke-SqlAutoscaling Unit Tests" -Tags @("Unit") {
                     }
                 }
             }
+            Mock Get-AzSqlDatabase -MockWith {
+                return @{
+                    CurrentServiceObjectiveName = "S2"
+                }
+            }
             $ParamsZeroDuration = $Params.Clone()
             $ParamsZeroDuration.SustainedUpMinutes = 0
 
             { ./Invoke-SqlAutoscaling.ps1 @ParamsZeroDuration } | Should Not throw
-            Assert-MockCalled -CommandName 'Get-AzMetric' -Times 1 -Scope It
+            Assert-MockCalled -CommandName 'Get-AzMetric' -Times 0 -Scope It
+            Assert-MockCalled -CommandName 'Set-AzSqlDatabase' -Times 2 -Scope It
         }
     }
 
