@@ -58,6 +58,7 @@
 
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSReviewUnusedParameter", "", Justification = "Parameters are used via variable scope in functions")]
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSUseBOMForUnicodeEncodedFile", "", Justification = "File is ASCII encoded")]
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSUseShouldProcessForStateChangingFunctions", "", Justification = "Script runs in Azure Automation where ShouldProcess is not applicable")]
 param(
     [string] $ResourceGroup = (Get-AutomationVariable -Name 'Autoscale_ResourceGroup'),
     [string] $ServerName = (Get-AutomationVariable -Name 'Autoscale_SqlServerName'),

@@ -382,7 +382,7 @@ Describe "Invoke-SqlAutoscaling Unit Tests" -Tags @("Unit") {
             }
             Mock Get-AzMetric -MockWith {
                 return $null
-            } -Verifiable
+            }
 
             { ./Invoke-SqlAutoscaling.ps1 @Params } | Should Not throw
             Assert-MockCalled -CommandName 'Get-AzMetric' -Times 1 -Scope It
@@ -407,7 +407,7 @@ Describe "Invoke-SqlAutoscaling Unit Tests" -Tags @("Unit") {
                 return @{
                     Data = @()
                 }
-            } -Verifiable
+            }
 
             { ./Invoke-SqlAutoscaling.ps1 @Params } | Should Not throw
             Assert-MockCalled -CommandName 'Get-AzMetric' -Times 1 -Scope It
@@ -432,7 +432,7 @@ Describe "Invoke-SqlAutoscaling Unit Tests" -Tags @("Unit") {
             }
             Mock Get-AzMetric -MockWith {
                 throw "Metric query failed"
-            } -Verifiable
+            }
 
             { ./Invoke-SqlAutoscaling.ps1 @Params } | Should Not throw
             Assert-MockCalled -CommandName 'Get-AzMetric' -Times 1 -Scope It
