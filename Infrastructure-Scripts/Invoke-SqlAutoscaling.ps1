@@ -116,7 +116,12 @@ function Test-SustainedMetric {
             -WarningAction SilentlyContinue `
             -ErrorAction Stop
 
-        if ($null -eq $metric -or $null -eq $metric.Data) {
+        if ($null -eq $metric) {
+            Log "Metric $MetricName returned no data."
+            return $false
+        }
+        
+        if ($null -eq $metric.Data) {
             Log "Metric $MetricName returned no data."
             return $false
         }

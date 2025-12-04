@@ -64,20 +64,6 @@ Describe "Invoke-SqlAutoscaling Unit Tests" -Tags @("Unit") {
                 CurrentServiceObjectiveName = "S2"
             }
         }
-        Mock Get-AzMetric -MockWith {
-            return @{
-                Data = @(
-                    [PSCustomObject]@{
-                        Average = 50
-                        TimeStamp = (Get-Date).ToUniversalTime()
-                    },
-                    [PSCustomObject]@{
-                        Average = 55
-                        TimeStamp = (Get-Date).ToUniversalTime()
-                    }
-                )
-            }
-        }
         Mock Set-AzSqlDatabase -MockWith { return $null }
     }
 
@@ -89,6 +75,11 @@ Describe "Invoke-SqlAutoscaling Unit Tests" -Tags @("Unit") {
                     CountDetails = @{
                         ActiveMessageCount = 150
                     }
+                }
+            }
+            Mock Get-AzSqlDatabase -MockWith {
+                return @{
+                    CurrentServiceObjectiveName = "S2"
                 }
             }
             Mock Get-AzMetric -MockWith {
@@ -130,6 +121,11 @@ Describe "Invoke-SqlAutoscaling Unit Tests" -Tags @("Unit") {
                     }
                 }
             }
+            Mock Get-AzSqlDatabase -MockWith {
+                return @{
+                    CurrentServiceObjectiveName = "S2"
+                }
+            }
             Mock Get-AzMetric -MockWith {
                 return @{
                     Data = @(
@@ -158,6 +154,11 @@ Describe "Invoke-SqlAutoscaling Unit Tests" -Tags @("Unit") {
                     CountDetails = @{
                         ActiveMessageCount = 5
                     }
+                }
+            }
+            Mock Get-AzSqlDatabase -MockWith {
+                return @{
+                    CurrentServiceObjectiveName = "S2"
                 }
             }
             Mock Get-AzMetric -MockWith {
@@ -193,6 +194,11 @@ Describe "Invoke-SqlAutoscaling Unit Tests" -Tags @("Unit") {
                     CountDetails = @{
                         ActiveMessageCount = 5
                     }
+                }
+            }
+            Mock Get-AzSqlDatabase -MockWith {
+                return @{
+                    CurrentServiceObjectiveName = "S2"
                 }
             }
             Mock Get-AzMetric -MockWith {
@@ -317,6 +323,11 @@ Describe "Invoke-SqlAutoscaling Unit Tests" -Tags @("Unit") {
                     }
                 }
             }
+            Mock Get-AzSqlDatabase -MockWith {
+                return @{
+                    CurrentServiceObjectiveName = "S2"
+                }
+            }
             Mock Get-AzMetric -MockWith {
                 return @{
                     Data = @(
@@ -343,6 +354,11 @@ Describe "Invoke-SqlAutoscaling Unit Tests" -Tags @("Unit") {
                     CountDetails = @{
                         ActiveMessageCount = 5
                     }
+                }
+            }
+            Mock Get-AzSqlDatabase -MockWith {
+                return @{
+                    CurrentServiceObjectiveName = "S2"
                 }
             }
             Mock Get-AzMetric -MockWith {
@@ -455,6 +471,16 @@ Describe "Invoke-SqlAutoscaling Unit Tests" -Tags @("Unit") {
             Mock Get-AzSqlDatabase -MockWith {
                 return @{
                     CurrentServiceObjectiveName = "S2"
+                }
+            }
+            Mock Get-AzMetric -MockWith {
+                return @{
+                    Data = @(
+                        [PSCustomObject]@{
+                            Average = 150
+                            TimeStamp = (Get-Date).ToUniversalTime()
+                        }
+                    )
                 }
             }
             $ParamsZeroDuration = $Params.Clone()
