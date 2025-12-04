@@ -120,7 +120,7 @@ function Test-SustainedMetric {
             Log "Metric $MetricName returned no data."
             return $false
         }
-        
+
         if ($null -eq $metric.Data) {
             Log "Metric $MetricName returned no data."
             return $false
