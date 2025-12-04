@@ -413,4 +413,5 @@ Describe "Invoke-SqlAutoscaling Unit Tests" -Tags @("Unit") {
             Assert-MockCalled -CommandName 'Get-AzMetric' -Times 1 -Scope It
         }
     }
+
 }
