@@ -57,7 +57,6 @@
 #>
 
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSReviewUnusedParameter", "", Justification = "Parameters are used via variable scope in functions")]
-[Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSUseApprovedVerbs", "Scale-DatabaseInOrder", Justification = "Scale is appropriate for this internal function")]
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSUseBOMForUnicodeEncodedFile", "", Justification = "File is ASCII encoded")]
 param(
     [string] $ResourceGroup = (Get-AutomationVariable -Name 'Autoscale_ResourceGroup'),
@@ -156,7 +155,7 @@ function Invoke-Scale {
     Log "Scale operation submitted."
 }
 
-function Scale-DatabaseInOrder {
+function Set-DatabaseScaleInOrder {
     param(
         [bool]   $IsScaleUp,
         [string] $PrimaryTarget,
@@ -211,13 +210,13 @@ $shouldScaleDown =
 
 if ($shouldScaleUp -and $currentObjective -ne $ScaleUpTarget) {
     Log "Scale-up criteria met."
-    Scale-DatabaseInOrder -IsScaleUp $true -PrimaryTarget $ScaleUpTarget -SecondaryTarget $ScaleUpTarget
+    Set-DatabaseScaleInOrder -IsScaleUp $true -PrimaryTarget $ScaleUpTarget -SecondaryTarget $ScaleUpTarget
     return
 }
 
 if ($shouldScaleDown -and $currentObjective -ne $ScaleDownTarget) {
     Log "Scale-down criteria met."
-    Scale-DatabaseInOrder -IsScaleUp $false -PrimaryTarget $ScaleDownTarget -SecondaryTarget $ScaleDownTarget
+    Set-DatabaseScaleInOrder -IsScaleUp $false -PrimaryTarget $ScaleDownTarget -SecondaryTarget $ScaleDownTarget
     return
 }
 
