@@ -380,6 +380,7 @@ Describe "Invoke-SqlAutoscaling Unit Tests" -Tags @("Unit") {
                     CurrentServiceObjectiveName = "S2"
                 }
             }
+            # Mock Get-AzMetric to return null
             Mock Get-AzMetric -MockWith {
                 return $null
             }
@@ -430,6 +431,7 @@ Describe "Invoke-SqlAutoscaling Unit Tests" -Tags @("Unit") {
                     CurrentServiceObjectiveName = "S2"
                 }
             }
+            # Mock Get-AzMetric to throw an error
             Mock Get-AzMetric -MockWith {
                 throw "Metric query failed"
             }
