@@ -291,6 +291,21 @@ Describe "Invoke-SqlAutoscaling Unit Tests" -Tags @("Unit") {
                     }
                 }
             }
+            Mock Get-AzSqlDatabase -MockWith {
+                return @{
+                    CurrentServiceObjectiveName = "S2"
+                }
+            }
+            Mock Get-AzMetric -MockWith {
+                return @{
+                    Data = @(
+                        [PSCustomObject]@{
+                            Average = 50
+                            TimeStamp = (Get-Date).ToUniversalTime()
+                        }
+                    )
+                }
+            }
 
             { ./Invoke-SqlAutoscaling.ps1 @Params } | Should Not throw
             Assert-MockCalled -CommandName 'Get-AzMetric' -Times 0 -Scope It
@@ -304,6 +319,21 @@ Describe "Invoke-SqlAutoscaling Unit Tests" -Tags @("Unit") {
                     CountDetails = @{
                         ActiveMessageCount = 50
                     }
+                }
+            }
+            Mock Get-AzSqlDatabase -MockWith {
+                return @{
+                    CurrentServiceObjectiveName = "S2"
+                }
+            }
+            Mock Get-AzMetric -MockWith {
+                return @{
+                    Data = @(
+                        [PSCustomObject]@{
+                            Average = 50
+                            TimeStamp = (Get-Date).ToUniversalTime()
+                        }
+                    )
                 }
             }
 
@@ -383,6 +413,8 @@ Describe "Invoke-SqlAutoscaling Unit Tests" -Tags @("Unit") {
 
     Context "Metric query returns no data" {
         It "Should not scale when metric query returns no data" {
+            $TestParams = $Params.Clone()
+            $TestParams.SustainedUpMinutes = 5
             Mock Get-AzServiceBusQueue -MockWith {
                 return @{
                     Id = "/subscriptions/test/resourceGroups/test/providers/Microsoft.ServiceBus/namespaces/test/queues/test"
@@ -396,17 +428,18 @@ Describe "Invoke-SqlAutoscaling Unit Tests" -Tags @("Unit") {
                     CurrentServiceObjectiveName = "S2"
                 }
             }
-            # Mock Get-AzMetric to return null
             Mock Get-AzMetric -MockWith {
                 return $null
             }
 
-            { ./Invoke-SqlAutoscaling.ps1 @Params } | Should Not throw
+            { ./Invoke-SqlAutoscaling.ps1 @TestParams } | Should Not throw
             Assert-MockCalled -CommandName 'Get-AzMetric' -Times 1 -Scope It
             Assert-MockCalled -CommandName 'Set-AzSqlDatabase' -Times 0 -Scope It
         }
 
         It "Should not scale when metric query returns no datapoints" {
+            $TestParams = $Params.Clone()
+            $TestParams.SustainedUpMinutes = 5
             Mock Get-AzServiceBusQueue -MockWith {
                 return @{
                     Id = "/subscriptions/test/resourceGroups/test/providers/Microsoft.ServiceBus/namespaces/test/queues/test"
@@ -426,7 +459,7 @@ Describe "Invoke-SqlAutoscaling Unit Tests" -Tags @("Unit") {
                 }
             }
 
-            { ./Invoke-SqlAutoscaling.ps1 @Params } | Should Not throw
+            { ./Invoke-SqlAutoscaling.ps1 @TestParams } | Should Not throw
             Assert-MockCalled -CommandName 'Get-AzMetric' -Times 1 -Scope It
             Assert-MockCalled -CommandName 'Set-AzSqlDatabase' -Times 0 -Scope It
         }
@@ -434,6 +467,8 @@ Describe "Invoke-SqlAutoscaling Unit Tests" -Tags @("Unit") {
 
     Context "Metric query fails" {
         It "Should not scale when metric query throws an error" {
+            $TestParams = $Params.Clone()
+            $TestParams.SustainedUpMinutes = 5
             Mock Get-AzServiceBusQueue -MockWith {
                 return @{
                     Id = "/subscriptions/test/resourceGroups/test/providers/Microsoft.ServiceBus/namespaces/test/queues/test"
@@ -447,12 +482,11 @@ Describe "Invoke-SqlAutoscaling Unit Tests" -Tags @("Unit") {
                     CurrentServiceObjectiveName = "S2"
                 }
             }
-            # Mock Get-AzMetric to throw an error
             Mock Get-AzMetric -MockWith {
                 throw "Metric query failed"
             }
 
-            { ./Invoke-SqlAutoscaling.ps1 @Params } | Should Not throw
+            { ./Invoke-SqlAutoscaling.ps1 @TestParams } | Should Not throw
             Assert-MockCalled -CommandName 'Get-AzMetric' -Times 1 -Scope It
             Assert-MockCalled -CommandName 'Set-AzSqlDatabase' -Times 0 -Scope It
         }
