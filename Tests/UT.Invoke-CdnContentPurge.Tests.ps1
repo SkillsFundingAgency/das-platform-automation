@@ -24,7 +24,14 @@ Describe "Invoke-CdnContentPurge Unit Tests" -Tags @("Unit") {
                     Name = $Config.CDNEndPointName
                 }
             }
-            Mock Clear-AzCdnEndpointContent -MockWith { Return $null }
+            Mock Clear-AzCdnEndpointContent {
+                param(
+                    [Parameter(ValueFromPipeline = $true)]
+                    $InputObject,
+                    [string]$ContentPath
+                )
+                return $null
+            }
             { ./Invoke-CdnContentPurge -CDNProfileResourceGroup $Config.resourceGroupName -CDNProfileName $Config.CdnProfileName -CDNEndPointName $Config.CDNEndPointName -PurgeContent $Config.purgeContent } | Should Not Throw
             Assert-MockCalled -CommandName 'Get-AzCdnEndpoint' -Times 1 -Scope It
             Assert-MockCalled -CommandName 'Clear-AzCdnEndpointContent' -Times 1 -Scope It
