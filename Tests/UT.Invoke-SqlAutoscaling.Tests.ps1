@@ -434,7 +434,7 @@ Describe "Invoke-SqlAutoscaling Unit Tests" -Tags @("Unit") {
 
             { ./Invoke-SqlAutoscaling.ps1 @TestParams } | Should Not throw
             Assert-MockCalled -CommandName 'Get-AzMetric' -Times 1 -Scope It
-            Assert-MockCalled -CommandName 'Set-AzSqlDatabase' -Times 0 -Scope It
+            Assert-MockCalled -CommandName 'Get-AzSqlDatabase' -Times 0 -Scope It
         }
 
         It "Should not scale when metric query returns no datapoints" {
@@ -461,7 +461,7 @@ Describe "Invoke-SqlAutoscaling Unit Tests" -Tags @("Unit") {
 
             { ./Invoke-SqlAutoscaling.ps1 @TestParams } | Should Not throw
             Assert-MockCalled -CommandName 'Get-AzMetric' -Times 1 -Scope It
-            Assert-MockCalled -CommandName 'Set-AzSqlDatabase' -Times 0 -Scope It
+            Assert-MockCalled -CommandName 'Get-AzSqlDatabase' -Times 0 -Scope It
         }
     }
 
@@ -488,7 +488,7 @@ Describe "Invoke-SqlAutoscaling Unit Tests" -Tags @("Unit") {
 
             { ./Invoke-SqlAutoscaling.ps1 @TestParams } | Should Not throw
             Assert-MockCalled -CommandName 'Get-AzMetric' -Times 1 -Scope It
-            Assert-MockCalled -CommandName 'Set-AzSqlDatabase' -Times 0 -Scope It
+            Assert-MockCalled -CommandName 'Get-AzSqlDatabase' -Times 0 -Scope It
         }
     }
 
