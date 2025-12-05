@@ -20,8 +20,9 @@ Describe "Invoke-CdnContentPurge Unit Tests" -Tags @("Unit") {
     Context "Parameters are ok" {
         It "Should call Clear-AzCdnEndpointContent" {
             Mock Get-AzCdnEndpoint -MockWith {
-                $cdnEndpointExists = [Microsoft.Azure.PowerShell.Cmdlets.Cdn.Models.Api20240201.Endpoint]::new()
-                return $cdnEndpointExists
+                return [PSCustomObject]@{
+                    Name = $Config.CDNEndPointName
+                }
             }
             Mock Clear-AzCdnEndpointContent -MockWith { Return $null }
             { ./Invoke-CdnContentPurge -CDNProfileResourceGroup $Config.resourceGroupName -CDNProfileName $Config.CdnProfileName -CDNEndPointName $Config.CDNEndPointName -PurgeContent $Config.purgeContent } | Should Not Throw

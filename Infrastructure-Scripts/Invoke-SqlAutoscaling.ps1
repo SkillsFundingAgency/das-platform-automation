@@ -51,9 +51,8 @@
     The target service objective name for scale-down operations (e.g., "S1").
 
     .EXAMPLE
-    .\Invoke-SqlAutoscaling.ps1 -ResourceGroup "my-rg" -ServerName "myserver" -DbName "mydb" -SbNamespace "mynamespace" -SbQueue "myqueue" -ScaleUpThreshold 100 -ScaleDownThreshold 10 -ScaleUpTarget "S3" -ScaleDownTarget "S1"
+    .\Invoke-SqlAutoscaling.ps1 -ResourceGroup "example-rg" -ServerName "example-server" -DbName "example-db" -SbNamespace "example-namespace" -SbQueue "example-queue" -ScaleUpThreshold 100 -ScaleDownThreshold 10 -ScaleUpTarget "S3" -ScaleDownTarget "S1"
 
-    Monitors the specified Service Bus queue and scales the database based on active message count.
 #>
 
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSReviewUnusedParameter", "", Justification = "Parameters are used via variable scope in functions")]
