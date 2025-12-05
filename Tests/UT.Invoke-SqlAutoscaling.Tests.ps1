@@ -1,6 +1,22 @@
 $Config = Get-Content $PSScriptRoot\..\Tests\Configuration\Unit.Tests.Config.json -Raw | ConvertFrom-Json
 Set-Location $PSScriptRoot\..\Infrastructure-Scripts\
 
+# Create function stub for Get-AutomationVariable to prevent parsing errors
+# This must be defined before the script is parsed
+if (-not (Get-Command Get-AutomationVariable -ErrorAction SilentlyContinue)) {
+    function Get-AutomationVariable {
+        param([string]$Name)
+        switch ($Name) {
+            'Autoscale_HasSecondary' { return $false }
+            'Autoscale_ScaleUpThreshold' { return 100 }
+            'Autoscale_ScaleDownThreshold' { return 10 }
+            'Autoscale_SustainedUpMinutes' { return 0 }
+            'Autoscale_SustainedDownMinutes' { return 0 }
+            default { return "TestValue" }
+        }
+    }
+}
+
 Describe "Invoke-SqlAutoscaling Unit Tests" -Tags @("Unit") {
 
     Context "No scaling when thresholds not met" {
