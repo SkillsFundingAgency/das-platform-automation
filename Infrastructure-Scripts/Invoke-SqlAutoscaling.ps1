@@ -54,7 +54,7 @@ function Test-SustainedMetric {
             -Aggregation Average `
             -WarningAction SilentlyContinue `
             -ErrorAction Stop
-        
+
         if (-not $metric -or -not $metric.Data) {
             Log "Metric $MetricName returned no data."
             return $false

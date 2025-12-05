@@ -30,7 +30,7 @@ Describe "Invoke-SqlAutoscaling Unit Tests" -Tags @("Unit") {
             # Mock Azure cmdlets
             Mock Connect-AzAccount -MockWith { return $null }
             Mock Write-Output -MockWith { return $null }
-            
+
             Mock Get-AzServiceBusQueue -MockWith {
                 return @{
                     Id = "/subscriptions/test/resourceGroups/test/providers/Microsoft.ServiceBus/namespaces/test/queues/test"
@@ -39,13 +39,13 @@ Describe "Invoke-SqlAutoscaling Unit Tests" -Tags @("Unit") {
                     }
                 }
             }
-            
+
             Mock Get-AzSqlDatabase -MockWith {
                 return @{
                     CurrentServiceObjectiveName = "S2"
                 }
             }
-            
+
             Mock Get-AzMetric -MockWith {
                 return @{
                     Data = @(
@@ -56,7 +56,7 @@ Describe "Invoke-SqlAutoscaling Unit Tests" -Tags @("Unit") {
                     )
                 }
             }
-            
+
             Mock Set-AzSqlDatabase -MockWith { return $null }
 
             { ./Invoke-SqlAutoscaling.ps1 } | Should Not throw
@@ -64,4 +64,3 @@ Describe "Invoke-SqlAutoscaling Unit Tests" -Tags @("Unit") {
         }
     }
 }
-
