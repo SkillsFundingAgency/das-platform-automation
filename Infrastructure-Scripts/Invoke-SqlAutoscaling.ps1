@@ -1,64 +1,3 @@
-<#
-    .SYNOPSIS
-    Automatically scales SQL Database based on Service Bus queue metrics.
-
-    .DESCRIPTION
-    Monitors Service Bus queue active message count and scales SQL Database up or down based on configured thresholds and sustained metric conditions. Supports both single database and primary/secondary database configurations.
-
-    .PARAMETER ResourceGroup
-    The resource group containing the SQL Server and database.
-
-    .PARAMETER ServerName
-    The name of the SQL Server.
-
-    .PARAMETER DbName
-    The name of the SQL Database.
-
-    .PARAMETER SecondaryServerName
-    The name of the secondary SQL Server (if using geo-replication).
-
-    .PARAMETER SecondaryDbName
-    The name of the secondary SQL Database (if using geo-replication).
-
-    .PARAMETER HasSecondary
-    Boolean indicating whether a secondary database exists.
-
-    .PARAMETER SbResourceGroup
-    The resource group containing the Service Bus namespace.
-
-    .PARAMETER SbNamespace
-    The name of the Service Bus namespace.
-
-    .PARAMETER SbQueue
-    The name of the Service Bus queue to monitor.
-
-    .PARAMETER ScaleUpThreshold
-    The number of active messages that triggers a scale-up evaluation.
-
-    .PARAMETER ScaleDownThreshold
-    The number of active messages that triggers a scale-down evaluation.
-
-    .PARAMETER SustainedUpMinutes
-    The number of minutes the metric must be sustained above the threshold before scaling up.
-
-    .PARAMETER SustainedDownMinutes
-    The number of minutes the metric must be sustained below the threshold before scaling down.
-
-    .PARAMETER ScaleUpTarget
-    The target service objective name for scale-up operations (e.g., "S3").
-
-    .PARAMETER ScaleDownTarget
-    The target service objective name for scale-down operations (e.g., "S1").
-
-    .EXAMPLE
-    .\Invoke-SqlAutoscaling.ps1 -ResourceGroup "my-rg" -ServerName "myserver" -DbName "mydb" -SbNamespace "mynamespace" -SbQueue "myqueue" -ScaleUpThreshold 100 -ScaleDownThreshold 10 -ScaleUpTarget "S3" -ScaleDownTarget "S1"
-
-    Monitors the specified Service Bus queue and scales the database based on active message count.
-#>
-
-[Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSReviewUnusedParameter", "", Justification = "Parameters are used via variable scope in functions")]
-[Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSUseBOMForUnicodeEncodedFile", "", Justification = "File is ASCII encoded")]
-[Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSUseShouldProcessForStateChangingFunctions", "", Justification = "Script runs in Azure Automation where ShouldProcess is not applicable")]
 param(
     [string] $ResourceGroup = (Get-AutomationVariable -Name 'Autoscale_ResourceGroup'),
     [string] $ServerName = (Get-AutomationVariable -Name 'Autoscale_SqlServerName'),
@@ -115,13 +54,8 @@ function Test-SustainedMetric {
             -Aggregation Average `
             -WarningAction SilentlyContinue `
             -ErrorAction Stop
-
-        if ($null -eq $metric) {
-            Log "Metric $MetricName returned no data."
-            return $false
-        }
-
-        if ($null -eq $metric.Data) {
+        
+        if (-not $metric -or -not $metric.Data) {
             Log "Metric $MetricName returned no data."
             return $false
         }
@@ -161,7 +95,7 @@ function Invoke-Scale {
     Log "Scale operation submitted."
 }
 
-function Set-DatabaseScaleInOrder {
+function Scale-DatabaseInOrder {
     param(
         [bool]   $IsScaleUp,
         [string] $PrimaryTarget,
@@ -216,13 +150,13 @@ $shouldScaleDown =
 
 if ($shouldScaleUp -and $currentObjective -ne $ScaleUpTarget) {
     Log "Scale-up criteria met."
-    Set-DatabaseScaleInOrder -IsScaleUp $true -PrimaryTarget $ScaleUpTarget -SecondaryTarget $ScaleUpTarget
+    Scale-DatabaseInOrder -IsScaleUp $true -PrimaryTarget $ScaleUpTarget -SecondaryTarget $ScaleUpTarget
     return
 }
 
 if ($shouldScaleDown -and $currentObjective -ne $ScaleDownTarget) {
     Log "Scale-down criteria met."
-    Set-DatabaseScaleInOrder -IsScaleUp $false -PrimaryTarget $ScaleDownTarget -SecondaryTarget $ScaleDownTarget
+    Scale-DatabaseInOrder -IsScaleUp $false -PrimaryTarget $ScaleDownTarget -SecondaryTarget $ScaleDownTarget
     return
 }
 
