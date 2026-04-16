@@ -3,10 +3,10 @@
     Adds an Azure SQL database to an existing SQL failover group.
 
     .DESCRIPTION
-    Resolves the primary SQL server name from deployment parameters, locates the target failover group, and adds the specified database when it is not already present. If the SQL server resource group parameter is not provided, the script automatically discovers the resource group for the SQL server.
+    Adds a newly created SQL Database to the shared SQL Server failover group.
 
     .PARAMETER ServerName
-    Base SQL server name from pipeline parameters. The script derives the West Europe primary server name by appending '-we'.
+    Name of Primary SQL Server that the database is created on.
 
     .PARAMETER DatabaseName
     Name of the Azure SQL database to add to the failover group.
@@ -15,10 +15,10 @@
     Name of the Azure SQL failover group that should contain the database.
 
     .PARAMETER SqlServerResourceGroupName
-    Optional resource group containing the SQL server. If omitted, the script detects it dynamically.
+    Resource group containing the SQL server
 
     .EXAMPLE
-    Add-SqlDatabaseFailover -ServerName "das-foo-shared-sql" -DatabaseName "das-env-foo-db" -FailoverGroupName "das-foo-shared-sql"
+    .\Add-SqlDatabaseFailover.ps1 -servername "das-foo-shared-sql-we" -databasename "das-pp-foo-db" -failovergroupname "das-foo-shared-sql" -sqlserverresourcegroupname "das-pp-shared-rg"
 #>
 
 [CmdletBinding()]
