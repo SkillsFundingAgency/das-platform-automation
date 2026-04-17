@@ -18,7 +18,7 @@
     Resource group containing the SQL server
 
     .EXAMPLE
-    .\Add-SqlDatabaseFailover.ps1 -sharedSQLServerName "das-foo-shared-sql-we" -databasename "das-pp-foo-db" -failovergroupname "das-foo-shared-sql" -sqlserverresourcegroupname "das-pp-shared-rg"
+    .\Add-SqlDatabaseFailover.ps1 -sharedSQLServerName "das-foo-shared-sql-we" -databasename "das-env-foo-db" -failovergroupname "das-env-shared-sql" -sqlserverresourcegroupname "das-env-shared-rg"
 #>
 
 [CmdletBinding()]
