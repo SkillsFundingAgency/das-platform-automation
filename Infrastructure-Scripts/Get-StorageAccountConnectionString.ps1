@@ -43,7 +43,7 @@ Param(
     [String]$StorageAccount,
     [Parameter(Mandatory = $false)]
     [switch]$UseSecondaryKey,
-    [Parameter(Mandatory = $true)]
+    [Parameter(Mandatory = $false)]
     [ValidateNotNullOrEmpty()]
     [String]$OutputVariable = "StorageConnectionString"
 )
