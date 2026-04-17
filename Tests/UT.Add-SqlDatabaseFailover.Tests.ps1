@@ -1,18 +1,17 @@
-# Requires -Version 5.1
-# Pester 5.x
-
 Describe "Add-SqlDatabaseFailover.ps1" {
     BeforeAll {
-        $scriptPath = Join-Path $PSScriptRoot "Add-SqlDatabaseFailover.ps1"
+        $scriptPath = Join-Path $PSScriptRoot "../Infrastructure-Scripts/Add-SqlDatabaseFailover.ps1"
+        $scriptPath = (Resolve-Path $scriptPath).Path
+
         if (-not (Test-Path $scriptPath)) {
             throw "Script under test not found at: $scriptPath"
         }
 
         $params = @{
-            SharedSQLServerName       = "das-foo-shared-sql-we"
-            FailoverGroupName         = "das-env-shared-sql"
-            SqlServerResourceGroupName= "das-env-shared-rg"
-            DatabaseName              = "das-env-foo-db"
+            SharedSQLServerName        = "das-foo-shared-sql-we"
+            FailoverGroupName          = "das-env-shared-sql"
+            SqlServerResourceGroupName = "das-env-shared-rg"
+            DatabaseName               = "das-env-foo-db"
         }
 
         $subscriptionId = "00000000-0000-0000-0000-000000000123"
@@ -41,10 +40,10 @@ Describe "Add-SqlDatabaseFailover.ps1" {
         It "does not call Add-AzSqlDatabaseToFailoverGroup" {
             & $scriptPath @params
 
-            Should -Invoke Get-AzSqlDatabaseFailoverGroup -Times 1 -Exactly
-            Should -Invoke Get-AzSqlDatabase -Times 0
-            Should -Invoke Add-AzSqlDatabaseToFailoverGroup -Times 0
-            Should -Invoke Write-Output -Times 1 -ParameterFilter {
+            Assert-MockCalled Get-AzSqlDatabaseFailoverGroup -Times 1 -Exactly
+            Assert-MockCalled Get-AzSqlDatabase -Times 0 -Exactly
+            Assert-MockCalled Add-AzSqlDatabaseToFailoverGroup -Times 0 -Exactly
+            Assert-MockCalled Write-Output -Times 1 -Exactly -ParameterFilter {
                 $InputObject -like "*already in failover group*"
             }
         }
@@ -75,10 +74,10 @@ Describe "Add-SqlDatabaseFailover.ps1" {
         It "fetches database and adds it to the failover group" {
             & $scriptPath @params
 
-            Should -Invoke Get-AzSqlDatabaseFailoverGroup -Times 1 -Exactly
-            Should -Invoke Get-AzSqlDatabase -Times 1 -Exactly
-            Should -Invoke Add-AzSqlDatabaseToFailoverGroup -Times 1 -Exactly
-            Should -Invoke Write-Output -Times 1 -ParameterFilter {
+            Assert-MockCalled Get-AzSqlDatabaseFailoverGroup -Times 1 -Exactly
+            Assert-MockCalled Get-AzSqlDatabase -Times 1 -Exactly
+            Assert-MockCalled Add-AzSqlDatabaseToFailoverGroup -Times 1 -Exactly
+            Assert-MockCalled Write-Output -Times 1 -Exactly -ParameterFilter {
                 $InputObject -like "*Added*to failover group*"
             }
         }
