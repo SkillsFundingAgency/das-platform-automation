@@ -1,0 +1,1 @@
+GRANT $(Grant) TO [$(Username)]
