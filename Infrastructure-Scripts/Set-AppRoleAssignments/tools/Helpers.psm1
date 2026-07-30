@@ -28,10 +28,25 @@ function Get-Environment {
 function Get-ServicePrincipal {
     Param(
         [Parameter(Mandatory = $true)]
-        [String]$DisplayName
+        [String]$DisplayName,
+        [Parameter(Mandatory = $false)]
+        [int]$RetryCount = 1,
+        [Parameter(Mandatory = $false)]
+        [int]$RetryDelaySeconds = 10
     )
 
-    $ServicePrincipal = az ad sp list --filter "displayName eq '$DisplayName'" | ConvertFrom-Json
+    for ($Attempt = 1; $Attempt -le $RetryCount; $Attempt++) {
+        $ServicePrincipal = az ad sp list --filter "displayName eq '$DisplayName'" | ConvertFrom-Json
+        if ($ServicePrincipal) {
+            return $ServicePrincipal
+        }
+        if ($Attempt -lt $RetryCount) {
+            #Newly created service principals can take a while to become visible to AAD reads
+            Write-Output "    -> Service principal $DisplayName not yet found in AAD (attempt $Attempt/$RetryCount) - waiting $RetryDelaySeconds seconds for replication"
+            Start-Sleep -Seconds $RetryDelaySeconds
+        }
+    }
+
     return $ServicePrincipal
 }
 
@@ -75,65 +90,80 @@ function Set-AzureCLIAccess {
 
     #Apply User Assignment required so only authorized users can acquire a token
     #https://docs.microsoft.com/en-us/graph/api/serviceprincipal-update?view=graph-rest-1.0&tabs=http
-    $MicrosoftGraphRequestParameters =
-    "--method", "patch",
-    "--uri", "https://graph.microsoft.com/v1.0/servicePrincipals/$ServicePrincipalObjectId",
-    "--headers", "Content-Type=application/json",
-    "--body", "{appRoleAssignmentRequired : true}"
+    $ServicePrincipal = az ad sp show --id $ServicePrincipalObjectId | ConvertFrom-Json
 
-    az rest @MicrosoftGraphRequestParameters
+    if (!$ServicePrincipal.appRoleAssignmentRequired) {
+        $MicrosoftGraphRequestParameters =
+        "--method", "patch",
+        "--uri", "https://graph.microsoft.com/v1.0/servicePrincipals/$ServicePrincipalObjectId",
+        "--headers", "Content-Type=application/json",
+        "--body", "{appRoleAssignmentRequired : true}"
+
+        az rest @MicrosoftGraphRequestParameters
+    }
 
     #Set apiApplication permissions create a permission scope to allow applications to access the app registration
     #https://docs.microsoft.com/en-us/graph/api/resources/permissionscope?view=graph-rest-1.0
+    $AppRegistration = az ad app show --id $AppRegistrationObjectId | ConvertFrom-Json
 
-    $PermissionScopeGuid = (New-Guid).Guid
-    $Body = (@{
-        api = @{
-            oauth2PermissionScopes = @(
-                @{
-                    adminConsentDescription = "Allow the application to access this app registration on behalf of the signed-in user."
-                    adminConsentDisplayName = "Access to this app registration"
-                    id = $PermissionScopeGuid
-                    isEnabled = $true
-                    type = "User"
-                    userConsentDescription = "Allow the application to access this app registration on your behalf"
-                    userConsentDisplayName = "Access to this app registration"
-                    value = "user_impersonation"
-                }
-            )
-        }
-    } | ConvertTo-Json -Compress -depth 10).Replace("`"","'")
+    if (!$AppRegistration.api.oauth2PermissionScopes -or $AppRegistration.api.oauth2PermissionScopes.Count -eq 0) {
+        $PermissionScopeGuid = (New-Guid).Guid
+        $Body = (@{
+            api = @{
+                oauth2PermissionScopes = @(
+                    @{
+                        adminConsentDescription = "Allow the application to access this app registration on behalf of the signed-in user."
+                        adminConsentDisplayName = "Access to this app registration"
+                        id = $PermissionScopeGuid
+                        isEnabled = $true
+                        type = "User"
+                        userConsentDescription = "Allow the application to access this app registration on your behalf"
+                        userConsentDisplayName = "Access to this app registration"
+                        value = "user_impersonation"
+                    }
+                )
+            }
+        } | ConvertTo-Json -Compress -depth 10).Replace("`"","'")
 
-    $MicrosoftGraphRequestParameters =
-    "--method", "patch",
-    "--uri", "https://graph.microsoft.com/v1.0/applications/$AppRegistrationObjectId",
-    "--headers", "Content-Type=application/json",
-    "--body", $Body
+        $MicrosoftGraphRequestParameters =
+        "--method", "patch",
+        "--uri", "https://graph.microsoft.com/v1.0/applications/$AppRegistrationObjectId",
+        "--headers", "Content-Type=application/json",
+        "--body", $Body
 
-    az rest @MicrosoftGraphRequestParameters
+        az rest @MicrosoftGraphRequestParameters
+    }
+    else {
+        $PermissionScopeGuid = $AppRegistration.api.oauth2PermissionScopes[0].id
+    }
 
     #Authorize Azure CLI to call app registration and acquire a token
     #https://docs.microsoft.com/en-us/graph/api/resources/preauthorizedapplication?view=graph-rest-1.0
-    $Body = (@{
-        api = @{
-            preAuthorizedApplications = @(
-                @{
-                    appId = "04b07795-8ddb-461a-bbee-02f9e1bf7b46"
-                    delegatedPermissionIds = @(
-                        $PermissionScopeGuid
-                    )
-                }
-            )
-        }
-    } | ConvertTo-Json -Compress -depth 10).Replace("`"","'")
+    $AzureCliAppId = "04b07795-8ddb-461a-bbee-02f9e1bf7b46"
+    $AlreadyPreAuthorized = $AppRegistration.api.preAuthorizedApplications | Where-Object { $_.appId -eq $AzureCliAppId }
 
-    $MicrosoftGraphRequestParameters =
-    "--method", "patch",
-    "--uri", "https://graph.microsoft.com/v1.0/applications/$AppRegistrationObjectId",
-    "--headers", "Content-Type=application/json",
-    "--body", $Body
+    if (!$AlreadyPreAuthorized) {
+        $Body = (@{
+            api = @{
+                preAuthorizedApplications = @(
+                    @{
+                        appId = $AzureCliAppId
+                        delegatedPermissionIds = @(
+                            $PermissionScopeGuid
+                        )
+                    }
+                )
+            }
+        } | ConvertTo-Json -Compress -depth 10).Replace("`"","'")
 
-    az rest @MicrosoftGraphRequestParameters
+        $MicrosoftGraphRequestParameters =
+        "--method", "patch",
+        "--uri", "https://graph.microsoft.com/v1.0/applications/$AppRegistrationObjectId",
+        "--headers", "Content-Type=application/json",
+        "--body", $Body
+
+        az rest @MicrosoftGraphRequestParameters
+    }
 }
 
 function New-AppRegistrationAppRole {
