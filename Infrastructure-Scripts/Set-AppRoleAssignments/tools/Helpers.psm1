@@ -132,6 +132,22 @@ function Set-AzureCLIAccess {
         "--body", $Body
 
         az rest @MicrosoftGraphRequestParameters
+
+        #Newly created permission scopes can take a while to become visible to Graph reads, so wait for it before referencing its id elsewhere
+        $ScopeVisible = $false
+        for ($Attempt = 1; $Attempt -le 6; $Attempt++) {
+            $AppRegistration = az ad app show --id $AppRegistrationObjectId | ConvertFrom-Json
+            if ($AppRegistration.api.oauth2PermissionScopes | Where-Object { $_.id -eq $PermissionScopeGuid }) {
+                $ScopeVisible = $true
+                break
+            }
+            Write-Output "      -> Permission scope $PermissionScopeGuid not yet visible on application (attempt $Attempt/6) - waiting 10 seconds for replication"
+            Start-Sleep -Seconds 10
+        }
+
+        if (!$ScopeVisible) {
+            throw "Permission scope $PermissionScopeGuid was not found on application $AppRegistrationObjectId after creation - Graph replication may still be in progress. Re-run the pipeline."
+        }
     }
     else {
         $PermissionScopeGuid = $AppRegistration.api.oauth2PermissionScopes[0].id
