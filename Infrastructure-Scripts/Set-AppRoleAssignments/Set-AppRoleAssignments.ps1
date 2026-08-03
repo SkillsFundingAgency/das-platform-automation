@@ -80,14 +80,23 @@ try {
             Write-Output "-> App registration $AppRegistrationName not found in AAD - Creating"
 
             if (!$DryRun) {
-                $AppRegistrationObject = New-AppRegistration -AppRegistrationName $AppRegistrationName -IdentifierUri $IdentifierUri
-                #Allow Azure CLI to acquire tokens
-                $ServicePrincipal = Get-ServicePrincipal -DisplayName $AppRegistrationName
-                Set-AzureCLIAccess -ServicePrincipalObjectId $ServicePrincipal.id -AppRegistrationObjectId $AppRegistrationObject.id
+                $null = New-AppRegistration -AppRegistrationName $AppRegistrationName -IdentifierUri $IdentifierUri
+
+                #Newly created service principals can take a while to become visible to AAD reads, so retry before giving up
+                $ServicePrincipal = Get-ServicePrincipal -DisplayName $AppRegistrationName -RetryCount 6 -RetryDelaySeconds 10
+                if (!$ServicePrincipal) {
+                    throw "Service principal $AppRegistrationName was not found after creation - AAD replication may still be in progress. Re-run the pipeline."
+                }
             }
 
             Write-Output "  -> Successfully created app registration - $AppRegistrationName"
 
+        }
+
+        if (!$DryRun) {
+            #Ensure Azure CLI access/Expose an API config is applied even if a previous run created the app registration but failed before finishing its configuration
+            $AppRegistrationObject = az ad app show --id $IdentifierUri | ConvertFrom-Json
+            Set-AzureCLIAccess -ServicePrincipalObjectId $ServicePrincipal.id -AppRegistrationObjectId $AppRegistrationObject.id
         }
 
         foreach ($AppRole in $AppRegistration.appRoles) {
@@ -101,11 +110,15 @@ try {
 
                 if (!$DryRun) {
                     New-AppRegistrationAppRole -AppRoleName $AppRole.appRoleName -IdentifierUri $IdentifierUri
+                    #The new app role can take a while to become visible to AAD reads, so retry before giving up
+                    $ServicePrincipal = Get-ServicePrincipal -DisplayName $AppRegistrationName -RetryCount 6 -RetryDelaySeconds 10
+                }
+                else {
+                    $ServicePrincipal = Get-ServicePrincipal -DisplayName $AppRegistrationName
                 }
 
                 Write-Output "    -> Successfully added app role $($AppRole.appRoleName)"
 
-                $ServicePrincipal = Get-ServicePrincipal -DisplayName $AppRegistrationName
                 $MatchedAppRole = $ServicePrincipal.appRoles | Where-Object { $_.value -eq $AppRole.appRoleName }
             }
 
