@@ -157,8 +157,10 @@ function Set-AzureCLIAccess {
     #https://docs.microsoft.com/en-us/graph/api/resources/preauthorizedapplication?view=graph-rest-1.0
     $AzureCliAppId = "04b07795-8ddb-461a-bbee-02f9e1bf7b46"
     $AlreadyPreAuthorized = $AppRegistration.api.preAuthorizedApplications | Where-Object { $_.appId -eq $AzureCliAppId }
+    #Re-patch when Azure CLI is listed but points at a stale scope GUID
+    $GuidMatches = $AlreadyPreAuthorized -and ($AlreadyPreAuthorized.delegatedPermissionIds -contains $PermissionScopeGuid)
 
-    if (!$AlreadyPreAuthorized) {
+    if (!$GuidMatches) {
         $Body = (@{
             api = @{
                 preAuthorizedApplications = @(
