@@ -23,6 +23,7 @@ Describe "Invoke-CdnContentPurge Unit Tests" -Tags @("Unit") {
                 $cdnEndpointExists = [Microsoft.Azure.PowerShell.Cmdlets.Cdn.Models.Endpoint]::new()
                 return $cdnEndpointExists
             }
+            function Clear-AzCdnEndpointContent { param($ContentPath) }
             Mock Clear-AzCdnEndpointContent -MockWith { Return $null }
             { ./Invoke-CdnContentPurge -CDNProfileResourceGroup $Config.resourceGroupName -CDNProfileName $Config.CdnProfileName -CDNEndPointName $Config.CDNEndPointName -PurgeContent $Config.purgeContent } | Should Not Throw
             Assert-MockCalled -CommandName 'Get-AzCdnEndpoint' -Times 1 -Scope It
