@@ -26,7 +26,7 @@ try {
     $TemplateParameters = (Get-Content -Path $TemplateFilePath -Raw | ConvertFrom-Json).Parameters
 }
 catch {
-    Write-Error "Failed to convert $TemplateFilePath to JSON"
+    Write-Error "Failed to convert $TemplateFilePath to JSON. $($_.Exception.Message)" -ErrorAction Continue
     throw $_
 }
 
