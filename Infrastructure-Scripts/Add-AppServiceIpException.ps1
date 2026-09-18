@@ -33,7 +33,7 @@ Param (
     [String]$RuleName
 )
 
-foreach ($Resource in $ResourceNames){
+foreach ($Resource in $ResourceNames) {
 
     $AppServiceResource = Get-AzResource -Name $Resource -ResourceType "Microsoft.Web/sites"
 
@@ -44,7 +44,23 @@ foreach ($Resource in $ResourceNames){
     $AppServiceResourceConfig = Get-AzWebAppAccessRestrictionConfig -ResourceGroupName $AppServiceResource.ResourceGroupName -Name $Resource
     Write-Output "Processing app service: $Resource ..."
 
-    if ((($AppServiceResourceConfig.MainSiteAccessRestrictions.Count) -gt 1) -and (($AppServiceResourceConfig.MainSiteAccessRestrictions[0].Action) -ne 'Deny')){
+    # --- Validate existing VNet access restrictions
+    $VNetRestrictions = $AppServiceResourceConfig.MainSiteAccessRestrictions | Where-Object { $_.VnetSubnetResourceId }
+
+    foreach ($Restriction in $VNetRestrictions) {
+        $Subnet = Get-AzResource -ResourceId $Restriction.VnetSubnetResourceId -ErrorAction SilentlyContinue
+
+        if (!$Subnet) {
+            throw @"
+Existing access restriction '$($Restriction.Name)' on '$Resource' references a subnet that no longer exists:
+$($Restriction.VnetSubnetResourceId)
+
+Remove or correct the stale access restriction before running this pipeline.
+"@
+        }
+    }
+
+    if ((($AppServiceResourceConfig.MainSiteAccessRestrictions.Count) -gt 1) -and (($AppServiceResourceConfig.MainSiteAccessRestrictions[0].Action) -ne 'Deny')) {
         Write-Output "  -> Creating rule: $RuleName"
 
         # --- Workout next priority number
@@ -59,10 +75,18 @@ foreach ($Resource in $ResourceNames){
         }
 
         Write-Output "  -> Rule priority set to $NewPriority"
-        Add-AzWebAppAccessRestrictionRule -ResourceGroupName $AppServiceResource.ResourceGroupName -WebAppName $Resource -Name $RuleName -Priority $NewPriority -Action "Allow" -IpAddress "$IpAddress/32"
-        Write-Output "  -> Rule created successfully."
+
+        try {
+            Add-AzWebAppAccessRestrictionRule -ResourceGroupName $AppServiceResource.ResourceGroupName -WebAppName $Resource -Name $RuleName -Priority $NewPriority -Action "Allow" -IpAddress "$IpAddress/32" -ErrorAction Stop
+            Write-Output "  -> Rule created successfully."
+        }
+        catch {
+            Write-Error "Failed to add access restriction '$RuleName' to '$Resource'."
+            Write-Error $_
+            throw
+        }
     }
-    elseif (($AppServiceResourceConfig.MainSiteAccessRestrictions[0].Action) -eq 'Deny'){
+    elseif (($AppServiceResourceConfig.MainSiteAccessRestrictions[0].Action) -eq 'Deny') {
         Write-Output "  -> Creating rule: $RuleName"
 
         # --- Workout next priority number
@@ -77,10 +101,18 @@ foreach ($Resource in $ResourceNames){
         }
 
         Write-Output "  -> Rule priority set to $NewPriority"
-        Add-AzWebAppAccessRestrictionRule -ResourceGroupName $AppServiceResource.ResourceGroupName -WebAppName $Resource -Name $RuleName -Priority $NewPriority -Action "Allow" -IpAddress "$IpAddress/32"
-        Write-Output "  -> Rule created successfully."
+
+        try {
+            Add-AzWebAppAccessRestrictionRule -ResourceGroupName $AppServiceResource.ResourceGroupName -WebAppName $Resource -Name $RuleName -Priority $NewPriority -Action "Allow" -IpAddress "$IpAddress/32" -ErrorAction Stop
+            Write-Output "  -> Rule created successfully."
+        }
+        catch {
+            Write-Error "Failed to add access restriction '$RuleName' to '$Resource'."
+            Write-Error $_
+            throw
+        }
     }
-    else{
+    else {
         Write-Output "  -> There are no existing access restrictions on $Resource. Whitelist is not required."
     }
 }
