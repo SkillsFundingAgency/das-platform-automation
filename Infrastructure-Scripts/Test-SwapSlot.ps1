@@ -36,6 +36,7 @@ param(
 Write-Output "##vso[task.setvariable variable=CompleteSwap]false"
 
 $IpRestrictions = Get-AzWebAppAccessRestrictionConfig -ResourceGroupName $ResourceGroupName -Name $AppServiceName -SlotName $SlotName
+Write-Verbose "MainSiteAccessRestrictions: `n$($IpRestrictions.MainSiteAccessRestrictions | Format-Table | Out-String)"
 $HasIpRestrictions = $IpRestrictions.MainSiteAccessRestrictions.RuleName -notcontains "Allow all" -and ($IpRestrictions.MainSiteAccessRestrictions | Where-Object { $_.Action -eq "Allow" }).IpAddress -notcontains "$MyIp/32"
 
 $MyIp = (Invoke-RestMethod $WhatsMyIpServiceUrl -UseBasicParsing)
@@ -45,8 +46,8 @@ if ($MyIp -notmatch $IpRegEx) {
 }
 
 if ($HasIpRestrictions) {
-    Write-Verbose "Whitelisting $MyIp"
     $Priority = ($IpRestrictions.MainSiteAccessRestrictions | Where-Object { $_.Action -eq "Allow" }).Priority[-1] + 1
+    Write-Verbose "Whitelisting $MyIp on app service $AppServiceName with priority $Priority"
     $null = Add-AzWebAppAccessRestrictionRule -ResourceGroupName $ResourceGroupName -WebAppName $AppServiceName -SlotName $SlotName -Name "DeployServer" -IpAddress "$MyIp/32" -Priority $Priority -Action Allow
 }
 
