@@ -15,7 +15,7 @@
     Substring of the SQL Server to search for
 
     .EXAMPLE
-    Remove-AzureSQLIPException -Name rulename -IPAddress $(IPAddress) -ResourceNamePatterb das-*
+    Remove-AzureSQLIPException -Name rulename -IPAddress $(IPAddress) -ResourceNamePattern das-*
 #>
 [CmdletBinding()]
 param(
@@ -45,14 +45,14 @@ foreach($SqlServer in $SubscriptionSqlServers) {
             FirewallRuleName = $Name
         }
 
-    $FirewallRules = Get-AzSqlServerFirewallRule -ServerName $ServerName -ResourceGroupName $ResourceGroupName | Where-Object {$_.StartIpAddress -eq $IPAddress}
+    $FirewallRules = Get-AzSqlServerFirewallRule -ServerName $ServerName -ResourceGroupName $ResourceGroupName | Where-Object {$_.FirewallRuleName -eq $Name -and $_.StartIpAddress -eq $IPAddress}
 
     if (!$FirewallRules) {
-        throw " -> Could not find whitelisted $IPAddress to remove!"
+        Write-Warning " -> Could not find whitelisted $IPAddress to remove on $ServerName. Nothing to remove."
     }
     else {
         Write-Output "  -> Removing $IPAddress"
-        Remove-AzSqlServerFirewallRule  @FirewallRuleParameters
+        Remove-AzSqlServerFirewallRule @FirewallRuleParameters -ErrorAction Stop
         Write-Output "  -> $IPAddress, removed!"
     }
 }
